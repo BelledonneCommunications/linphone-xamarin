@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:LinphoneXamarin"
+             x:Class="LinphoneXamarin.MainPage">
+
+  <StackLayout>
+    <Label Text="Hello Linphone Xamarin"
+           x:Name="globalStateLabel"
+           HorizontalOptions="Center"
+           VerticalOptions="CenterAndExpand" />
+
+    <Button Text="Start Linphone"
+            x:Name="startLinphoneButton"
+            HorizontalOptions="Center"
+            VerticalOptions="CenterAndExpand"
+            Clicked="OnButtonClicked" />
+  </StackLayout>
+
+</ContentPage>
