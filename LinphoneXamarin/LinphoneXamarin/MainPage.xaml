@@ -9,12 +9,6 @@
            x:Name="globalStateLabel"
            HorizontalOptions="Center"
            VerticalOptions="CenterAndExpand" />
-
-    <Button Text="Start Linphone"
-            x:Name="startLinphoneButton"
-            HorizontalOptions="Center"
-            VerticalOptions="CenterAndExpand"
-            Clicked="OnButtonClicked" />
   </StackLayout>
 
 </ContentPage>

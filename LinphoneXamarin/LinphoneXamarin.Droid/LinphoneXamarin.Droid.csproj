@@ -135,6 +135,12 @@
   <ItemGroup>
     <AndroidJavaLibrary Include="Libs\liblinphone.jar" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\LibLinphoneJavaBindings\LibLinphoneJavaBindings.csproj">
+      <Project>{d4ed3a97-c1c9-4111-a0c2-3d2d98490d72}</Project>
+      <Name>LibLinphoneJavaBindings</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="..\LinphoneXamarin\LinphoneXamarin.projitems" Label="Shared" Condition="Exists('..\LinphoneXamarin\LinphoneXamarin.projitems')" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\..\packages\Xamarin.Forms.2.2.0.45\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets" Condition="Exists('..\..\packages\Xamarin.Forms.2.2.0.45\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets')" />
