@@ -105,7 +105,7 @@ class CsharpTranslator(object):
 			if type(_type) is AbsApi.EnumType:
 				return "IntPtr" # ?
 			elif type(_type) is AbsApi.ClassType:
-				return "IntPtr" #TODO
+				return _type.name
 			elif type(_type) is AbsApi.BaseType:
 				return self.translate_base_type(_type, isArg, dllImport)
 			elif type(_type) is AbsApi.ListType:
@@ -164,6 +164,15 @@ class CsharpTranslator(object):
 				return {c_name}({nativePtr}) == 0;
 			}}
 		}}""".format(**methodElems)
+		elif methodElems['return'][:8] == "Linphone":
+			methodDict['impl'] = """{static}public {return} {name}
+		{{
+			get
+			{{
+				IntPtr ptr = {c_name}({nativePtr});
+				return {return}.fromNativePtr(ptr);
+			}}
+		}}""".format(**methodElems)
 		else:
 			methodDict['impl'] = """{static}public {return} {name}
 		{{
@@ -191,6 +200,14 @@ class CsharpTranslator(object):
 			set
 			{{
 				{c_name}({nativePtr}, value ? 1 : 0);
+			}}
+		}}""".format(**methodElems)
+		elif methodElems['return'][:8] == "Linphone":
+			methodDict['impl'] = """{static}public {return} {name}
+		{{
+			set
+			{{
+				{c_name}({nativePtr}, value.nativePtr);
 			}}
 		}}""".format(**methodElems)
 		else:
@@ -245,6 +262,19 @@ class CsharpTranslator(object):
 			set
 			{{
 				{c_name_set}({nativePtr}, value ? 1 : 0);
+			}}
+		}}""".format(**methodElems)
+		elif methodElems['return'][:8] == "Linphone":
+			methodDict['impl'] = """{static}public {return} {name}
+		{{
+			get
+			{{
+				IntPtr ptr = {c_name_get}({nativePtr});
+				return {return}.fromNativePtr(ptr);
+			}}
+			set
+			{{
+				{c_name_set}({nativePtr}, value.nativePtr);
 			}}
 		}}""".format(**methodElems)
 		else:

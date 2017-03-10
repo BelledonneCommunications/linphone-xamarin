@@ -24,14 +24,48 @@ namespace Linphone
     public class LinphoneWrapper 
     {
         public const string LIB_NAME = "linphone-x86.so";
+		
+		[DllImport(LinphoneWrapper.LIB_NAME)]
+		static extern int belle_sip_object_data_set(IntPtr ptr, string name, IntPtr data, IntPtr cb);
+
+        internal static void set(IntPtr ptr, IntPtr obj)
+        {
+            belle_sip_object_data_set(ptr, "cs_obj", obj, IntPtr.Zero);
+        }
+
+        [DllImport(LinphoneWrapper.LIB_NAME)]
+		static extern IntPtr belle_sip_object_data_get(IntPtr ptr, string name);
+
+        internal static IntPtr get(IntPtr ptr)
+        {
+            return belle_sip_object_data_get(ptr, "cs_obj");
+        }
     }
 
     {{#classes}}
     {{#_class}}
     public class {{className}}
     {
-        private IntPtr nativePtr;
+        internal IntPtr nativePtr;
 
+		internal static {{className}} fromNativePtr(IntPtr ptr)
+		{
+			if (ptr == null) return null;
+			IntPtr objPtr = LinphoneWrapper.get(ptr);
+			if (objPtr == IntPtr.Zero)
+			{
+				{{className}} obj = new {{className}}();
+				obj.nativePtr = ptr;
+				Marshal.StructureToPtr(obj, objPtr, false);
+				LinphoneWrapper.set(ptr, objPtr);
+				return obj;
+			} 
+			else
+			{
+				return Marshal.PtrToStructure<{{className}}>(objPtr);
+			}
+		}
+		
         {{#dllImports}}
         {{{prototype}}}
 		
