@@ -16,16 +16,30 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+using System;
+using System.Runtime.InteropServices;
+
 namespace Linphone
 {
+    public class LinphoneWrapper 
+    {
+        public const string LIB_NAME = "linphone.dll";
+    }
+
+    {{#classes}}
     {{#_class}}
     public class {{className}}
     {
-        const string LIBNAME = "linphone.dll";
+        private IntPtr nativePtr;
 
         {{#dllImports}}
         {{{prototype}}}
+		
+        {{impl}}
+		
         {{/dllImports}}
     }
     {{/_class}}
+	
+    {{/classes}}
 }
