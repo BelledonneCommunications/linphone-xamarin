@@ -44,6 +44,7 @@ namespace Linphone
 
     {{#classes}}
     {{#_class}}
+    [StructLayout(LayoutKind.Sequential)]
     public class {{className}}
     {
         internal IntPtr nativePtr;
@@ -56,6 +57,7 @@ namespace Linphone
 			{
 				{{className}} obj = new {{className}}();
 				obj.nativePtr = ptr;
+				objPtr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof({{className}})));
 				Marshal.StructureToPtr(obj, objPtr, false);
 				LinphoneWrapper.set(ptr, objPtr);
 				return obj;
