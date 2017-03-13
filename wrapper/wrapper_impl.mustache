@@ -80,6 +80,15 @@ namespace Linphone
 	
 	{{/enum}}
 	{{/enums}}
+	{{#interfaces}}
+	{{#interface}}
+	public class {{interfaceName}}
+	{
+	
+	}
+	
+	{{/interface}}
+	{{/interfaces}}
     {{#classes}}
     {{#_class}}
     [StructLayout(LayoutKind.Sequential)]
@@ -127,6 +136,9 @@ namespace Linphone
 				IntPtr ptr = {{getter_c_name}}({{getter_nativePtr}});
 				return {{return}}.fromNativePtr(ptr);
 				{{/is_class}}
+				{{#is_enum}}
+				return {{getter_c_name}}({{getter_nativePtr}});
+				{{/is_enum}}
 				{{#is_generic}}
 				return {{getter_c_name}}({{getter_nativePtr}});
 				{{/is_generic}}
@@ -144,6 +156,9 @@ namespace Linphone
 				{{#is_class}}
 				{{setter_c_name}}({{setter_nativePtr}}value.nativePtr);
 				{{/is_class}}
+				{{#is_enum}}
+				{{setter_c_name}}({{setter_nativePtr}}(int)value);
+				{{/is_enum}}
 				{{#is_generic}}
 				{{setter_c_name}}({{setter_nativePtr}}value);
 				{{/is_generic}}
@@ -166,6 +181,9 @@ namespace Linphone
 			IntPtr ptr = {{c_name}}({{nativePtr}}{{c_args}});
 			return {{type}}.fromNativePtr(ptr);
 			{{/is_class}}
+			{{#is_enum}}
+			{{return}}{{c_name}}({{nativePtr}}{{c_args}});
+			{{/is_enum}}
 			{{#is_generic}}
 			{{return}}{{c_name}}({{nativePtr}}{{c_args}});
 			{{/is_generic}}
