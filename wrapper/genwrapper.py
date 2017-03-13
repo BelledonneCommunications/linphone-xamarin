@@ -38,15 +38,16 @@ class CsharpTranslator(object):
 
 	def translate_argument_name(self, name):
 		argname = name.to_camel_case(lower=True)
+		arg = argname
 		if argname == "params":
-			return "parameters"
+			arg = "parameters"
 		elif argname == "event":
-			return "ev"
+			arg = "ev"
 		elif argname == "ref":
-			return "reference"
+			arg = "reference"
 		elif argname == "value":
-			return "val"
-		return argname
+			arg = "val"
+		return arg
 
 	def translate_base_type(self, _type, isArg, dllImport=True):
 		if _type.name == 'void':
@@ -90,29 +91,17 @@ class CsharpTranslator(object):
 		return res
 	
 	def translate_type(self, _type, isArg, dllImport=True):
-		if dllImport:
-			if (_type.isref):
-				return "IntPtr"
-			elif type(_type) is AbsApi.EnumType:
-				return "IntPtr" # ?
-			elif type(_type) is AbsApi.ClassType:
-				return "IntPtr"
-			elif type(_type) is AbsApi.BaseType:
-				return self.translate_base_type(_type, isArg)
-			elif type(_type) is AbsApi.ListType:
-				raise AbsApi.Error('Lists are not supported right now') #TODO
-		else:
-			if type(_type) is AbsApi.EnumType:
-				return "IntPtr" # ?
-			elif type(_type) is AbsApi.ClassType:
-				return _type.name
-			elif type(_type) is AbsApi.BaseType:
-				return self.translate_base_type(_type, isArg, dllImport)
-			elif type(_type) is AbsApi.ListType:
-				raise AbsApi.Error('Lists are not supported right now') #TODO
+		if type(_type) is AbsApi.EnumType:
+			return "IntPtr" # ?
+		elif type(_type) is AbsApi.ClassType:
+			return "IntPtr" if dllImport else _type.name
+		elif type(_type) is AbsApi.BaseType:
+			return self.translate_base_type(_type, isArg, dllImport)
+		elif type(_type) is AbsApi.ListType:
+			raise AbsApi.Error('Lists are not supported right now') #TODO
 	
 	def translate_argument(self, arg, dllImport=True):
-		return '{0} {1}'.format(self.translate_type(arg.type, True), self.translate_argument_name(arg.name))
+		return '{0} {1}'.format(self.translate_type(arg.type, isArg=True, dllImport=dllImport), self.translate_argument_name(arg.name))
 
 	def translate_method(self, method, static=False, genImpl=True):
 		if method.name.to_snake_case(fullName=True) in self.ignore:
@@ -151,8 +140,13 @@ class CsharpTranslator(object):
 				if arg is not method.args[0]:
 					methodDict['impl']['args'] += ', '
 					methodDict['impl']['c_args'] += ', '
+				if self.translate_type(arg.type, False, False)[:8] == "Linphone":
+					methodDict['impl']['c_args'] += self.translate_argument_name(arg.name) + ".nativePtr"
+				elif self.translate_type(arg.type, False, False) == "bool":
+					methodDict['impl']['c_args'] += self.translate_argument_name(arg.name) + " ? 1 : 0"
+				else:
+					methodDict['impl']['c_args'] += self.translate_argument_name(arg.name)
 				methodDict['impl']['args'] += self.translate_argument(arg, False)
-				methodDict['impl']['c_args'] += self.translate_argument_name(arg.name)
 
 		return methodDict
 	
@@ -232,6 +226,19 @@ class CsharpTranslator(object):
 	
 ###########################################################################################################################################
 
+	def translate_enum(self, enum):
+		enumDict = {}
+		enumDict['enumName'] = enum.name.to_camel_case()
+		enumDict['values'] = []
+		i = 0
+		for enumValue in enum.values:
+			enumValDict = {}
+			enumValDict['name'] = enumValue.name.to_camel_case()
+			enumValDict['notLast'] = i < len(enum.values) - 1
+			enumDict['values'].append(enumValDict)
+			i += 1
+		return enumDict
+
 	def translate_class(self, _class):
 		if _class.name.to_camel_case(fullName=True) in self.ignore:
 			raise AbsApi.Error('{0} has been escaped'.format(_class.name.to_camel_case(fullName=True)))
@@ -268,7 +275,16 @@ class CsharpTranslator(object):
 
 		return classDict
 
+	def translate_interface(self, interface):
+		pass
+
 ###########################################################################################################################################
+
+class EnumImpl(object):
+	def __init__(self, enum, translator):
+		namespace = enum.find_first_ancestor_by_type(AbsApi.Namespace)
+		self.namespace = namespace.name.concatenate(fullName=True) if namespace is not None else None
+		self.enum = translator.translate_enum(enum)
 
 class ClassImpl(object):
 	def __init__(self, _class, translator):
@@ -276,9 +292,12 @@ class ClassImpl(object):
 		self.namespace = namespace.name.concatenate(fullName=True) if namespace is not None else None
 		if type(_class) is AbsApi.Class:
 			self._class = translator.translate_class(_class)
+		else: # Interface
+			self._class = translator.translate_interface(_class)
 
 class WrapperImpl(object):
-	def __init__(self, classes):
+	def __init__(self, enums, classes):
+		self.enums = enums
 		self.classes = classes
 	
 ###########################################################################################################################################
@@ -312,17 +331,24 @@ def main():
 	translator = CsharpTranslator()
 	renderer = pystache.Renderer()
 	
+	enums = []
+	for item in parser.enumsIndex.items():
+		if item[1] is not None:
+			impl = EnumImpl(item[1], translator)
+			enums.append(impl)
+		else:
+			print('warning: {0} enum won\'t be translated because of parsing errors'.format(item[0]))
+
 	classes = []
 	for _class in parser.classesIndex.values() + parser.interfacesIndex.values():
 		if _class is not None:
 			try:
 				impl = ClassImpl(_class, translator)
-				if type(_class) is AbsApi.Class:
-					classes.append(impl)
+				classes.append(impl)
 			except AbsApi.Error as e:
 				print('Could not translate {0}: {1}'.format(_class.name.to_camel_case(fullName=True), e.args[0]))
 
-	wrapper = WrapperImpl(classes)
+	wrapper = WrapperImpl(enums, classes)
 	render(renderer, wrapper, args.outputdir + "/" + args.outputfile)
 
 if __name__ == '__main__':

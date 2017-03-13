@@ -41,7 +41,45 @@ namespace Linphone
             return belle_sip_object_data_get(ptr, "cs_obj");
         }
     }
+	
+	public class LinphoneAndroid
+	{
+		[DllImport(LinphoneWrapper.LIB_NAME)]
+        static extern void ms_set_jvm_from_env(IntPtr jnienv);
+		
+		public static void setJVM(IntPtr jnienv)
+		{
+			ms_set_jvm_from_env(jnienv);
+		}
 
+        [DllImport(LinphoneWrapper.LIB_NAME)]
+        static extern void setAndroidLogHandler();
+		
+		public static void setNativeLogHandler()
+		{
+			setAndroidLogHandler();
+		}
+
+        [DllImport(LinphoneWrapper.LIB_NAME)]
+        static extern void setMediastreamerAndroidContext(IntPtr jnienv, IntPtr context);
+		
+		public static void setAndroidContext(IntPtr jnienv, IntPtr context)
+		{
+			setMediastreamerAndroidContext(jnienv, context);
+		}
+	}
+	
+	{{#enums}}
+	{{#enum}}
+	public enum {{enumName}}
+	{
+		{{#values}}
+		{{name}},
+		{{/values}}
+	}
+	
+	{{/enum}}
+	{{/enums}}
     {{#classes}}
     {{#_class}}
     [StructLayout(LayoutKind.Sequential)]
