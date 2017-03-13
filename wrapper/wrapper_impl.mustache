@@ -113,6 +113,27 @@ namespace Linphone
 		{{/has_setter}}
 		}
 		{{/has_property}}
+		{{#has_impl}}
+		{{#impl}}
+		public {{static}}{{type}} {{name}}({{args}})
+		{
+			{{#is_string}}
+			IntPtr stringPtr = {{c_name}}({{nativePtr}}{{c_args}});
+			return Marshal.PtrToStringAnsi(stringPtr);
+			{{/is_string}}
+			{{#is_bool}}
+			{{return}}{{c_name}}({{nativePtr}}{{c_args}}) == 0 ? false : true;
+			{{/is_bool}}
+			{{#is_class}}
+			IntPtr ptr = {{c_name}}({{nativePtr}}{{c_args}});
+			return {{type}}.fromNativePtr(ptr);
+			{{/is_class}}
+			{{#is_generic}}
+			{{return}}{{c_name}}({{nativePtr}}{{c_args}});
+			{{/is_generic}}
+		}
+		{{/impl}}
+		{{/has_impl}}
 		
         {{/dllImports}}
     }

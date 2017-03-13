@@ -111,7 +111,7 @@ class CsharpTranslator(object):
 			elif type(_type) is AbsApi.ListType:
 				raise AbsApi.Error('Lists are not supported right now') #TODO
 	
-	def translate_argument(self, arg):
+	def translate_argument(self, arg, dllImport=True):
 		return '{0} {1}'.format(self.translate_type(arg.type, True), self.translate_argument_name(arg.name))
 
 	def translate_method(self, method, static=False, genImpl=True):
@@ -131,8 +131,28 @@ class CsharpTranslator(object):
 		methodDict['prototype'] = """[DllImport(LinphoneWrapper.LIB_NAME)]
 		static extern {return} {name}({params});""".format(**methodElems)
 
+		methodDict['has_impl'] = genImpl
 		if genImpl:
-			methodDict['impl'] = """"""
+			methodDict['impl'] = {}
+			methodDict['impl']['static'] = 'static ' if static else ''
+			methodDict['impl']['type'] = self.translate_type(method.returnType, False, False)
+			methodDict['impl']['name'] = method.name.to_camel_case()
+			methodDict['impl']['return'] = '' if methodDict['impl']['type'] == "void" else 'return '
+			methodDict['impl']['c_name'] = method.name.to_c()
+			methodDict['impl']['nativePtr'] = '' if static else ('nativePtr, ' if len(method.args) > 0 else 'nativePtr')
+			methodDict['is_string'] = methodDict['impl']['type'] == "string"
+			methodDict['is_bool'] = methodDict['impl']['type'] == "bool"
+			methodDict['is_class'] = methodDict['impl']['type'][:8] == "Linphone"
+			methodDict['is_generic'] = not methodDict['is_string'] and not methodDict['is_bool'] and not methodDict['is_class']
+			
+			methodDict['impl']['args'] = ''
+			methodDict['impl']['c_args'] = ''
+			for arg in method.args:
+				if arg is not method.args[0]:
+					methodDict['impl']['args'] += ', '
+					methodDict['impl']['c_args'] += ', '
+				methodDict['impl']['args'] += self.translate_argument(arg, False)
+				methodDict['impl']['c_args'] += self.translate_argument_name(arg.name)
 
 		return methodDict
 	
@@ -228,7 +248,7 @@ class CsharpTranslator(object):
 				elif 'set' in method.name.to_word_list():
 					methodDict = self.translate_property_setter(method, method.name.to_camel_case(), True)
 				else:
-					methodDict = self.translate_method(method, True)
+					methodDict = self.translate_method(method, static=True, genImpl=True)
 				classDict['dllImports'].append(methodDict)
 			except AbsApi.Error as e:
 				print('Could not translate {0}: {1}'.format(method.name.to_snake_case(fullName=True), e.args[0]))
@@ -241,7 +261,7 @@ class CsharpTranslator(object):
 
 		for method in _class.instanceMethods:
 			try:
-				methodDict = self.translate_method(method)
+				methodDict = self.translate_method(method, static=False, genImpl=True)
 				classDict['dllImports'].append(methodDict)
 			except AbsApi.Error as e:
 				print('Could not translate {0}: {1}'.format(method.name.to_snake_case(fullName=True), e.args[0]))
