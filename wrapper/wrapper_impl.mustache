@@ -1,4 +1,5 @@
 /*
+LinphoneWrapper.cs
 Copyright (C) 2017 Belledonne Communications SARL
 
 This program is free software; you can redistribute it and/or
@@ -21,6 +22,7 @@ using System.Runtime.InteropServices;
 
 namespace Linphone
 {
+	#region Wrapper specifics
     public class LinphoneWrapper 
     {
         public const string LIB_NAME = "linphone-x86.so";
@@ -68,6 +70,7 @@ namespace Linphone
 			setMediastreamerAndroidContext(jnienv, context);
 		}
 	}
+	#endregion
 	
 	#region Enums
 	{{#enums}}
@@ -83,14 +86,54 @@ namespace Linphone
 	{{/enums}}
 	#endregion
 	
-	#region Interfaces
+	#region Listeners
 	{{#interfaces}}
 	{{#interface}}
+    [StructLayout(LayoutKind.Sequential)]
 	public class {{interfaceName}}
 	{
+        internal IntPtr nativePtr;
+
+		internal static {{interfaceName}} fromNativePtr(IntPtr ptr)
+		{
+			if (ptr == null) return null;
+			IntPtr objPtr = LinphoneWrapper.get(ptr);
+			if (objPtr == IntPtr.Zero)
+			{
+				{{interfaceName}} obj = new {{interfaceName}}();
+				obj.nativePtr = ptr;
+				objPtr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof({{interfaceName}})));
+				Marshal.StructureToPtr(obj, objPtr, false);
+				LinphoneWrapper.set(ptr, objPtr);
+				return obj;
+			} 
+			else
+			{
+				return Marshal.PtrToStructure<{{interfaceName}}>(objPtr);
+			}
+		}
+		
 		{{#methods}}
 		[DllImport(LinphoneWrapper.LIB_NAME)]
-		{{{prototype}}}
+		{{#cb_setter}}
+		static extern void {{name}}(IntPtr thiz, IntPtr cb);
+		{{/cb_setter}}
+		
+		{{#delegate}}
+		[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+		public delegate void {{name}}({{params}});
+		{{/delegate}}
+		
+		{{#delegate_setter}}
+		public {{delegate_name}} {{name}}
+		{
+			set
+			{
+				IntPtr cb = Marshal.GetFunctionPointerForDelegate(value);
+				{{c_name}}(nativePtr, cb);
+			}
+		}
+		{{/delegate_setter}}
 		
 		{{/methods}}
 	}
@@ -126,6 +169,16 @@ namespace Linphone
 			}
 		}
 		
+		{{#isLinphoneFactory}}
+		[DllImport(LinphoneWrapper.LIB_NAME)]
+		static extern IntPtr linphone_factory_create_core_cbs(IntPtr factory);
+		
+		public LinphoneCoreListener CreateCoreListener()
+		{
+			IntPtr coreCbsPtr = linphone_factory_create_core_cbs(nativePtr);
+			return LinphoneCoreListener.fromNativePtr(coreCbsPtr);
+		}
+		{{/isLinphoneFactory}}		
         {{#dllImports}}
 		
 		[DllImport(LinphoneWrapper.LIB_NAME)]
@@ -206,7 +259,6 @@ namespace Linphone
 		}
 		{{/impl}}
 		{{/has_impl}}
-		
         {{/dllImports}}
     }
     {{/_class}}	
