@@ -69,9 +69,50 @@ namespace Linphone
 		}
 		
         {{#dllImports}}
+		
         {{{prototype}}}
 		
-        {{impl}}
+		{{#has_property}}
+		{{property}}
+		{
+		{{#has_getter}}
+			get
+			{
+				{{#is_string}}
+				IntPtr stringPtr = {{getter_c_name}}({{nativePtr}});
+				return Marshal.PtrToStringAnsi(stringPtr);
+				{{/is_string}}
+				{{#is_bool}}
+				return {{getter_c_name}}({{nativePtr}}) == 0;
+				{{/is_bool}}
+				{{#is_class}}
+				IntPtr ptr = {{getter_c_name}}({{nativePtr}});
+				return {{return}}.fromNativePtr(ptr);
+				{{/is_class}}
+				{{#is_generic}}
+				return {{getter_c_name}}({{nativePtr}});
+				{{/is_generic}}
+			}
+		{{/has_getter}}
+		{{#has_setter}}
+			set
+			{
+				{{#is_string}}
+				{{setter_c_name}}({{nativePtr}}, value);
+				{{/is_string}}
+				{{#is_bool}}
+				{{setter_c_name}}({{nativePtr}}, value ? 1 : 0);
+				{{/is_bool}}
+				{{#is_class}}
+				{{setter_c_name}}({{nativePtr}}, value.nativePtr);
+				{{/is_class}}
+				{{#is_generic}}
+				{{setter_c_name}}({{nativePtr}}, value);
+				{{/is_generic}}
+			}
+		{{/has_setter}}
+		}
+		{{/has_property}}
 		
         {{/dllImports}}
     }

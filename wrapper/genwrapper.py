@@ -140,84 +140,45 @@ class CsharpTranslator(object):
 
 	def translate_property_getter(self, prop, name, static=False):
 		methodDict = self.translate_method(prop, static, False)
-		
+
 		methodElems = {}
 		methodElems['static'] = 'static ' if static else ''
-		methodElems['nativePtr'] = '' if static else 'nativePtr'
 		methodElems['return'] = self.translate_type(prop.returnType, False, False)
 		methodElems['name'] = (name[3:] if len(name) > 3 else 'Instance') if name[:3] == "Get" else name
-		methodElems['c_name'] = prop.name.to_c()
-		if methodElems['return'] == "string":
-			methodDict['impl'] = """{static}public string {name}
-		{{
-			get
-			{{
-				IntPtr stringPtr = {c_name}({nativePtr});
-				return Marshal.PtrToStringAnsi(stringPtr);
-			}}
-		}}""".format(**methodElems)
-		elif methodElems['return'] == "bool":
-			methodDict['impl'] = """{static}public {return} {name}
-		{{
-			get
-			{{
-				return {c_name}({nativePtr}) == 0;
-			}}
-		}}""".format(**methodElems)
-		elif methodElems['return'][:8] == "Linphone":
-			methodDict['impl'] = """{static}public {return} {name}
-		{{
-			get
-			{{
-				IntPtr ptr = {c_name}({nativePtr});
-				return {return}.fromNativePtr(ptr);
-			}}
-		}}""".format(**methodElems)
-		else:
-			methodDict['impl'] = """{static}public {return} {name}
-		{{
-			get
-			{{
-				return {c_name}({nativePtr});
-			}}
-		}}""".format(**methodElems)
+
+		methodDict['has_property'] = True
+		methodDict['property'] = "{static}public {return} {name}".format(**methodElems)
+		methodDict['has_getter'] = True
+		methodDict['has_setter'] = False
+		methodDict['return'] = methodElems['return']
+		methodDict['nativePtr'] = '' if static else 'nativePtr'
+		methodDict['getter_c_name'] = prop.name.to_c()
+		methodDict['is_string'] = methodElems['return'] == "string"
+		methodDict['is_bool'] = methodElems['return'] == "bool"
+		methodDict['is_class'] = methodElems['return'][:8] == "Linphone"
+		methodDict['is_generic'] = not methodDict['is_string'] and not methodDict['is_bool'] and not methodDict['is_class']	
 
 		return methodDict
 
 	def translate_property_setter(self, prop, name, static=False):
-		methodDict = self.translate_method(prop, genImpl=False)
-		
+		methodDict = self.translate_method(prop, static, False)
+
 		methodElems = {}
 		methodElems['static'] = 'static ' if static else ''
-		methodElems['nativePtr'] = '' if static else 'nativePtr'
 		methodElems['return'] = self.translate_type(prop.args[0].type, True, False)
-		methodElems['name'] = name
-		methodElems['c_name'] = prop.name.to_c()
-		
-		if methodElems['return'] == "bool":
-			methodDict['impl'] = """{static}public {return} {name}
-		{{
-			set
-			{{
-				{c_name}({nativePtr}, value ? 1 : 0);
-			}}
-		}}""".format(**methodElems)
-		elif methodElems['return'][:8] == "Linphone":
-			methodDict['impl'] = """{static}public {return} {name}
-		{{
-			set
-			{{
-				{c_name}({nativePtr}, value.nativePtr);
-			}}
-		}}""".format(**methodElems)
-		else:
-			methodDict['impl'] = """{static}public {return} {name}
-		{{
-			set
-			{{
-				{c_name}({nativePtr}, value);
-			}}
-		}}""".format(**methodElems)
+		methodElems['name'] = (name[3:] if len(name) > 3 else 'Instance') if name[:3] == "Get" else name
+
+		methodDict['has_property'] = True
+		methodDict['property'] = "{static}public {return} {name}".format(**methodElems)
+		methodDict['has_getter'] = False
+		methodDict['has_setter'] = True
+		methodDict['return'] = methodElems['return']
+		methodDict['nativePtr'] = '' if static else 'nativePtr'
+		methodDict['setter_c_name'] = prop.name.to_c()
+		methodDict['is_string'] = methodElems['return'] == "string"
+		methodDict['is_bool'] = methodElems['return'] == "bool"
+		methodDict['is_class'] = methodElems['return'][:8] == "Linphone"
+		methodDict['is_generic'] = not methodDict['is_string'] and not methodDict['is_bool'] and not methodDict['is_class']
 
 		return methodDict
 
@@ -234,61 +195,21 @@ class CsharpTranslator(object):
 
 		methodElems = {}
 		methodElems['static'] = 'static ' if static else ''
-		methodElems['nativePtr'] = '' if static else 'nativePtr'
 		methodElems['return'] = self.translate_type(prop.getter.returnType, False, False)
-		methodElems['name'] = name
-		methodElems['c_name_get'] = prop.getter.name.to_c()
-		methodElems['c_name_set'] = prop.setter.name.to_c()
-		if methodElems['return'] == "string":
-			methodDict['impl'] = """{static}public string {name}
-		{{
-			get
-			{{
-				IntPtr stringPtr = {c_name_get}({nativePtr});
-				return Marshal.PtrToStringAnsi(stringPtr);
-			}}
-			set
-			{{
-				{c_name_set}({nativePtr}, value);
-			}}
-		}}""".format(**methodElems)
-		elif methodElems['return'] == "bool":
-			methodDict['impl'] = """{static}public {return} {name}
-		{{
-			get
-			{{
-				return {c_name_get}({nativePtr}) == 0;
-			}}
-			set
-			{{
-				{c_name_set}({nativePtr}, value ? 1 : 0);
-			}}
-		}}""".format(**methodElems)
-		elif methodElems['return'][:8] == "Linphone":
-			methodDict['impl'] = """{static}public {return} {name}
-		{{
-			get
-			{{
-				IntPtr ptr = {c_name_get}({nativePtr});
-				return {return}.fromNativePtr(ptr);
-			}}
-			set
-			{{
-				{c_name_set}({nativePtr}, value.nativePtr);
-			}}
-		}}""".format(**methodElems)
-		else:
-			methodDict['impl'] = """{static}public {return} {name}
-		{{
-			get
-			{{
-				return {c_name_get}({nativePtr});
-			}}
-			set
-			{{
-				{c_name_set}({nativePtr}, value);
-			}}
-		}}""".format(**methodElems)
+		methodElems['name'] = (name[3:] if len(name) > 3 else 'Instance') if name[:3] == "Get" else name
+
+		methodDict['has_property'] = True
+		methodDict['property'] = "{static}public {return} {name}".format(**methodElems)
+		methodDict['has_getter'] = True
+		methodDict['has_setter'] = True
+		methodDict['return'] = methodElems['return']
+		methodDict['nativePtr'] = '' if static else 'nativePtr'
+		methodDict['getter_c_name'] = prop.getter.name.to_c()
+		methodDict['setter_c_name'] = prop.setter.name.to_c()
+		methodDict['is_string'] = methodElems['return'] == "string"
+		methodDict['is_bool'] = methodElems['return'] == "bool"
+		methodDict['is_class'] = methodElems['return'][:8] == "Linphone"
+		methodDict['is_generic'] = not methodDict['is_string'] and not methodDict['is_bool'] and not methodDict['is_class']
 
 		return methodDict
 	
