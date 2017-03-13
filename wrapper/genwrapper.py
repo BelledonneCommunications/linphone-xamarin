@@ -119,8 +119,7 @@ class CsharpTranslator(object):
 			methodElems['params'] += self.translate_argument(arg)
 		
 		methodDict = {}
-		methodDict['prototype'] = """[DllImport(LinphoneWrapper.LIB_NAME)]
-		static extern {return} {name}({params});""".format(**methodElems)
+		methodDict['prototype'] = "static extern {return} {name}({params});".format(**methodElems)
 
 		methodDict['has_impl'] = genImpl
 		if genImpl:
@@ -209,10 +208,9 @@ class CsharpTranslator(object):
 		methodDictSet = self.translate_property_setter(prop.setter, name, static)
 
 		protoElems = {}
-		protoElems['getter_prototype'] = methodDict['prototype']
-		protoElems['setter_prototype'] = methodDictSet['prototype']
-		methodDict["prototype"] = """{getter_prototype}
-		{setter_prototype}""".format(**protoElems)
+		methodDict["prototype"] = methodDict['prototype']
+		methodDict["has_second_prototype"] = True
+		methodDict["second_prototype"] = methodDictSet['prototype']
 
 		methodDict['has_setter'] = True
 		methodDict['setter_nativePtr'] = methodDictSet['setter_nativePtr']
@@ -287,10 +285,17 @@ class CsharpTranslator(object):
 		if interface.name.to_camel_case(fullName=True) in self.ignore:
 			raise AbsApi.Error('{0} has been escaped'.format(interface.name.to_camel_case(fullName=True)))
 
-		classDict = {}
-		classDict['interfaceName'] = "Linphone" + interface.name.to_camel_case()
-
-		return classDict
+		interfaceDict = {}
+		interfaceDict['interfaceName'] = "Linphone" + interface.name.to_camel_case()
+		interfaceDict['methods'] = []
+		for method in interface.methods:
+			try:
+				methodDict = self.translate_method(method, static=False, genImpl=False)
+				interfaceDict['methods'].append(methodDict)
+			except AbsApi.Error as e:
+				print('Could not translate {0}: {1}'.format(method.name.to_snake_case(fullName=True), e.args[0]))
+		
+		return interfaceDict
 
 ###########################################################################################################################################
 

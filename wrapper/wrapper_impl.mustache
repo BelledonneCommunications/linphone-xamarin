@@ -69,6 +69,7 @@ namespace Linphone
 		}
 	}
 	
+	#region Enums
 	{{#enums}}
 	{{#enum}}
 	public enum {{enumName}}
@@ -80,15 +81,25 @@ namespace Linphone
 	
 	{{/enum}}
 	{{/enums}}
+	#endregion
+	
+	#region Interfaces
 	{{#interfaces}}
 	{{#interface}}
 	public class {{interfaceName}}
 	{
-	
+		{{#methods}}
+		[DllImport(LinphoneWrapper.LIB_NAME)]
+		{{{prototype}}}
+		
+		{{/methods}}
 	}
 	
 	{{/interface}}
 	{{/interfaces}}
+	#endregion
+	
+	#region Classes
     {{#classes}}
     {{#_class}}
     [StructLayout(LayoutKind.Sequential)]
@@ -117,7 +128,12 @@ namespace Linphone
 		
         {{#dllImports}}
 		
+		[DllImport(LinphoneWrapper.LIB_NAME)]
         {{{prototype}}}
+		{{#has_second_prototype}}
+		[DllImport(LinphoneWrapper.LIB_NAME)]
+		{{second_prototype}}
+		{{/has_second_prototype}}
 		
 		{{#has_property}}
 		{{property}}
@@ -193,7 +209,7 @@ namespace Linphone
 		
         {{/dllImports}}
     }
-    {{/_class}}
-	
+    {{/_class}}	
     {{/classes}}
+	#endregion
 }
