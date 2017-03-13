@@ -151,7 +151,7 @@ class CsharpTranslator(object):
 		methodDict['has_getter'] = True
 		methodDict['has_setter'] = False
 		methodDict['return'] = methodElems['return']
-		methodDict['nativePtr'] = '' if static else 'nativePtr'
+		methodDict['getter_nativePtr'] = '' if static else 'nativePtr'
 		methodDict['getter_c_name'] = prop.name.to_c()
 		methodDict['is_string'] = methodElems['return'] == "string"
 		methodDict['is_bool'] = methodElems['return'] == "bool"
@@ -173,7 +173,7 @@ class CsharpTranslator(object):
 		methodDict['has_getter'] = False
 		methodDict['has_setter'] = True
 		methodDict['return'] = methodElems['return']
-		methodDict['nativePtr'] = '' if static else 'nativePtr'
+		methodDict['setter_nativePtr'] = '' if static else 'nativePtr, '
 		methodDict['setter_c_name'] = prop.name.to_c()
 		methodDict['is_string'] = methodElems['return'] == "string"
 		methodDict['is_bool'] = methodElems['return'] == "bool"
@@ -183,33 +183,18 @@ class CsharpTranslator(object):
 		return methodDict
 
 	def translate_property_getter_setter(self, prop, name, static=False):
-		methodDict = {}
-		methodDictGet = self.translate_method(prop.getter, genImpl=False)
-		methodDictSet = self.translate_method(prop.setter, genImpl=False)
+		methodDict = self.translate_property_getter(prop.getter, name, static)
+		methodDictSet = self.translate_property_setter(prop.setter, name, static)
 
 		protoElems = {}
-		protoElems['getter_prototype'] = methodDictGet['prototype']
+		protoElems['getter_prototype'] = methodDict['prototype']
 		protoElems['setter_prototype'] = methodDictSet['prototype']
 		methodDict["prototype"] = """{getter_prototype}
 		{setter_prototype}""".format(**protoElems)
 
-		methodElems = {}
-		methodElems['static'] = 'static ' if static else ''
-		methodElems['return'] = self.translate_type(prop.getter.returnType, False, False)
-		methodElems['name'] = (name[3:] if len(name) > 3 else 'Instance') if name[:3] == "Get" else name
-
-		methodDict['has_property'] = True
-		methodDict['property'] = "{static}public {return} {name}".format(**methodElems)
-		methodDict['has_getter'] = True
 		methodDict['has_setter'] = True
-		methodDict['return'] = methodElems['return']
-		methodDict['nativePtr'] = '' if static else 'nativePtr'
-		methodDict['getter_c_name'] = prop.getter.name.to_c()
-		methodDict['setter_c_name'] = prop.setter.name.to_c()
-		methodDict['is_string'] = methodElems['return'] == "string"
-		methodDict['is_bool'] = methodElems['return'] == "bool"
-		methodDict['is_class'] = methodElems['return'][:8] == "Linphone"
-		methodDict['is_generic'] = not methodDict['is_string'] and not methodDict['is_bool'] and not methodDict['is_class']
+		methodDict['setter_nativePtr'] = methodDictSet['setter_nativePtr']
+		methodDict['setter_c_name'] = methodDictSet['setter_c_name']
 
 		return methodDict
 	
@@ -240,6 +225,8 @@ class CsharpTranslator(object):
 			try:
 				if 'get' in method.name.to_word_list():
 					methodDict = self.translate_property_getter(method, method.name.to_camel_case(), True)
+				elif 'set' in method.name.to_word_list():
+					methodDict = self.translate_property_setter(method, method.name.to_camel_case(), True)
 				else:
 					methodDict = self.translate_method(method, True)
 				classDict['dllImports'].append(methodDict)

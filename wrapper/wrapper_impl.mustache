@@ -79,18 +79,18 @@ namespace Linphone
 			get
 			{
 				{{#is_string}}
-				IntPtr stringPtr = {{getter_c_name}}({{nativePtr}});
+				IntPtr stringPtr = {{getter_c_name}}({{getter_nativePtr}});
 				return Marshal.PtrToStringAnsi(stringPtr);
 				{{/is_string}}
 				{{#is_bool}}
-				return {{getter_c_name}}({{nativePtr}}) == 0;
+				return {{getter_c_name}}({{getter_nativePtr}}) == 0;
 				{{/is_bool}}
 				{{#is_class}}
-				IntPtr ptr = {{getter_c_name}}({{nativePtr}});
+				IntPtr ptr = {{getter_c_name}}({{getter_nativePtr}});
 				return {{return}}.fromNativePtr(ptr);
 				{{/is_class}}
 				{{#is_generic}}
-				return {{getter_c_name}}({{nativePtr}});
+				return {{getter_c_name}}({{getter_nativePtr}});
 				{{/is_generic}}
 			}
 		{{/has_getter}}
@@ -98,16 +98,16 @@ namespace Linphone
 			set
 			{
 				{{#is_string}}
-				{{setter_c_name}}({{nativePtr}}, value);
+				{{setter_c_name}}({{setter_nativePtr}}value);
 				{{/is_string}}
 				{{#is_bool}}
-				{{setter_c_name}}({{nativePtr}}, value ? 1 : 0);
+				{{setter_c_name}}({{setter_nativePtr}}value ? 1 : 0);
 				{{/is_bool}}
 				{{#is_class}}
-				{{setter_c_name}}({{nativePtr}}, value.nativePtr);
+				{{setter_c_name}}({{setter_nativePtr}}value.nativePtr);
 				{{/is_class}}
 				{{#is_generic}}
-				{{setter_c_name}}({{nativePtr}}, value);
+				{{setter_c_name}}({{setter_nativePtr}}value);
 				{{/is_generic}}
 			}
 		{{/has_setter}}
