@@ -30,6 +30,9 @@ class CsharpTranslator(object):
 	def __init__(self):
 		self.ignore = []
 
+	def translate_class_name(self, name):
+		return 'Linphone' + name
+
 	def translate_method_name(self, name, recursive=False, topAncestor=None):
 		translatedName = name.to_camel_case(lower=True)
 			
@@ -96,7 +99,7 @@ class CsharpTranslator(object):
 				return 'int'
 			return _type.name
 		elif type(_type) is AbsApi.ClassType:
-			return "IntPtr" if dllImport else "Linphone" + _type.desc.name.to_camel_case()
+			return "IntPtr" if dllImport else self.translate_class_name(_type.desc.name.to_camel_case())
 		elif type(_type) is AbsApi.BaseType:
 			return self.translate_base_type(_type, isArg, dllImport)
 		elif type(_type) is AbsApi.ListType:
@@ -186,7 +189,7 @@ class CsharpTranslator(object):
 		methodElems = {}
 		methodElems['static'] = 'static ' if static else ''
 		methodElems['return'] = self.translate_type(prop.args[0].type, True, False)
-		methodElems['name'] = (name[3:] if len(name) > 3 else 'Instance') if name[:3] == "Get" else name
+		methodElems['name'] = (name[3:] if len(name) > 3 else 'Instance') if name[:3] == "Set" else name
 
 		methodDict['has_property'] = True
 		methodDict['property'] = "{static}public {return} {name}".format(**methodElems)
@@ -229,6 +232,8 @@ class CsharpTranslator(object):
 		elif prop.setter is not None:
 			res.append(self.translate_property_setter(prop.setter, name))
 		return res
+	
+###########################################################################################################################################
 
 	def translate_listener(self, _class, method):
 		listenedClass = method.find_first_ancestor_by_type(AbsApi.Interface).listenedClass
@@ -245,7 +250,7 @@ class CsharpTranslator(object):
 		for arg in method.args:
 			if arg != method.args[0]:
 				listenerDict['delegate']['params'] += ', '
-			listenerDict['delegate']['params'] += self.translate_argument(arg)
+			listenerDict['delegate']['params'] += self.translate_argument(arg, dllImport=False)
 
 		listenerDict['delegate_setter'] = {}
 		listenerDict['delegate_setter']["name"] = method.name.to_camel_case()
@@ -256,7 +261,7 @@ class CsharpTranslator(object):
 	def generate_getter_for_listener_callbacks(self, _class, classname):
 		methodDict = {}
 		c_name = _class.name.to_snake_case(fullName=True) + '_get_callbacks'
-		classname = "Linphone" + classname
+		classname = self.translate_class_name(classname)
 		methodDict['prototype'] = "static extern IntPtr {c_name}(IntPtr thiz);".format(classname = classname, c_name = c_name)
 
 		methodDict['has_impl'] = False
@@ -273,12 +278,58 @@ class CsharpTranslator(object):
 		methodDict['is_generic'] = False
 
 		return methodDict
+
+	def generate_add_for_listener_callbacks(self, _class, classname):
+		methodDict = {}
+		c_name = _class.name.to_snake_case(fullName=True) + '_add_callbacks'
+		classname = self.translate_class_name(classname)
+		methodDict['prototype'] = "static extern void {c_name}(IntPtr thiz, IntPtr cbs);".format(classname = classname, c_name = c_name)
+		methodDict['has_impl'] = True
+		methodDict['impl'] = {}
+		methodDict['impl']['static'] = ''
+		methodDict['impl']['type'] = 'void'
+		methodDict['impl']['name'] = 'AddListener'
+		methodDict['impl']['return'] = ''
+		methodDict['impl']['c_name'] = c_name
+		methodDict['impl']['nativePtr'] = 'nativePtr, '
+		methodDict['impl']['args'] = classname + ' cbs'
+		methodDict['impl']['c_args'] = 'cbs.nativePtr'
+		methodDict['is_string'] = False
+		methodDict['is_bool'] = False
+		methodDict['is_class'] = False
+		methodDict['is_enum'] = False
+		methodDict['is_generic'] = True
+
+		return methodDict
+
+	def generate_remove_for_listener_callbacks(self, _class, classname):
+		methodDict = {}
+		c_name = _class.name.to_snake_case(fullName=True) + '_remove_callbacks'
+		classname = self.translate_class_name(classname)
+		methodDict['prototype'] = "static extern void {c_name}(IntPtr thiz, IntPtr cbs);".format(classname = classname, c_name = c_name)
+		methodDict['has_impl'] = True
+		methodDict['impl'] = {}
+		methodDict['impl']['static'] = ''
+		methodDict['impl']['type'] = 'void'
+		methodDict['impl']['name'] = 'RemoveListener'
+		methodDict['impl']['return'] = ''
+		methodDict['impl']['c_name'] = c_name
+		methodDict['impl']['nativePtr'] = 'nativePtr, '
+		methodDict['impl']['args'] = classname + ' cbs'
+		methodDict['impl']['c_args'] = 'cbs.nativePtr'
+		methodDict['is_string'] = False
+		methodDict['is_bool'] = False
+		methodDict['is_class'] = False
+		methodDict['is_enum'] = False
+		methodDict['is_generic'] = True
+
+		return methodDict
 	
 ###########################################################################################################################################
 
 	def translate_enum(self, enum):
 		enumDict = {}
-		enumDict['enumName'] = "Linphone" + enum.name.to_camel_case()
+		enumDict['enumName'] = self.translate_class_name(enum.name.to_camel_case())
 		enumDict['values'] = []
 		i = 0
 		for enumValue in enum.values:
@@ -294,23 +345,28 @@ class CsharpTranslator(object):
 			raise AbsApi.Error('{0} has been escaped'.format(_class.name.to_camel_case(fullName=True)))
 
 		classDict = {}
-		classDict['className'] = "Linphone" + _class.name.to_camel_case()
+		classDict['className'] = self.translate_class_name(_class.name.to_camel_case())
 		classDict['isLinphoneFactory'] = _class.name.to_camel_case() == "Factory"
-
 		classDict['dllImports'] = []
 
 		islistenable = _class.listenerInterface is not None
 		ismonolistenable = (islistenable and not _class.multilistener)
 		if islistenable:
-			classDict['listenerName'] = _class.listenerInterface.name.to_camel_case()
-			classDict['dllImports'].append(self.generate_getter_for_listener_callbacks(_class, classDict['listenerName']))
+			listenerName = _class.listenerInterface.name.to_camel_case()
+			if ismonolistenable:
+				classDict['dllImports'].append(self.generate_getter_for_listener_callbacks(_class, listenerName))
+			else:
+				classDict['dllImports'].append(self.generate_add_for_listener_callbacks(_class, listenerName))
+				classDict['dllImports'].append(self.generate_remove_for_listener_callbacks(_class, listenerName))
 		
 		for method in _class.classMethods:
 			try:
 				if 'get' in method.name.to_word_list():
 					methodDict = self.translate_property_getter(method, method.name.to_camel_case(), True)
-				elif 'set' in method.name.to_word_list():
-					methodDict = self.translate_property_setter(method, method.name.to_camel_case(), True)
+				#The following doesn't work because there a at least one method that has both getter and setter, 
+				#and because it doesn't do both of them at once, property is declared twice
+				#elif 'set' in method.name.to_word_list():
+				#	methodDict = self.translate_property_setter(method, method.name.to_camel_case(), True)
 				else:
 					methodDict = self.translate_method(method, static=True, genImpl=True)
 				classDict['dllImports'].append(methodDict)
@@ -337,8 +393,7 @@ class CsharpTranslator(object):
 			raise AbsApi.Error('{0} has been escaped'.format(interface.name.to_camel_case(fullName=True)))
 
 		interfaceDict = {}
-		interfaceDict['interfaceName'] = "Linphone" + interface.name.to_camel_case()
-		interfaceDict['className'] = "Linphone" + interface.name.to_camel_case()
+		interfaceDict['interfaceName'] = self.translate_class_name(interface.name.to_camel_case())
 		interfaceDict['methods'] = []
 		for method in interface.methods:
 			interfaceDict['methods'].append(self.translate_listener(interface, method))

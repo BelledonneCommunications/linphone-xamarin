@@ -48,25 +48,21 @@ namespace Linphone
 	{
 		[DllImport(LinphoneWrapper.LIB_NAME)]
         static extern void ms_set_jvm_from_env(IntPtr jnienv);
-		
-		public static void setJVM(IntPtr jnienv)
-		{
-			ms_set_jvm_from_env(jnienv);
-		}
 
         [DllImport(LinphoneWrapper.LIB_NAME)]
         static extern void setAndroidLogHandler();
+
+        [DllImport(LinphoneWrapper.LIB_NAME)]
+        static extern void setMediastreamerAndroidContext(IntPtr jnienv, IntPtr context);
 		
 		public static void setNativeLogHandler()
 		{
 			setAndroidLogHandler();
 		}
-
-        [DllImport(LinphoneWrapper.LIB_NAME)]
-        static extern void setMediastreamerAndroidContext(IntPtr jnienv, IntPtr context);
 		
 		public static void setAndroidContext(IntPtr jnienv, IntPtr context)
 		{
+			ms_set_jvm_from_env(jnienv);
 			setMediastreamerAndroidContext(jnienv, context);
 		}
 	}
