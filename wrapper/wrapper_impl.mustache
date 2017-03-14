@@ -92,7 +92,7 @@ namespace Linphone
 
 		internal static {{interfaceName}} fromNativePtr(IntPtr ptr)
 		{
-			if (ptr == null) return null;
+			if (ptr == IntPtr.Zero) return null;
 			IntPtr objPtr = LinphoneWrapper.get(ptr);
 			if (objPtr == IntPtr.Zero)
 			{
@@ -148,7 +148,7 @@ namespace Linphone
 
 		internal static {{className}} fromNativePtr(IntPtr ptr)
 		{
-			if (ptr == null) return null;
+			if (ptr == IntPtr.Zero) return null;
 			IntPtr objPtr = LinphoneWrapper.get(ptr);
 			if (objPtr == IntPtr.Zero)
 			{

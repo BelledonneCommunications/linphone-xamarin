@@ -147,7 +147,8 @@ class CsharpTranslator(object):
 					methodDict['impl']['c_args'] += ', '
 				if self.translate_type(arg.type, False, False)[:8] == "Linphone":
 					if type(arg.type) is AbsApi.ClassType:
-						methodDict['impl']['c_args'] += self.translate_argument_name(arg.name) + ".nativePtr"
+						argname = self.translate_argument_name(arg.name)
+						methodDict['impl']['c_args'] += argname + " != null ? " + argname + ".nativePtr : IntPtr.Zero"
 					else:
 						methodDict['impl']['c_args'] += '(int)' + self.translate_argument_name(arg.name)
 				elif self.translate_type(arg.type, False, False) == "bool":
@@ -293,7 +294,7 @@ class CsharpTranslator(object):
 		methodDict['impl']['c_name'] = c_name
 		methodDict['impl']['nativePtr'] = 'nativePtr, '
 		methodDict['impl']['args'] = classname + ' cbs'
-		methodDict['impl']['c_args'] = 'cbs.nativePtr'
+		methodDict['impl']['c_args'] = 'cbs != null ? cbs.nativePtr : IntPtr.Zero'
 		methodDict['is_string'] = False
 		methodDict['is_bool'] = False
 		methodDict['is_class'] = False
@@ -316,7 +317,7 @@ class CsharpTranslator(object):
 		methodDict['impl']['c_name'] = c_name
 		methodDict['impl']['nativePtr'] = 'nativePtr, '
 		methodDict['impl']['args'] = classname + ' cbs'
-		methodDict['impl']['c_args'] = 'cbs.nativePtr'
+		methodDict['impl']['c_args'] = 'cbs != null ? cbs.nativePtr : IntPtr.Zero'
 		methodDict['is_string'] = False
 		methodDict['is_bool'] = False
 		methodDict['is_class'] = False
