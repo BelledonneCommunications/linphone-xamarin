@@ -30,6 +30,15 @@ class CsharpTranslator(object):
 	def __init__(self):
 		self.ignore = []
 
+	def get_class_array_type(self, name):
+		length = len(name)
+		if length > 11 and name[:11] == 'IEnumerable':
+			return name[12:length-1]
+		return None
+
+	def is_generic(self, methodDict):
+		return not methodDict['is_string'] and not methodDict['is_bool'] and not methodDict['is_class'] and not methodDict['is_enum'] and methodDict['list_type'] == None
+
 	def translate_class_name(self, name):
 		return 'Linphone' + name
 
@@ -87,7 +96,7 @@ class CsharpTranslator(object):
 		elif _type.name == 'floatant':
 			return 'float'
 		elif _type.name == 'string_array':
-			if dllImport:
+			if dllImport or isArg:
 				return 'IntPtr'
 			else:
 				return 'IEnumerable<string>'
@@ -106,7 +115,24 @@ class CsharpTranslator(object):
 		elif type(_type) is AbsApi.BaseType:
 			return self.translate_base_type(_type, isArg, dllImport)
 		elif type(_type) is AbsApi.ListType:
-			raise AbsApi.Error('Lists are not supported right now') #TODO
+			if isArg:
+				raise AbsApi.Error('Lists as params are not supported yet')
+			elif dllImport:
+				return 'IntPtr'
+			else:
+				if type(_type.containedTypeDesc) is AbsApi.BaseType:
+					if _type.containedTypeDesc.name == 'string':
+						return 'IEnumerable<string>'
+					else:
+						raise AbsApi.Error('translation of bctbx_list_t of basic C types is not supported')
+				elif type(_type.containedTypeDesc) is AbsApi.ClassType:
+					ptrType = self.translate_class_name(_type.containedTypeDesc.desc.name.to_camel_case())
+					return 'IEnumerable<' + ptrType + '>'
+				else:
+					if _type.containedTypeDesc:
+						raise AbsApi.Error('translation of bctbx_list_t of enums')
+					else:
+						raise AbsApi.Error('translation of bctbx_list_t of unknow type !')
 	
 	def translate_argument(self, arg, dllImport=True):
 		return '{0} {1}'.format(self.translate_type(arg.type, isArg=True, dllImport=dllImport), self.translate_argument_name(arg.name))
@@ -136,17 +162,21 @@ class CsharpTranslator(object):
 			methodDict['impl']['return'] = '' if methodDict['impl']['type'] == "void" else 'return '
 			methodDict['impl']['c_name'] = method.name.to_c()
 			methodDict['impl']['nativePtr'] = '' if static else ('nativePtr, ' if len(method.args) > 0 else 'nativePtr')
+
+			methodDict['list_type'] = self.get_class_array_type(methodDict['impl']['type'])
+			methodDict['is_string_list'] = methodDict['list_type'] == 'string'
+			methodDict['is_class_list'] = not methodDict['list_type'] == None and not methodDict['list_type'] == 'string'
+
 			methodDict['is_string'] = methodDict['impl']['type'] == "string"
 			methodDict['is_bool'] = methodDict['impl']['type'] == "bool"
 			methodDict['is_class'] = methodDict['impl']['type'][:8] == "Linphone" and type(method.returnType) is AbsApi.ClassType
 			methodDict['is_enum'] = methodDict['impl']['type'][:8] == "Linphone" and type(method.returnType) is AbsApi.EnumType
-			methodDict['is_string_array'] = methodDict['impl']['type'] == "IEnumerable<string>"
-			methodDict['is_generic'] = not methodDict['is_string'] and not methodDict['is_bool'] and not methodDict['is_class'] and not methodDict['is_enum'] and not methodDict['is_string_array']
+			methodDict['is_generic'] = self.is_generic(methodDict)
 			methodDict['takeRef'] = 'true'
 			if type(method.returnType.parent) is AbsApi.Method and len(method.returnType.parent.name.words) >=1:
 				if method.returnType.parent.name.words == ['new'] or method.returnType.parent.name.words[0] == 'create':
 					methodDict['takeRef'] = 'false'
-			
+
 			methodDict['impl']['args'] = ''
 			methodDict['impl']['c_args'] = ''
 			for arg in method.args:
@@ -184,12 +214,16 @@ class CsharpTranslator(object):
 		methodDict['return'] = methodElems['return']
 		methodDict['getter_nativePtr'] = '' if static else 'nativePtr'
 		methodDict['getter_c_name'] = prop.name.to_c()
+
+		methodDict['list_type'] = self.get_class_array_type(methodDict['return'])
+		methodDict['is_string_list'] = methodDict['list_type'] == 'string'
+		methodDict['is_class_list'] = not methodDict['list_type'] == None and not methodDict['list_type'] == 'string'
+
 		methodDict['is_string'] = methodElems['return'] == "string"
 		methodDict['is_bool'] = methodElems['return'] == "bool"
 		methodDict['is_class'] = methodElems['return'][:8] == "Linphone" and type(prop.returnType) is AbsApi.ClassType
 		methodDict['is_enum'] = methodElems['return'][:8] == "Linphone" and type(prop.returnType) is AbsApi.EnumType
-		methodDict['is_string_array'] = methodDict['return'] == "IEnumerable<string>"
-		methodDict['is_generic'] = not methodDict['is_string'] and not methodDict['is_bool'] and not methodDict['is_class'] and not methodDict['is_enum'] and not methodDict['is_string_array']
+		methodDict['is_generic'] = self.is_generic(methodDict)
 		methodDict['takeRef'] = 'true'
 		if type(prop.returnType.parent) is AbsApi.Method and len(prop.returnType.parent.name.words) >=1:
 			if prop.returnType.parent.name.words == ['new'] or prop.returnType.parent.name.words[0] == 'create':
@@ -212,12 +246,16 @@ class CsharpTranslator(object):
 		methodDict['return'] = methodElems['return']
 		methodDict['setter_nativePtr'] = '' if static else 'nativePtr, '
 		methodDict['setter_c_name'] = prop.name.to_c()
+
+		methodDict['list_type'] = self.get_class_array_type(methodDict['return'])
+		methodDict['is_string_list'] = methodDict['list_type'] == 'string'
+		methodDict['is_class_list'] = not methodDict['list_type'] == None and not methodDict['list_type'] == 'string'
+
 		methodDict['is_string'] = methodElems['return'] == "string"
 		methodDict['is_bool'] = methodElems['return'] == "bool"
 		methodDict['is_class'] = methodElems['return'][:8] == "Linphone" and type(prop.args[0].type) is AbsApi.ClassType
 		methodDict['is_enum'] = methodElems['return'][:8] == "Linphone" and type(prop.args[0].type) is AbsApi.EnumType
-		methodDict['is_string_array'] = methodDict['return'] == "IEnumerable<string>"
-		methodDict['is_generic'] = not methodDict['is_string'] and not methodDict['is_bool'] and not methodDict['is_class'] and not methodDict['is_enum'] and not methodDict['is_string_array']
+		methodDict['is_generic'] = self.is_generic(methodDict)
 
 		return methodDict
 
@@ -286,12 +324,14 @@ class CsharpTranslator(object):
 		methodDict['return'] = classname
 		methodDict['getter_nativePtr'] = 'nativePtr'
 		methodDict['getter_c_name'] = c_name
+		methodDict['is_string_list'] = False
+		methodDict['is_class_list'] = False
+		methodDict['list_type'] = None
 		methodDict['is_string'] = False
 		methodDict['is_bool'] = False
 		methodDict['is_class'] = True
 		methodDict['is_enum'] = False
 		methodDict['is_generic'] = False
-		methodDict['is_string_array'] = False
 		methodDict['takeRef'] = 'true'
 
 		return methodDict
@@ -311,12 +351,14 @@ class CsharpTranslator(object):
 		methodDict['impl']['nativePtr'] = 'nativePtr, '
 		methodDict['impl']['args'] = classname + ' cbs'
 		methodDict['impl']['c_args'] = 'cbs != null ? cbs.nativePtr : IntPtr.Zero'
+		methodDict['is_string_list'] = False
+		methodDict['is_class_list'] = False
+		methodDict['list_type'] = None
 		methodDict['is_string'] = False
 		methodDict['is_bool'] = False
 		methodDict['is_class'] = False
 		methodDict['is_enum'] = False
 		methodDict['is_generic'] = True
-		methodDict['is_string_array'] = False
 		methodDict['takeRef'] = 'true'
 
 		return methodDict
@@ -336,12 +378,14 @@ class CsharpTranslator(object):
 		methodDict['impl']['nativePtr'] = 'nativePtr, '
 		methodDict['impl']['args'] = classname + ' cbs'
 		methodDict['impl']['c_args'] = 'cbs != null ? cbs.nativePtr : IntPtr.Zero'
+		methodDict['is_string_list'] = False
+		methodDict['is_class_list'] = False
+		methodDict['list_type'] = None
 		methodDict['is_string'] = False
 		methodDict['is_bool'] = False
 		methodDict['is_class'] = False
 		methodDict['is_enum'] = False
 		methodDict['is_generic'] = True
-		methodDict['is_string_array'] = False
 		methodDict['takeRef'] = 'true'
 
 		return methodDict

@@ -46,6 +46,12 @@ namespace Linphone
 		[DllImport(LinphoneWrapper.LIB_NAME)]
 		static extern void belle_sip_object_unref(IntPtr ptr);
 		
+		[DllImport(LinphoneWrapper.LIB_NAME)]
+		static extern IntPtr bctbx_list_next(IntPtr ptr);
+		
+		[DllImport(LinphoneWrapper.LIB_NAME)]
+		static extern IntPtr bctbx_list_get_data(IntPtr ptr);
+		
 		~LinphoneObject()
 		{
 			if (nativePtr != IntPtr.Zero) {
@@ -88,6 +94,25 @@ namespace Linphone
 					yield return key;
 					arrayPtr = new IntPtr(arrayPtr.ToInt64() + IntPtr.Size);
 					ptr = Marshal.ReadIntPtr(arrayPtr);
+				}
+			}
+		}
+		
+		internal static IEnumerable<T> MarshalBctbxList<T>(IntPtr listPtr) where T : LinphoneObject, new()
+		{
+			if (listPtr != IntPtr.Zero)
+			{
+				IntPtr ptr = listPtr;
+				while (ptr != IntPtr.Zero)
+				{
+					IntPtr dataPtr = bctbx_list_get_data(ptr);
+					if (dataPtr == IntPtr.Zero)
+					{
+						break;
+					}
+					T obj = fromNativePtr<T>(dataPtr);
+					yield return obj;
+					ptr = bctbx_list_next(ptr);
 				}
 			}
 		}
@@ -213,9 +238,12 @@ namespace Linphone
 				{{#is_generic}}
 				return {{getter_c_name}}({{getter_nativePtr}});
 				{{/is_generic}}
-				{{#is_string_array}}
+				{{#is_string_list}}
 				return MarshalStringArray({{getter_c_name}}({{getter_nativePtr}}));
-				{{/is_string_array}}
+				{{/is_string_list}}
+				{{#is_class_list}}
+				return MarshalBctbxList<{{{list_type}}}>({{getter_c_name}}({{getter_nativePtr}}));
+				{{/is_class_list}}
 			}
 		{{/has_getter}}
 		{{#has_setter}}
@@ -261,9 +289,12 @@ namespace Linphone
 			{{#is_generic}}
 			{{return}}{{c_name}}({{nativePtr}}{{c_args}});
 			{{/is_generic}}
-			{{#is_string_array}}
+			{{#is_string_list}}
 			return MarshalStringArray({{c_name}}({{nativePtr}}{{c_args}}));
-			{{/is_string_array}}
+			{{/is_string_list}}
+			{{#is_class_list}}
+			return MarshalBctbxList<{{{list_type}}}>({{c_name}}({{nativePtr}}{{c_args}}));
+			{{/is_class_list}}
 		}
 		{{/impl}}
 		{{/has_impl}}
