@@ -138,6 +138,10 @@ class CsharpTranslator(object):
 			methodDict['is_class'] = methodDict['impl']['type'][:8] == "Linphone" and type(method.returnType) is AbsApi.ClassType
 			methodDict['is_enum'] = methodDict['impl']['type'][:8] == "Linphone" and type(method.returnType) is AbsApi.EnumType
 			methodDict['is_generic'] = not methodDict['is_string'] and not methodDict['is_bool'] and not methodDict['is_class'] and not methodDict['is_enum']
+			methodDict['takeRef'] = 'true'
+			if type(method.returnType.parent) is AbsApi.Method and len(method.returnType.parent.name.words) >=1:
+				if method.returnType.parent.name.words == ['new'] or method.returnType.parent.name.words[0] == 'create':
+					methodDict['takeRef'] = 'false'
 			
 			methodDict['impl']['args'] = ''
 			methodDict['impl']['c_args'] = ''
@@ -181,6 +185,10 @@ class CsharpTranslator(object):
 		methodDict['is_class'] = methodElems['return'][:8] == "Linphone" and type(prop.returnType) is AbsApi.ClassType
 		methodDict['is_enum'] = methodElems['return'][:8] == "Linphone" and type(prop.returnType) is AbsApi.EnumType
 		methodDict['is_generic'] = not methodDict['is_string'] and not methodDict['is_bool'] and not methodDict['is_class'] and not methodDict['is_enum']
+		methodDict['takeRef'] = 'true'
+		if type(prop.returnType.parent) is AbsApi.Method and len(prop.returnType.parent.name.words) >=1:
+			if prop.returnType.parent.name.words == ['new'] or prop.returnType.parent.name.words[0] == 'create':
+				methodDict['takeRef'] = 'false'
 
 		return methodDict
 
@@ -277,6 +285,7 @@ class CsharpTranslator(object):
 		methodDict['is_class'] = True
 		methodDict['is_enum'] = False
 		methodDict['is_generic'] = False
+		methodDict['takeRef'] = 'true'
 
 		return methodDict
 
@@ -300,6 +309,7 @@ class CsharpTranslator(object):
 		methodDict['is_class'] = False
 		methodDict['is_enum'] = False
 		methodDict['is_generic'] = True
+		methodDict['takeRef'] = 'true'
 
 		return methodDict
 
@@ -323,6 +333,7 @@ class CsharpTranslator(object):
 		methodDict['is_class'] = False
 		methodDict['is_enum'] = False
 		methodDict['is_generic'] = True
+		methodDict['takeRef'] = 'true'
 
 		return methodDict
 	

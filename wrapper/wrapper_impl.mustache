@@ -26,23 +26,56 @@ namespace Linphone
     public class LinphoneWrapper 
     {
         public const string LIB_NAME = "linphone-x86.so";
+    }
+	
+    [StructLayout(LayoutKind.Sequential)]
+	public class LinphoneObject
+	{
+        internal IntPtr nativePtr;
 		
 		[DllImport(LinphoneWrapper.LIB_NAME)]
 		static extern int belle_sip_object_data_set(IntPtr ptr, string name, IntPtr data, IntPtr cb);
 
-        internal static void set(IntPtr ptr, IntPtr obj)
-        {
-            belle_sip_object_data_set(ptr, "cs_obj", obj, IntPtr.Zero);
-        }
-
         [DllImport(LinphoneWrapper.LIB_NAME)]
 		static extern IntPtr belle_sip_object_data_get(IntPtr ptr, string name);
-
-        internal static IntPtr get(IntPtr ptr)
-        {
-            return belle_sip_object_data_get(ptr, "cs_obj");
-        }
-    }
+		
+		[DllImport(LinphoneWrapper.LIB_NAME)]
+		static extern void belle_sip_object_ref(IntPtr ptr);
+		
+		[DllImport(LinphoneWrapper.LIB_NAME)]
+		static extern void belle_sip_object_unref(IntPtr ptr);
+		
+		~LinphoneObject()
+		{
+			if (nativePtr != IntPtr.Zero) {
+				belle_sip_object_data_set(nativePtr, "cs_obj", IntPtr.Zero, IntPtr.Zero);
+				belle_sip_object_unref(nativePtr);
+			}
+		}
+		
+		internal static T fromNativePtr<T>(IntPtr ptr, bool takeRef=true) where T : LinphoneObject, new()
+		{
+			if (ptr == IntPtr.Zero) return null;
+			IntPtr objPtr = belle_sip_object_data_get(ptr, "cs_obj");
+			if (objPtr == IntPtr.Zero)
+			{
+                T obj = new T();
+				if (takeRef)
+                {
+                    belle_sip_object_ref(ptr);
+                }
+				obj.nativePtr = ptr;
+                objPtr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(T)));
+				Marshal.StructureToPtr(obj, objPtr, false);
+				belle_sip_object_data_set(ptr, "cs_obj", objPtr, IntPtr.Zero);
+				return obj;
+			} 
+			else
+			{
+				return Marshal.PtrToStructure<T>(objPtr);
+			}
+		}
+	}
 	
 	public class LinphoneAndroid
 	{
@@ -86,29 +119,8 @@ namespace Linphone
 	{{#interfaces}}
 	{{#interface}}
     [StructLayout(LayoutKind.Sequential)]
-	public class {{interfaceName}}
+	public class {{interfaceName}} : LinphoneObject
 	{
-        internal IntPtr nativePtr;
-
-		internal static {{interfaceName}} fromNativePtr(IntPtr ptr)
-		{
-			if (ptr == IntPtr.Zero) return null;
-			IntPtr objPtr = LinphoneWrapper.get(ptr);
-			if (objPtr == IntPtr.Zero)
-			{
-				{{interfaceName}} obj = new {{interfaceName}}();
-				obj.nativePtr = ptr;
-				objPtr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof({{interfaceName}})));
-				Marshal.StructureToPtr(obj, objPtr, false);
-				LinphoneWrapper.set(ptr, objPtr);
-				return obj;
-			} 
-			else
-			{
-				return Marshal.PtrToStructure<{{interfaceName}}>(objPtr);
-			}
-		}
-		
 		{{#methods}}
 		[DllImport(LinphoneWrapper.LIB_NAME)]
 		{{#cb_setter}}
@@ -142,29 +154,8 @@ namespace Linphone
     {{#classes}}
     {{#_class}}
     [StructLayout(LayoutKind.Sequential)]
-    public class {{className}}
+    public class {{className}} : LinphoneObject
     {
-        internal IntPtr nativePtr;
-
-		internal static {{className}} fromNativePtr(IntPtr ptr)
-		{
-			if (ptr == IntPtr.Zero) return null;
-			IntPtr objPtr = LinphoneWrapper.get(ptr);
-			if (objPtr == IntPtr.Zero)
-			{
-				{{className}} obj = new {{className}}();
-				obj.nativePtr = ptr;
-				objPtr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof({{className}})));
-				Marshal.StructureToPtr(obj, objPtr, false);
-				LinphoneWrapper.set(ptr, objPtr);
-				return obj;
-			} 
-			else
-			{
-				return Marshal.PtrToStructure<{{className}}>(objPtr);
-			}
-		}
-		
 		{{#isLinphoneFactory}}
 		[DllImport(LinphoneWrapper.LIB_NAME)]
 		static extern IntPtr linphone_factory_create_core_cbs(IntPtr factory);
@@ -172,11 +163,10 @@ namespace Linphone
 		public LinphoneCoreListener CreateCoreListener()
 		{
 			IntPtr coreCbsPtr = linphone_factory_create_core_cbs(nativePtr);
-			return LinphoneCoreListener.fromNativePtr(coreCbsPtr);
+			return LinphoneObject.fromNativePtr<LinphoneCoreListener>(coreCbsPtr, false);
 		}
 		{{/isLinphoneFactory}}		
-        {{#dllImports}}
-		
+        {{#dllImports}}		
 		[DllImport(LinphoneWrapper.LIB_NAME)]
         {{{prototype}}}
 		{{#has_second_prototype}}
@@ -199,7 +189,7 @@ namespace Linphone
 				{{/is_bool}}
 				{{#is_class}}
 				IntPtr ptr = {{getter_c_name}}({{getter_nativePtr}});
-				return {{return}}.fromNativePtr(ptr);
+				return LinphoneObject.fromNativePtr<{{return}}>(ptr, {{takeRef}});
 				{{/is_class}}
 				{{#is_enum}}
 				return {{getter_c_name}}({{getter_nativePtr}});
@@ -244,7 +234,7 @@ namespace Linphone
 			{{/is_bool}}
 			{{#is_class}}
 			IntPtr ptr = {{c_name}}({{nativePtr}}{{c_args}});
-			return {{type}}.fromNativePtr(ptr);
+			return LinphoneObject.fromNativePtr<{{type}}>(ptr, {{takeRef}});
 			{{/is_class}}
 			{{#is_enum}}
 			{{return}}{{c_name}}({{nativePtr}}{{c_args}});
