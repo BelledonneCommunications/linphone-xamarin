@@ -19,6 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 using System;
 using System.Runtime.InteropServices;
+using System.Collections.Generic;
 
 namespace Linphone
 {
@@ -73,6 +74,21 @@ namespace Linphone
 			else
 			{
 				return Marshal.PtrToStructure<T>(objPtr);
+			}
+		}
+		
+		internal static IEnumerable<string> MarshalStringArray(IntPtr arrayPtr)
+		{
+			if (arrayPtr != IntPtr.Zero)
+			{
+				IntPtr ptr = Marshal.ReadIntPtr(arrayPtr);
+				while (ptr != IntPtr.Zero)
+				{
+					string key = Marshal.PtrToStringAnsi(ptr);
+					yield return key;
+					arrayPtr = new IntPtr(arrayPtr.ToInt64() + IntPtr.Size);
+					ptr = Marshal.ReadIntPtr(arrayPtr);
+				}
 			}
 		}
 	}
@@ -163,7 +179,7 @@ namespace Linphone
 		public LinphoneCoreListener CreateCoreListener()
 		{
 			IntPtr coreCbsPtr = linphone_factory_create_core_cbs(nativePtr);
-			return LinphoneObject.fromNativePtr<LinphoneCoreListener>(coreCbsPtr, false);
+			return fromNativePtr<LinphoneCoreListener>(coreCbsPtr, false);
 		}
 		{{/isLinphoneFactory}}		
         {{#dllImports}}		
@@ -175,7 +191,7 @@ namespace Linphone
 		{{/has_second_prototype}}
 		
 		{{#has_property}}
-		{{property}}
+		{{{property}}}
 		{
 		{{#has_getter}}
 			get
@@ -189,7 +205,7 @@ namespace Linphone
 				{{/is_bool}}
 				{{#is_class}}
 				IntPtr ptr = {{getter_c_name}}({{getter_nativePtr}});
-				return LinphoneObject.fromNativePtr<{{return}}>(ptr, {{takeRef}});
+				return fromNativePtr<{{return}}>(ptr, {{takeRef}});
 				{{/is_class}}
 				{{#is_enum}}
 				return {{getter_c_name}}({{getter_nativePtr}});
@@ -197,6 +213,9 @@ namespace Linphone
 				{{#is_generic}}
 				return {{getter_c_name}}({{getter_nativePtr}});
 				{{/is_generic}}
+				{{#is_string_array}}
+				return MarshalStringArray({{getter_c_name}}({{getter_nativePtr}}));
+				{{/is_string_array}}
 			}
 		{{/has_getter}}
 		{{#has_setter}}
@@ -223,7 +242,7 @@ namespace Linphone
 		{{/has_property}}
 		{{#has_impl}}
 		{{#impl}}
-		public {{static}}{{type}} {{name}}({{args}})
+		public {{static}}{{{type}}} {{name}}({{args}})
 		{
 			{{#is_string}}
 			IntPtr stringPtr = {{c_name}}({{nativePtr}}{{c_args}});
@@ -234,7 +253,7 @@ namespace Linphone
 			{{/is_bool}}
 			{{#is_class}}
 			IntPtr ptr = {{c_name}}({{nativePtr}}{{c_args}});
-			return LinphoneObject.fromNativePtr<{{type}}>(ptr, {{takeRef}});
+			return fromNativePtr<{{type}}>(ptr, {{takeRef}});
 			{{/is_class}}
 			{{#is_enum}}
 			{{return}}{{c_name}}({{nativePtr}}{{c_args}});
@@ -242,6 +261,9 @@ namespace Linphone
 			{{#is_generic}}
 			{{return}}{{c_name}}({{nativePtr}}{{c_args}});
 			{{/is_generic}}
+			{{#is_string_array}}
+			return MarshalStringArray({{c_name}}({{nativePtr}}{{c_args}}));
+			{{/is_string_array}}
 		}
 		{{/impl}}
 		{{/has_impl}}

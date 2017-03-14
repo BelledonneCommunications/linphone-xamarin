@@ -87,7 +87,10 @@ class CsharpTranslator(object):
 		elif _type.name == 'floatant':
 			return 'float'
 		elif _type.name == 'string_array':
-			return 'string[]'
+			if dllImport:
+				return 'IntPtr'
+			else:
+				return 'IEnumerable<string>'
 		else:
 			raise AbsApi.Error('\'{0}\' is not a base abstract type'.format(_type.name))
 
@@ -137,7 +140,8 @@ class CsharpTranslator(object):
 			methodDict['is_bool'] = methodDict['impl']['type'] == "bool"
 			methodDict['is_class'] = methodDict['impl']['type'][:8] == "Linphone" and type(method.returnType) is AbsApi.ClassType
 			methodDict['is_enum'] = methodDict['impl']['type'][:8] == "Linphone" and type(method.returnType) is AbsApi.EnumType
-			methodDict['is_generic'] = not methodDict['is_string'] and not methodDict['is_bool'] and not methodDict['is_class'] and not methodDict['is_enum']
+			methodDict['is_string_array'] = methodDict['impl']['type'] == "IEnumerable<string>"
+			methodDict['is_generic'] = not methodDict['is_string'] and not methodDict['is_bool'] and not methodDict['is_class'] and not methodDict['is_enum'] and not methodDict['is_string_array']
 			methodDict['takeRef'] = 'true'
 			if type(method.returnType.parent) is AbsApi.Method and len(method.returnType.parent.name.words) >=1:
 				if method.returnType.parent.name.words == ['new'] or method.returnType.parent.name.words[0] == 'create':
@@ -184,7 +188,8 @@ class CsharpTranslator(object):
 		methodDict['is_bool'] = methodElems['return'] == "bool"
 		methodDict['is_class'] = methodElems['return'][:8] == "Linphone" and type(prop.returnType) is AbsApi.ClassType
 		methodDict['is_enum'] = methodElems['return'][:8] == "Linphone" and type(prop.returnType) is AbsApi.EnumType
-		methodDict['is_generic'] = not methodDict['is_string'] and not methodDict['is_bool'] and not methodDict['is_class'] and not methodDict['is_enum']
+		methodDict['is_string_array'] = methodDict['return'] == "IEnumerable<string>"
+		methodDict['is_generic'] = not methodDict['is_string'] and not methodDict['is_bool'] and not methodDict['is_class'] and not methodDict['is_enum'] and not methodDict['is_string_array']
 		methodDict['takeRef'] = 'true'
 		if type(prop.returnType.parent) is AbsApi.Method and len(prop.returnType.parent.name.words) >=1:
 			if prop.returnType.parent.name.words == ['new'] or prop.returnType.parent.name.words[0] == 'create':
@@ -211,7 +216,8 @@ class CsharpTranslator(object):
 		methodDict['is_bool'] = methodElems['return'] == "bool"
 		methodDict['is_class'] = methodElems['return'][:8] == "Linphone" and type(prop.args[0].type) is AbsApi.ClassType
 		methodDict['is_enum'] = methodElems['return'][:8] == "Linphone" and type(prop.args[0].type) is AbsApi.EnumType
-		methodDict['is_generic'] = not methodDict['is_string'] and not methodDict['is_bool'] and not methodDict['is_class'] and not methodDict['is_enum']
+		methodDict['is_string_array'] = methodDict['return'] == "IEnumerable<string>"
+		methodDict['is_generic'] = not methodDict['is_string'] and not methodDict['is_bool'] and not methodDict['is_class'] and not methodDict['is_enum'] and not methodDict['is_string_array']
 
 		return methodDict
 
@@ -285,6 +291,7 @@ class CsharpTranslator(object):
 		methodDict['is_class'] = True
 		methodDict['is_enum'] = False
 		methodDict['is_generic'] = False
+		methodDict['is_string_array'] = False
 		methodDict['takeRef'] = 'true'
 
 		return methodDict
@@ -309,6 +316,7 @@ class CsharpTranslator(object):
 		methodDict['is_class'] = False
 		methodDict['is_enum'] = False
 		methodDict['is_generic'] = True
+		methodDict['is_string_array'] = False
 		methodDict['takeRef'] = 'true'
 
 		return methodDict
@@ -333,6 +341,7 @@ class CsharpTranslator(object):
 		methodDict['is_class'] = False
 		methodDict['is_enum'] = False
 		methodDict['is_generic'] = True
+		methodDict['is_string_array'] = False
 		methodDict['takeRef'] = 'true'
 
 		return methodDict
