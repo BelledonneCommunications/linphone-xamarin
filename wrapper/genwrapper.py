@@ -292,9 +292,12 @@ class CsharpTranslator(object):
 		listenedClass = method.find_first_ancestor_by_type(AbsApi.Interface).listenedClass
 
 		listenerDict = {}
-		c_name = listenedClass.name.to_snake_case(fullName=True) + '_cbs_set_' + method.name.to_snake_case()[3:]
+		c_name_getter = listenedClass.name.to_snake_case(fullName=True) + '_cbs_get_' + method.name.to_snake_case()[3:]
+		listenerDict['cb_getter'] = {}
+		listenerDict['cb_getter']['name'] = c_name_getter
+		c_name_setter = listenedClass.name.to_snake_case(fullName=True) + '_cbs_set_' + method.name.to_snake_case()[3:]
 		listenerDict['cb_setter'] = {}
-		listenerDict['cb_setter']['name'] = c_name
+		listenerDict['cb_setter']['name'] = c_name_setter
 
 		listenerDict['delegate'] = {}
 		delegate_name = method.name.to_camel_case() + "Delegate"
@@ -308,7 +311,8 @@ class CsharpTranslator(object):
 		listenerDict['delegate_setter'] = {}
 		listenerDict['delegate_setter']["name"] = method.name.to_camel_case()
 		listenerDict['delegate_setter']["delegate_name"] = delegate_name
-		listenerDict['delegate_setter']["c_name"] = c_name
+		listenerDict['delegate_setter']["c_name_setter"] = c_name_setter
+		listenerDict['delegate_setter']["c_name_getter"] = c_name_getter
 		return listenerDict
 
 	def generate_getter_for_listener_callbacks(self, _class, classname):

@@ -167,6 +167,10 @@ namespace Linphone
 		{{#cb_setter}}
 		static extern void {{name}}(IntPtr thiz, IntPtr cb);
 		{{/cb_setter}}
+		[DllImport(LinphoneWrapper.LIB_NAME)]
+		{{#cb_getter}}
+		static extern IntPtr {{name}}(IntPtr thiz);
+		{{/cb_getter}}
 		
 		{{#delegate}}
 		[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -176,10 +180,15 @@ namespace Linphone
 		{{#delegate_setter}}
 		public {{delegate_name}} {{name}}
 		{
+			get
+			{
+				IntPtr cb = {{c_name_getter}}(nativePtr);
+				return Marshal.GetDelegateForFunctionPointer<{{delegate_name}}>(cb);
+			}
 			set
 			{
 				IntPtr cb = Marshal.GetFunctionPointerForDelegate(value);
-				{{c_name}}(nativePtr, cb);
+				{{c_name_setter}}(nativePtr, cb);
 			}
 		}
 		{{/delegate_setter}}

@@ -429,18 +429,8 @@ class CParser(object):
 		self.cListType = 'bctbx_list_t'
 		self.regexFixedSizeInteger = '^(u?)int(\d?\d)_t$'
 		self.methodBl = ['ref', 'unref', 'new', 'destroy', 'getCurrentCallbacks', 'setUserData', 'getUserData']
-		self.functionBl = ['linphone_tunnel_get_http_proxy',
-					   'linphone_core_can_we_add_call',
-					   'linphone_core_add_listener',
-					   'linphone_core_remove_listener',
-					   'linphone_core_get_current_callbacks',
-					   'linphone_proxy_config_set_file_transfer_server',
-					   'linphone_proxy_config_get_file_transfer_server',
-					   'linphone_buffer_get_content',
-					   'linphone_chat_room_send_chat_message', # overloaded
-					   'linphone_chat_message_resend', # overloaded
-					   'linphone_config_read_relative_file',
-					   'linphone_vcard_get_belcard', # manualy wrapped
+		self.functionBl = ['linphone_chat_room_send_chat_message', # overloaded
+					   'linphone_vcard_get_belcard',
 					   'linphone_chat_room_destroy', # was deprecated when the wrapper generator was made
 					   'linphone_chat_room_send_message', # was deprecated when the wrapper generator was made
 					   'linphone_chat_room_send_message2', # was deprecated when the wrapper generator was made
@@ -485,8 +475,7 @@ class CParser(object):
 		self.classBl = ['LinphoneImEncryptionEngine',
 					   'LinphoneImEncryptionEngineCbs',
 					   'LinphoneImNotifPolicy',
-					   'LpConfig',
-					   'LinphoneCallStats']  # temporarly blacklisted
+					   'LpConfig',]
 		
 		self.cProject = cProject
 		
