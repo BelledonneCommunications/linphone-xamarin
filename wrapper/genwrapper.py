@@ -159,6 +159,7 @@ class CsharpTranslator(object):
 			methodDict['impl']['static'] = 'static ' if static else ''
 			methodDict['impl']['type'] = self.translate_type(method.returnType, False, False)
 			methodDict['impl']['name'] = method.name.to_camel_case()
+			methodDict['impl']['override'] = 'override ' if method.name.to_camel_case() == 'ToString' else ''
 			methodDict['impl']['return'] = '' if methodDict['impl']['type'] == "void" else 'return '
 			methodDict['impl']['c_name'] = method.name.to_c()
 			methodDict['impl']['nativePtr'] = '' if static else ('nativePtr, ' if len(method.args) > 0 else 'nativePtr')
@@ -292,27 +293,49 @@ class CsharpTranslator(object):
 		listenedClass = method.find_first_ancestor_by_type(AbsApi.Interface).listenedClass
 
 		listenerDict = {}
-		c_name_getter = listenedClass.name.to_snake_case(fullName=True) + '_cbs_get_' + method.name.to_snake_case()[3:]
-		listenerDict['cb_getter'] = {}
-		listenerDict['cb_getter']['name'] = c_name_getter
 		c_name_setter = listenedClass.name.to_snake_case(fullName=True) + '_cbs_set_' + method.name.to_snake_case()[3:]
 		listenerDict['cb_setter'] = {}
 		listenerDict['cb_setter']['name'] = c_name_setter
 
 		listenerDict['delegate'] = {}
-		delegate_name = method.name.to_camel_case() + "Delegate"
-		listenerDict['delegate']['name'] = delegate_name
+		delegate_name_public = method.name.to_camel_case() + "Delegate"
+		delegate_name_private = delegate_name_public + "Private"
+		listenerDict['delegate']['name_public'] = delegate_name_public
+		listenerDict['delegate']['name_private'] = delegate_name_private
+		var_name_public = method.name.to_snake_case() + '_public'
+		var_name_private = method.name.to_snake_case() + '_private'
+		listenerDict['delegate']['var_public'] = var_name_public
+		listenerDict['delegate']['var_private'] = var_name_private
+		listenerDict['delegate']['cb_name'] = method.name.to_snake_case()
+		listenerDict['delegate']['name'] = method.name.to_camel_case()
+
+		
+		listenerDict['delegate']['params_public'] = ""
+		listenerDict['delegate']['params_private'] = ""
 		listenerDict['delegate']['params'] = ""
 		for arg in method.args:
+			dllImportType = self.translate_type(arg.type, isArg=True, dllImport=True)
+			normalType = self.translate_type(arg.type, isArg=True, dllImport=False)
+			argName = self.translate_argument_name(arg.name)
 			if arg != method.args[0]:
+				listenerDict['delegate']['params_public'] += ', '
+				listenerDict['delegate']['params_private'] += ', '
 				listenerDict['delegate']['params'] += ', '
-			listenerDict['delegate']['params'] += self.translate_argument(arg, dllImport=False)
+			if normalType == dllImportType:
+				listenerDict['delegate']['params'] += argName
+			else:
+				if normalType == "bool":
+					listenerDict['delegate']['params'] += argName + " == 0"
+				elif normalType[:8] == "Linphone" and type(arg.type) is AbsApi.ClassType:
+					listenerDict['delegate']['params'] += "fromNativePtr<" + normalType + ">(" + argName + ")"
+				elif normalType[:8] == "Linphone" and type(arg.type) is AbsApi.EnumType:
+					listenerDict['delegate']['params'] += "(" + normalType + ")" + argName + ""
+				else:
+					raise("Error")
+			listenerDict['delegate']['params_public'] += normalType + " " + argName
+			listenerDict['delegate']['params_private'] += dllImportType + " " + argName
 
-		listenerDict['delegate_setter'] = {}
-		listenerDict['delegate_setter']["name"] = method.name.to_camel_case()
-		listenerDict['delegate_setter']["delegate_name"] = delegate_name
-		listenerDict['delegate_setter']["c_name_setter"] = c_name_setter
-		listenerDict['delegate_setter']["c_name_getter"] = c_name_getter
+		listenerDict['delegate']["c_name_setter"] = c_name_setter
 		return listenerDict
 
 	def generate_getter_for_listener_callbacks(self, _class, classname):

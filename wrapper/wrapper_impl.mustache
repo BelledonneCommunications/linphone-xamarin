@@ -41,7 +41,7 @@ namespace Linphone
 		static extern IntPtr belle_sip_object_data_get(IntPtr ptr, string name);
 		
 		[DllImport(LinphoneWrapper.LIB_NAME)]
-		static extern void belle_sip_object_ref(IntPtr ptr);
+		static extern IntPtr belle_sip_object_ref(IntPtr ptr);
 		
 		[DllImport(LinphoneWrapper.LIB_NAME)]
 		static extern void belle_sip_object_unref(IntPtr ptr);
@@ -54,7 +54,9 @@ namespace Linphone
 		
 		~LinphoneObject()
 		{
+			Console.WriteLine("Destroying" + this.ToString());
 			if (nativePtr != IntPtr.Zero) {
+				Console.WriteLine("Unreffing" + this.ToString());
 				belle_sip_object_data_set(nativePtr, "cs_obj", IntPtr.Zero, IntPtr.Zero);
 				belle_sip_object_unref(nativePtr);
 			}
@@ -67,9 +69,11 @@ namespace Linphone
 			if (objPtr == IntPtr.Zero)
 			{
                 T obj = new T();
+				Console.WriteLine("Creating" + obj.ToString());
 				if (takeRef)
                 {
-                    belle_sip_object_ref(ptr);
+                    ptr = belle_sip_object_ref(ptr);
+                    Console.WriteLine("Reffing" + obj.ToString());
                 }
 				obj.nativePtr = ptr;
                 objPtr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(T)));
@@ -167,32 +171,30 @@ namespace Linphone
 		{{#cb_setter}}
 		static extern void {{name}}(IntPtr thiz, IntPtr cb);
 		{{/cb_setter}}
-		[DllImport(LinphoneWrapper.LIB_NAME)]
-		{{#cb_getter}}
-		static extern IntPtr {{name}}(IntPtr thiz);
-		{{/cb_getter}}
 		
 		{{#delegate}}
 		[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-		public delegate void {{name}}({{params}});
-		{{/delegate}}
+		private delegate void {{name_private}}({{params_private}});
 		
-		{{#delegate_setter}}
-		public {{delegate_name}} {{name}}
+		public delegate void {{name_public}}({{params_public}});
+		private {{name_private}} {{var_private}};
+		private {{name_public}} {{var_public}};
+		
+		private void {{cb_name}}({{params_private}})
 		{
-			get
-			{
-				IntPtr cb = {{c_name_getter}}(nativePtr);
-				return Marshal.GetDelegateForFunctionPointer<{{delegate_name}}>(cb);
-			}
+			{{var_public}}?.Invoke({{{params}}});
+		}
+		public {{name_public}} {{name}}
+		{
 			set
 			{
-				IntPtr cb = Marshal.GetFunctionPointerForDelegate(value);
+				{{var_private}} = {{cb_name}};
+				{{var_public}} = value;
+				IntPtr cb = Marshal.GetFunctionPointerForDelegate({{var_private}});
 				{{c_name_setter}}(nativePtr, cb);
 			}
 		}
-		{{/delegate_setter}}
-		
+		{{/delegate}}		
 		{{/methods}}
 	}
 	
@@ -279,7 +281,7 @@ namespace Linphone
 		{{/has_property}}
 		{{#has_impl}}
 		{{#impl}}
-		public {{static}}{{{type}}} {{name}}({{args}})
+		public {{static}}{{override}}{{{type}}} {{name}}({{args}})
 		{
 			{{#is_string}}
 			IntPtr stringPtr = {{c_name}}({{nativePtr}}{{c_args}});
