@@ -14,14 +14,18 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+
 import re
 import genapixml as CApi
+
 
 class Error(RuntimeError):
 	pass
 
+
 class BlacklistedException(Error):
 	pass
+
 
 class Name(object):
 	camelCaseParsingRegex = re.compile('[A-Z][a-z0-9]*')
@@ -170,15 +174,15 @@ class MethodName(Name):
 	
 	def to_c(self):
 		suffix = ('_' + str(self.overloadRef)) if self.overloadRef > 0 else ''
-		return Name.to_snake_case(self, fullName=True) + suffix
+		return self.to_snake_case(fullName=True) + suffix
 
 
 class ArgName(Name):
 	def to_c(self):
-		return Name.to_snake_case(self)
+		return self.to_snake_case()
 
 
-class PropertyName(Name):
+class PropertyName(ArgName):
 	pass
 
 
@@ -277,8 +281,22 @@ class Namespace(DocumentableObject):
 		child.parent = self
 
 
+class Flag:
+	def __init__(self, position):
+		self.position = position
+
+
 class EnumValue(DocumentableObject):
-	pass
+	def __init__(self, name):
+		DocumentableObject.__init__(self, name)
+		self.value = None
+	
+	def value_from_string(self, stringValue):
+		m = re.match('^1\s*<<\s*([0-9]+)$', stringValue)
+		if m is not None:
+			self.value = Flag(int(m.group(1)))
+		else:
+			self.value = int(stringValue, base=0)
 
 
 class Enum(DocumentableObject):
@@ -357,6 +375,7 @@ class Property(DocumentableObject):
 		DocumentableObject.__init__(self, name)
 		self._setter = None
 		self._getter = None
+		self._type = None
 	
 	def set_setter(self, setter):
 		self._setter = setter
@@ -367,6 +386,8 @@ class Property(DocumentableObject):
 	
 	def set_getter(self, getter):
 		self._getter = getter
+		if self._type is None:
+			self._type = getter.returnType
 		getter.parent = self
 	
 	def get_getter(self):
@@ -384,6 +405,7 @@ class Class(DocumentableObject):
 		self.classMethods = []
 		self._listenerInterface = None
 		self.multilistener = False
+		self.refcountable = False
 	
 	def add_property(self, property):
 		self.properties.append(property)
@@ -425,57 +447,20 @@ class Interface(DocumentableObject):
 
 class CParser(object):
 	def __init__(self, cProject):
-		self.cBaseType = ['void', 'bool_t', 'char', 'short', 'int', 'long', 'size_t', 'time_t', 'float', 'double']
+		self.cBaseType = ['void', 'bool_t', 'char', 'short', 'int', 'long', 'size_t', 'time_t', 'float', 'double', 'LinphoneStatus']
 		self.cListType = 'bctbx_list_t'
 		self.regexFixedSizeInteger = '^(u?)int(\d?\d)_t$'
 		self.methodBl = ['ref', 'unref', 'new', 'destroy', 'getCurrentCallbacks', 'setUserData', 'getUserData']
-		self.functionBl = ['linphone_chat_room_send_chat_message', # overloaded
-					   'linphone_vcard_get_belcard',
-					   'linphone_chat_room_destroy', # was deprecated when the wrapper generator was made
-					   'linphone_chat_room_send_message', # was deprecated when the wrapper generator was made
-					   'linphone_chat_room_send_message2', # was deprecated when the wrapper generator was made
-					   'linphone_chat_room_get_lc', # was deprecated when the wrapper generator was made
-					   'linphone_chat_message_start_file_download', # was deprecated when the wrapper generator was made
-					   'linphone_vcard_new', # was deprecated when the wrapper generator was made
-					   'linphone_vcard_free', # was deprecated when the wrapper generator was made
-					   'linphone_call_params_destroy', # was deprecated when the wrapper generator was made
-					   'linphone_address_is_secure', # was deprecated when the wrapper generator was made
-					   'linphone_address_destroy', # was deprecated when the wrapper generator was made
-					   'linphone_core_enable_logs', # was deprecated when the wrapper generator was made
-					   'linphone_core_enable_logs_with_cb', # was deprecated when the wrapper generator was made
-					   'linphone_core_disable_logs', # was deprecated when the wrapper generator was made
-					   'linphone_core_get_user_agent_name', # was deprecated when the wrapper generator was made
-					   'linphone_core_get_user_agent_version', # was deprecated when the wrapper generator was made
-					   'linphone_core_new', # was deprecated when the wrapper generator was made
-					   'linphone_core_new_with_config', # was deprecated when the wrapper generator was made
-					   'linphone_core_add_listener', # was deprecated when the wrapper generator was made
-					   'linphone_core_remove_listener', # was deprecated when the wrapper generator was made
-					   'linphone_core_send_dtmf', # was deprecated when the wrapper generator was made
-					   'linphone_core_get_default_proxy', # was deprecated when the wrapper generator was made
-					   'linphone_core_set_firewall_policy', # was deprecated when the wrapper generator was made
-					   'linphone_core_get_firewall_policy', # was deprecated when the wrapper generator was made
-					   'linphone_core_get_ring_level', # was deprecated when the wrapper generator was made
-					   'linphone_core_get_play_level', # was deprecated when the wrapper generator was made
-					   'linphone_core_get_rec_level', # was deprecated when the wrapper generator was made
-					   'linphone_core_set_ring_level', # was deprecated when the wrapper generator was made
-					   'linphone_core_set_play_level', # was deprecated when the wrapper generator was made
-					   'linphone_core_set_rec_level', # was deprecated when the wrapper generator was made
-					   'linphone_core_mute_mic', # was deprecated when the wrapper generator was made
-					   'linphone_core_is_mic_muted', # was deprecated when the wrapper generator was made
-					   'linphone_core_enable_video', # was deprecated when the wrapper generator was made
-					   'linphone_core_create_lp_config', # was deprecated when the wrapper generator was made
-					   'linphone_core_destroy', # was deprecated when the wrapper generator was made
-					   'linphone_proxy_config_normalize_number', # was deprecated when the wrapper generator was made
-					   'linphone_call_is_in_conference', # was deprecated when the wrapper generator was made
-					   'linphone_friend_new', # was deprecated when the wrapper generator was made
-					   'linphone_friend_new_with_address', # was deprecated when the wrapper generator was made
-					   'linphone_core_get_sound_source', # was deprecated when the wrapper generator was made
-					   'linphone_core_set_sound_source'] # was deprecated when the wrapper generator was made
+		self.functionBl = [
+					   'linphone_vcard_get_belcard'] # manualy wrapped
 
-		self.classBl = ['LinphoneImEncryptionEngine',
-					   'LinphoneImEncryptionEngineCbs',
-					   'LinphoneImNotifPolicy',
-					   'LpConfig',]
+		self.classBl = ['LpConfig',
+					   'LinphonePlayer',
+					   'LinphoneCoreVTable',]  # temporarly blacklisted
+		
+		# list of classes that must be concidered as refcountable even if
+		# they are no ref()/unref() methods
+		self.forcedRefcountableClasses = ['LinphoneFactory']
 		
 		self.cProject = cProject
 		
@@ -510,64 +495,84 @@ class CParser(object):
 		
 	def parse_all(self):
 		for enum in self.cProject.enums:
-			CParser.parse_enum(self, enum)
+			try:
+				self.parse_enum(enum)
+			except Error as e:
+				print('Could not parse \'{0}\' enum: {1}'.format(enum.name, e.args[0]))
+		
 		for _class in self.cProject.classes:
 			try:
-				CParser.parse_class(self, _class)
+				self.parse_class(_class)
 			except BlacklistedException:
 				pass
 			except Error as e:
 				print('Could not parse \'{0}\' class: {1}'.format(_class.name, e.args[0]))
-		CParser._fix_all_types(self)
+				
+		self._fix_all_types()
+	
+	
+	def _class_is_refcountable(self, _class):
+		if _class.name in self.forcedRefcountableClasses:
+			return True
+		
+		for method in _class.instanceMethods:
+			if method.startswith(_class.cFunctionPrefix) and method[len(_class.cFunctionPrefix):] == 'ref':
+				return True
+		return False
+	
+	def _fix_all_types_in_class_or_interface(self, _class):
+		if _class is not None:
+			if type(_class) is Class:
+				self._fix_all_types_in_class(_class)
+			else:
+				self._fix_all_types_in_interface(_class)
 	
 	def _fix_all_types(self):
-		for _class in self.classesIndex.values() + self.interfacesIndex.values():
-			if _class is not None:
-				if type(_class) is Class:
-					CParser._fix_all_types_in_class(self, _class)
-				else:
-					CParser._fix_all_types_in_interface(self, _class)
+		for _class in self.interfacesIndex.values():
+			self._fix_all_types_in_class_or_interface(_class)
+		for _class in self.classesIndex.values():
+			self._fix_all_types_in_class_or_interface(_class)
 	
 	def _fix_all_types_in_class(self, _class):
 		for property in _class.properties:
 			if property.setter is not None:
-				CParser._fix_all_types_in_method(self, property.setter)
+				self._fix_all_types_in_method(property.setter)
 			if property.getter is not None:
-				CParser._fix_all_types_in_method(self, property.getter)
+				self._fix_all_types_in_method(property.getter)
 		
 		for method in (_class.instanceMethods + _class.classMethods):
-			CParser._fix_all_types_in_method(self, method)
+			self._fix_all_types_in_method(method)
 	
 	def _fix_all_types_in_interface(self, interface):
 		for method in interface.methods:
-			CParser._fix_all_types_in_method(self, method)
+			self._fix_all_types_in_method(method)
 	
 	def _fix_all_types_in_method(self, method):
 		try:
-			CParser._fix_type(self, method.returnType)
+			self._fix_type(method.returnType)
 			for arg in method.args:
-				CParser._fix_type(self, arg.type)
+				self._fix_type(arg.type)
 		except Error as e:
 			print('warning: some types could not be fixed in {0}() function: {1}'.format(method.name.to_snake_case(fullName=True), e.args[0]))
 		
-	def _fix_type(self, type):
-		if isinstance(type, EnumType) and type.desc is None:
-			type.desc = self.enumsIndex[type.name]
-		elif isinstance(type, ClassType) and type.desc is None:
-			if type.name in self.classesIndex:
-				type.desc = self.classesIndex[type.name]
+	def _fix_type(self, _type):
+		if isinstance(_type, EnumType) and _type.desc is None:
+			_type.desc = self.enumsIndex[_type.name]
+		elif isinstance(_type, ClassType) and _type.desc is None:
+			if _type.name in self.classesIndex:
+				_type.desc = self.classesIndex[_type.name]
 			else:
-				type.desc = self.interfacesIndex[type.name]
-		elif isinstance(type, ListType) and type.containedTypeDesc is None:
-			if type.containedTypeName in self.classesIndex:
-				type.containedTypeDesc = ClassType(type.containedTypeName, classDesc=self.classesIndex[type.containedTypeName])
-			elif type.containedTypeName in self.interfacesIndex:
-				type.containedTypeDesc = ClassType(type.containedTypeName, classDesc=self.interfacesIndex[type.containedTypeName])
-			elif type.containedTypeName in self.enumsIndex:
-				type.containedTypeDesc = EnumType(type.containedTypeName, enumDesc=self.enumsIndex[type.containedTypeName])
+				_type.desc = self.interfacesIndex[_type.name]
+		elif isinstance(_type, ListType) and _type.containedTypeDesc is None:
+			if _type.containedTypeName in self.classesIndex:
+				_type.containedTypeDesc = ClassType(_type.containedTypeName, classDesc=self.classesIndex[_type.containedTypeName])
+			elif _type.containedTypeName in self.interfacesIndex:
+				_type.containedTypeDesc = ClassType(_type.containedTypeName, classDesc=self.interfacesIndex[_type.containedTypeName])
+			elif _type.containedTypeName in self.enumsIndex:
+				_type.containedTypeDesc = EnumType(_type.containedTypeName, enumDesc=self.enumsIndex[_type.containedTypeName])
 			else:
-				if type.containedTypeName is not None:
-					type.containedTypeDesc = CParser.parse_c_base_type(self, type.containedTypeName)
+				if _type.containedTypeName is not None:
+					_type.containedTypeDesc = self.parse_c_base_type(_type.containedTypeName)
 				else:
 					raise Error('bctbx_list_t type without specified contained type')
 	
@@ -586,6 +591,11 @@ class CParser(object):
 			valueName = EnumValueName()
 			valueName.from_camel_case(cEnumValue.name, namespace=name)
 			aEnumValue = EnumValue(valueName)
+			if cEnumValue.value is not None:
+				try:
+					aEnumValue.value_from_string(cEnumValue.value)
+				except ValueError:
+					raise Error('{0} enum value has an invalid definition ({1})'.format(cEnumValue.name, cEnumValue.value))
 			enum.add_value(aEnumValue)
 		
 		self.enumsIndex[nameStr] = enum
@@ -596,10 +606,10 @@ class CParser(object):
 			raise BlacklistedException('{0} is blacklisted'.format(cclass.name));
 		
 		if cclass.name.endswith('Cbs'):
-			_class = CParser._parse_listener(self, cclass)
+			_class = self._parse_listener(cclass)
 			self.interfacesIndex[cclass.name] = _class
 		else:
-			_class = CParser._parse_class(self, cclass)
+			_class = self._parse_class(cclass)
 			self.classesIndex[cclass.name] = _class
 		self.namespace.add_child(_class)
 		return _class
@@ -608,11 +618,12 @@ class CParser(object):
 		name = ClassName()
 		name.from_camel_case(cclass.name, namespace=self.namespace.name)
 		_class = Class(name)
+		_class.refcountable = self._class_is_refcountable(cclass)
 		
 		for cproperty in cclass.properties.values():
 			try:
 				if cproperty.name != 'callbacks':
-					absProperty = CParser._parse_property(self, cproperty, namespace=name)
+					absProperty = self._parse_property(cproperty, namespace=name)
 					_class.add_property(absProperty)
 				else:
 					_class.listenerInterface = self.interfacesIndex[cproperty.getter.returnArgument.ctype]
@@ -621,7 +632,7 @@ class CParser(object):
 		
 		for cMethod in cclass.instanceMethods.values():
 			try:
-				method = CParser.parse_method(self, cMethod, namespace=name)
+				method = self.parse_method(cMethod, namespace=name)
 				if method.name.to_snake_case() == 'add_callbacks' or method.name.to_snake_case() == 'remove_callbacks':
 					if _class.listenerInterface is None or not _class.multilistener:
 						_class.multilistener = True
@@ -638,7 +649,7 @@ class CParser(object):
 				
 		for cMethod in cclass.classMethods.values():
 			try:
-				method = CParser.parse_method(self, cMethod, type=Method.Type.Class, namespace=name)
+				method = self.parse_method(cMethod, type=Method.Type.Class, namespace=name)
 				_class.add_class_method(method)
 			except BlacklistedException:
 				pass
@@ -656,10 +667,10 @@ class CParser(object):
 			methodType = Method.Type.Instance
 		aproperty = Property(name)
 		if cproperty.setter is not None:
-			method = CParser.parse_method(self, cproperty.setter, namespace=namespace, type=methodType)
+			method = self.parse_method(cproperty.setter, namespace=namespace, type=methodType)
 			aproperty.setter = method
 		if cproperty.getter is not None:
-			method = CParser.parse_method(self, cproperty.getter, namespace=namespace, type=methodType)
+			method = self.parse_method(cproperty.getter, namespace=namespace, type=methodType)
 			aproperty.getter = method
 		return aproperty
 	
@@ -678,7 +689,7 @@ class CParser(object):
 		for property in cclass.properties.values():
 			if property.name != 'user_data':
 				try:
-					method = CParser._parse_listener_property(self, property, listener, cclass.events)
+					method = self._parse_listener_property(property, listener, cclass.events)
 					listener.add_method(method)
 				except Error as e:
 					print('Could not parse property \'{0}\' of listener \'{1}\': {2}'.format(property.name, cclass.name, e.args[0]))
@@ -704,11 +715,11 @@ class CParser(object):
 			raise Error('invalid event name \'{0}\''.format(eventName))
 		
 		method = Method(methodName)
-		method.returnType = CParser.parse_type(self, event.returnArgument)
+		method.returnType = self.parse_type(event.returnArgument)
 		for arg in event.arguments:
 			argName = ArgName()
 			argName.from_snake_case(arg.name)
-			argument = Argument(argName, CParser.parse_type(self, arg))
+			argument = Argument(argName, self.parse_type(arg))
 			method.add_arguments(argument)
 		
 		return method
@@ -717,18 +728,18 @@ class CParser(object):
 		name = MethodName()
 		name.from_snake_case(cfunction.name, namespace=namespace)
 		
-		if CParser._is_blacklisted(self, name):
+		if self._is_blacklisted(name):
 			raise BlacklistedException('{0} is blacklisted'.format(name.to_c()));
 		
 		method = Method(name, type=type)
 		method.deprecated = cfunction.deprecated
-		method.returnType = CParser.parse_type(self, cfunction.returnArgument)
+		method.returnType = self.parse_type(cfunction.returnArgument)
 		
 		for arg in cfunction.arguments:
 			if type == Method.Type.Instance and arg is cfunction.arguments[0]:
 				method.constMethod = ('const' in arg.completeType.split(' '))
 			else:
-				aType = CParser.parse_type(self, arg)
+				aType = self.parse_type(arg)
 				argName = ArgName()
 				argName.from_snake_case(arg.name)
 				absArg = Argument(argName, aType)
@@ -738,14 +749,13 @@ class CParser(object):
 	
 	def parse_type(self, cType):
 		if cType.ctype in self.cBaseType or re.match(self.regexFixedSizeInteger, cType.ctype):
-			absType = CParser.parse_c_base_type(self, cType.completeType)
+			absType = self.parse_c_base_type(cType.completeType)
 		elif cType.ctype in self.enumsIndex:
 			absType = EnumType(cType.ctype, enumDesc=self.enumsIndex[cType.ctype])
 		elif cType.ctype in self.classesIndex or cType.ctype in self.interfacesIndex:
-			#params = {'classDesc': self.classesIndex[cType.ctype]}
-			#if 'const' in cType.completeType.split(' '):
-				#params['isconst'] = True
 			absType = ClassType(cType.ctype)
+			absType.isconst = cType.completeType.startswith('const ')
+			absType.isref = cType.completeType.endswith('*')
 		elif cType.ctype == self.cListType:
 			absType = ListType(cType.containedType)
 		else:
@@ -787,6 +797,8 @@ class CParser(object):
 					param['size'] = 'long double'
 				else:
 					param['size'] = 'double'
+			elif elem == 'LinphoneStatus':
+				name = 'status'
 			elif elem == '*':
 				if name is not None:
 					if name == 'character':

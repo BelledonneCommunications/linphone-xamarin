@@ -24,20 +24,29 @@ using System.Collections.Generic;
 namespace Linphone
 {
 	#region Wrapper specifics
-    public class LinphoneWrapper 
-    {
-        public const string LIB_NAME = "linphone"; // With this, it automatically finds liblinphone.so
-    }
+	public class LinphoneWrapper 
+	{
+		public const string LIB_NAME = "linphone"; // With this, it automatically finds liblinphone.so
+	}
+
+	[Serializable()]
+	public class LinphoneException : System.Exception
+	{
+		public LinphoneException() : base() { }
+		public LinphoneException(string message) : base(message) { }
+		public LinphoneException(string message, System.Exception inner) : base(message, inner) { }
+		protected LinphoneException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) { }
+	}
 	
-    [StructLayout(LayoutKind.Sequential)]
+	[StructLayout(LayoutKind.Sequential)]
 	public class LinphoneObject
 	{
-        internal IntPtr nativePtr;
+		internal IntPtr nativePtr;
 		
 		[DllImport(LinphoneWrapper.LIB_NAME)]
 		static extern int belle_sip_object_data_set(IntPtr ptr, string name, IntPtr data, IntPtr cb);
 
-        [DllImport(LinphoneWrapper.LIB_NAME)]
+		[DllImport(LinphoneWrapper.LIB_NAME)]
 		static extern IntPtr belle_sip_object_data_get(IntPtr ptr, string name);
 		
 		[DllImport(LinphoneWrapper.LIB_NAME)]
@@ -51,13 +60,18 @@ namespace Linphone
 		
 		[DllImport(LinphoneWrapper.LIB_NAME)]
 		static extern IntPtr bctbx_list_get_data(IntPtr ptr);
+
+		[DllImport(LinphoneWrapper.LIB_NAME)]
+		static extern IntPtr bctbx_list_append(IntPtr elem, string data);
+
+		[DllImport(LinphoneWrapper.LIB_NAME)]
+		static extern IntPtr bctbx_list_append(IntPtr elem, IntPtr data);
 		
 		~LinphoneObject()
 		{
 			Console.WriteLine("Destroying" + this.ToString());
 			if (nativePtr != IntPtr.Zero) {
 				Console.WriteLine("Unreffing" + this.ToString());
-				belle_sip_object_data_set(nativePtr, "cs_obj", IntPtr.Zero, IntPtr.Zero);
 				belle_sip_object_unref(nativePtr);
 			}
 		}
@@ -68,22 +82,28 @@ namespace Linphone
 			IntPtr objPtr = belle_sip_object_data_get(ptr, "cs_obj");
 			if (objPtr == IntPtr.Zero)
 			{
-                T obj = new T();
+				T obj = new T();
 				Console.WriteLine("Creating" + obj.ToString());
 				if (takeRef)
-                {
-                    ptr = belle_sip_object_ref(ptr);
-                    Console.WriteLine("Reffing" + obj.ToString());
-                }
+				{
+					ptr = belle_sip_object_ref(ptr);
+					Console.WriteLine("Reffing" + obj.ToString());
+				}
 				obj.nativePtr = ptr;
-                objPtr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(T)));
+				objPtr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(T)));
 				Marshal.StructureToPtr(obj, objPtr, false);
 				belle_sip_object_data_set(ptr, "cs_obj", objPtr, IntPtr.Zero);
 				return obj;
 			} 
 			else
 			{
-				return Marshal.PtrToStructure<T>(objPtr);
+				T obj = Marshal.PtrToStructure<T>(objPtr);
+				if (takeRef)
+				{
+					obj.nativePtr = belle_sip_object_ref(obj.nativePtr);
+					Console.WriteLine("Reffing" + obj.ToString());
+				}
+				return obj;
 			}
 		}
 		
@@ -120,18 +140,38 @@ namespace Linphone
 				}
 			}
 		}
+
+		internal static IntPtr StringArrayToBctbxList(IEnumerable<string> stringlist)
+		{
+			IntPtr bctbx_list = IntPtr.Zero;
+			foreach (string s in stringlist)
+			{
+				bctbx_list = bctbx_list_append(bctbx_list, s);
+			}
+			return bctbx_list;
+		}
+
+		internal static IntPtr ObjectArrayToBctbxList<T>(IEnumerable<T> objlist) where T : LinphoneObject, new()
+		{
+			IntPtr bctbx_list = IntPtr.Zero;
+			foreach (T ptr in objlist)
+			{
+				bctbx_list = bctbx_list_append(bctbx_list, ptr.nativePtr);
+			}
+			return bctbx_list;
+		}
 	}
 	
 	public class LinphoneAndroid
 	{
 		[DllImport(LinphoneWrapper.LIB_NAME)]
-        static extern void ms_set_jvm_from_env(IntPtr jnienv);
+		static extern void ms_set_jvm_from_env(IntPtr jnienv);
 
-        [DllImport(LinphoneWrapper.LIB_NAME)]
-        static extern void setAndroidLogHandler();
+		[DllImport(LinphoneWrapper.LIB_NAME)]
+		static extern void setAndroidLogHandler();
 
-        [DllImport(LinphoneWrapper.LIB_NAME)]
-        static extern void setMediastreamerAndroidContext(IntPtr jnienv, IntPtr context);
+		[DllImport(LinphoneWrapper.LIB_NAME)]
+		static extern void setMediastreamerAndroidContext(IntPtr jnienv, IntPtr context);
 		
 		public static void setNativeLogHandler()
 		{
@@ -152,7 +192,7 @@ namespace Linphone
 	public enum {{enumName}}
 	{
 		{{#values}}
-		{{name}},
+		{{name}} = {{value}},
 		{{/values}}
 	}
 	
@@ -163,7 +203,7 @@ namespace Linphone
 	#region Listeners
 	{{#interfaces}}
 	{{#interface}}
-    [StructLayout(LayoutKind.Sequential)]
+	[StructLayout(LayoutKind.Sequential)]
 	public class {{interfaceName}} : LinphoneObject
 	{
 		{{#methods}}
@@ -203,31 +243,31 @@ namespace Linphone
 	#endregion
 	
 	#region Classes
-    {{#classes}}
-    {{#_class}}
-    [StructLayout(LayoutKind.Sequential)]
-    public class {{className}} : LinphoneObject
-    {
+	{{#classes}}
+	{{#_class}}
+	[StructLayout(LayoutKind.Sequential)]
+	public class {{className}} : LinphoneObject
+	{
 		{{#isLinphoneFactory}}
 		[DllImport(LinphoneWrapper.LIB_NAME)]
 		static extern IntPtr linphone_factory_create_core_cbs(IntPtr factory);
 		
-		public LinphoneCoreListener CreateCoreListener()
+		public CoreListener CreateCoreListener()
 		{
 			IntPtr coreCbsPtr = linphone_factory_create_core_cbs(nativePtr);
-			return fromNativePtr<LinphoneCoreListener>(coreCbsPtr, false);
+			return fromNativePtr<CoreListener>(coreCbsPtr, false);
 		}
 		{{/isLinphoneFactory}}		
-        {{#dllImports}}		
+		{{#dllImports}}		
 		[DllImport(LinphoneWrapper.LIB_NAME)]
-        {{{prototype}}}
+		{{{prototype}}}
 		{{#has_second_prototype}}
 		[DllImport(LinphoneWrapper.LIB_NAME)]
 		{{second_prototype}}
 		{{/has_second_prototype}}
 		
 		{{#has_property}}
-		{{{property}}}
+		{{property_static}}public {{{property_return}}} {{property_name}}
 		{
 		{{#has_getter}}
 			get
@@ -261,27 +301,40 @@ namespace Linphone
 			set
 			{
 				{{#is_string}}
-				{{setter_c_name}}({{setter_nativePtr}}value);
+				{{#exception}}int exception_result = {{/exception}}{{setter_c_name}}({{setter_nativePtr}}value);
+				{{#exception}}if (exception_result != 0) throw new LinphoneException("{{property_name}} setter returned value " + exception_result);{{/exception}}
 				{{/is_string}}
 				{{#is_bool}}
-				{{setter_c_name}}({{setter_nativePtr}}value ? 1 : 0);
+				{{#exception}}int exception_result = {{/exception}}{{setter_c_name}}({{setter_nativePtr}}value ? 1 : 0);
+				{{#exception}}if (exception_result != 0) throw new LinphoneException("{{property_name}} setter returned value " + exception_result);{{/exception}}
 				{{/is_bool}}
 				{{#is_class}}
-				{{setter_c_name}}({{setter_nativePtr}}value.nativePtr);
+				{{#exception}}int exception_result = {{/exception}}{{setter_c_name}}({{setter_nativePtr}}value.nativePtr);
+				{{#exception}}if (exception_result != 0) throw new LinphoneException("{{property_name}} setter returned value " + exception_result);{{/exception}}
 				{{/is_class}}
 				{{#is_enum}}
-				{{setter_c_name}}({{setter_nativePtr}}(int)value);
+				{{#exception}}int exception_result = {{/exception}}{{setter_c_name}}({{setter_nativePtr}}(int)value);
+				{{#exception}}if (exception_result != 0) throw new LinphoneException("{{property_name}} setter returned value " + exception_result);{{/exception}}
 				{{/is_enum}}
 				{{#is_generic}}
-				{{setter_c_name}}({{setter_nativePtr}}value);
+				{{#exception}}int exception_result = {{/exception}}{{setter_c_name}}({{setter_nativePtr}}value);
+				{{#exception}}if (exception_result != 0) throw new LinphoneException("{{property_name}} setter returned value " + exception_result);{{/exception}}
 				{{/is_generic}}
+				{{#is_string_list}}
+				{{#exception}}int exception_result = {{/exception}}{{setter_c_name}}({{setter_nativePtr}}StringArrayToBctbxList(value));
+				{{#exception}}if (exception_result != 0) throw new LinphoneException("{{property_name}} setter returned value " + exception_result);{{/exception}}
+				{{/is_string_list}}
+				{{#is_class_list}}
+				{{#exception}}int exception_result = {{/exception}}{{setter_c_name}}({{setter_nativePtr}}ObjectArrayToBctbxList<{{{list_type}}}>(value));
+				{{#exception}}if (exception_result != 0) throw new LinphoneException("{{property_name}} setter returned value " + exception_result);{{/exception}}
+				{{/is_class_list}}
 			}
 		{{/has_setter}}
 		}
 		{{/has_property}}
 		{{#has_impl}}
 		{{#impl}}
-		public {{static}}{{override}}{{{type}}} {{name}}({{args}})
+		public {{static}}{{override}}{{{type}}} {{name}}({{{args}}})
 		{
 			{{#is_string}}
 			IntPtr stringPtr = {{c_name}}({{nativePtr}}{{c_args}});
@@ -295,10 +348,12 @@ namespace Linphone
 			return fromNativePtr<{{type}}>(ptr, {{takeRef}});
 			{{/is_class}}
 			{{#is_enum}}
-			{{return}}{{c_name}}({{nativePtr}}{{c_args}});
+			{{#exception}}int exception_result = {{/exception}}{{return}}{{c_name}}({{nativePtr}}{{c_args}});
+			{{#exception}}if (exception_result != 0) throw new LinphoneException("{{name}} returned value " + exception_result);{{/exception}}
 			{{/is_enum}}
 			{{#is_generic}}
-			{{return}}{{c_name}}({{nativePtr}}{{c_args}});
+			{{#exception}}int exception_result = {{/exception}}{{return}}{{c_name}}({{nativePtr}}{{c_args}});
+			{{#exception}}if (exception_result != 0) throw new LinphoneException("{{name}} returned value " + exception_result);{{/exception}}
 			{{/is_generic}}
 			{{#is_string_list}}
 			return MarshalStringArray({{c_name}}({{nativePtr}}{{c_args}}));
@@ -309,9 +364,9 @@ namespace Linphone
 		}
 		{{/impl}}
 		{{/has_impl}}
-        {{/dllImports}}
-    }
-    {{/_class}}	
-    {{/classes}}
+		{{/dllImports}}
+	}
+	{{/_class}}	
+	{{/classes}}
 	#endregion
 }

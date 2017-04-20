@@ -30,6 +30,21 @@ class CsharpTranslator(object):
 	def __init__(self):
 		self.ignore = []
 
+	def init_method_dict(self):
+		methodDict = {}
+		methodDict['has_impl'] = True
+		methodDict['impl'] = {}
+		methodDict['is_string_list'] = False
+		methodDict['is_class_list'] = False
+		methodDict['list_type'] = None
+		methodDict['is_string'] = False
+		methodDict['is_bool'] = False
+		methodDict['is_class'] = False
+		methodDict['is_enum'] = False
+		methodDict['is_generic'] = False
+		methodDict['takeRef'] = 'true'
+		return methodDict
+
 	def get_class_array_type(self, name):
 		length = len(name)
 		if length > 11 and name[:11] == 'IEnumerable':
@@ -38,9 +53,6 @@ class CsharpTranslator(object):
 
 	def is_generic(self, methodDict):
 		return not methodDict['is_string'] and not methodDict['is_bool'] and not methodDict['is_class'] and not methodDict['is_enum'] and methodDict['list_type'] == None
-
-	def translate_class_name(self, name):
-		return 'Linphone' + name
 
 	def translate_method_name(self, name, recursive=False, topAncestor=None):
 		translatedName = name.to_camel_case(lower=True)
@@ -65,6 +77,11 @@ class CsharpTranslator(object):
 		if _type.name == 'void':
 				if _type.isref:
 					return 'IntPtr'
+				return 'void'
+		elif _type.name == 'status':
+			if dllImport:
+				return 'int'
+			else:
 				return 'void'
 		elif _type.name == 'boolean':
 			if dllImport:
@@ -104,20 +121,24 @@ class CsharpTranslator(object):
 			raise AbsApi.Error('\'{0}\' is not a base abstract type'.format(_type.name))
 
 		return res
+
+	def is_linphone_type(self, _type, isArg, dllImport=True):
+		if type(_type) is AbsApi.ClassType:
+			return False if dllImport else True
+		elif type(_type) is AbsApi.EnumType:
+			return False if dllImport else True
 	
 	def translate_type(self, _type, isArg, dllImport=True):
 		if type(_type) is AbsApi.EnumType:
 			if dllImport and isArg:
 				return 'int'
-			return _type.name
+			return _type.desc.name.to_camel_case()
 		elif type(_type) is AbsApi.ClassType:
-			return "IntPtr" if dllImport else self.translate_class_name(_type.desc.name.to_camel_case())
+			return "IntPtr" if dllImport else _type.desc.name.to_camel_case()
 		elif type(_type) is AbsApi.BaseType:
 			return self.translate_base_type(_type, isArg, dllImport)
 		elif type(_type) is AbsApi.ListType:
-			if isArg:
-				raise AbsApi.Error('Lists as params are not supported yet')
-			elif dllImport:
+			if dllImport:
 				return 'IntPtr'
 			else:
 				if type(_type.containedTypeDesc) is AbsApi.BaseType:
@@ -126,7 +147,7 @@ class CsharpTranslator(object):
 					else:
 						raise AbsApi.Error('translation of bctbx_list_t of basic C types is not supported')
 				elif type(_type.containedTypeDesc) is AbsApi.ClassType:
-					ptrType = self.translate_class_name(_type.containedTypeDesc.desc.name.to_camel_case())
+					ptrType = _type.containedTypeDesc.desc.name.to_camel_case()
 					return 'IEnumerable<' + ptrType + '>'
 				else:
 					if _type.containedTypeDesc:
@@ -135,7 +156,13 @@ class CsharpTranslator(object):
 						raise AbsApi.Error('translation of bctbx_list_t of unknow type !')
 	
 	def translate_argument(self, arg, dllImport=True):
-		return '{0} {1}'.format(self.translate_type(arg.type, isArg=True, dllImport=dllImport), self.translate_argument_name(arg.name))
+		return '{0} {1}'.format(self.translate_type(arg.type, True, dllImport), self.translate_argument_name(arg.name))
+	
+	def throws_exception(self, return_type):
+		if type(return_type) is AbsApi.BaseType:
+			if return_type.name == 'status':
+				return True
+		return False
 
 	def translate_method(self, method, static=False, genImpl=True):
 		if method.name.to_snake_case(fullName=True) in self.ignore:
@@ -157,6 +184,7 @@ class CsharpTranslator(object):
 		if genImpl:
 			methodDict['impl'] = {}
 			methodDict['impl']['static'] = 'static ' if static else ''
+			methodDict['impl']['exception'] = self.throws_exception(method.returnType)
 			methodDict['impl']['type'] = self.translate_type(method.returnType, False, False)
 			methodDict['impl']['name'] = method.name.to_camel_case()
 			methodDict['impl']['override'] = 'override ' if method.name.to_camel_case() == 'ToString' else ''
@@ -170,8 +198,8 @@ class CsharpTranslator(object):
 
 			methodDict['is_string'] = methodDict['impl']['type'] == "string"
 			methodDict['is_bool'] = methodDict['impl']['type'] == "bool"
-			methodDict['is_class'] = methodDict['impl']['type'][:8] == "Linphone" and type(method.returnType) is AbsApi.ClassType
-			methodDict['is_enum'] = methodDict['impl']['type'][:8] == "Linphone" and type(method.returnType) is AbsApi.EnumType
+			methodDict['is_class'] = self.is_linphone_type(method.returnType, False, False) and type(method.returnType) is AbsApi.ClassType
+			methodDict['is_enum'] = self.is_linphone_type(method.returnType, False, False) and type(method.returnType) is AbsApi.EnumType
 			methodDict['is_generic'] = self.is_generic(methodDict)
 			methodDict['takeRef'] = 'true'
 			if type(method.returnType.parent) is AbsApi.Method and len(method.returnType.parent.name.words) >=1:
@@ -184,7 +212,7 @@ class CsharpTranslator(object):
 				if arg is not method.args[0]:
 					methodDict['impl']['args'] += ', '
 					methodDict['impl']['c_args'] += ', '
-				if self.translate_type(arg.type, False, False)[:8] == "Linphone":
+				if self.is_linphone_type(arg.type, False, False):
 					if type(arg.type) is AbsApi.ClassType:
 						argname = self.translate_argument_name(arg.name)
 						methodDict['impl']['c_args'] += argname + " != null ? " + argname + ".nativePtr : IntPtr.Zero"
@@ -192,6 +220,12 @@ class CsharpTranslator(object):
 						methodDict['impl']['c_args'] += '(int)' + self.translate_argument_name(arg.name)
 				elif self.translate_type(arg.type, False, False) == "bool":
 					methodDict['impl']['c_args'] += self.translate_argument_name(arg.name) + " ? 1 : 0"
+				elif self.get_class_array_type(self.translate_type(arg.type, False, False)) is not None:
+					listtype = self.get_class_array_type(self.translate_type(arg.type, False, False))
+					if listtype == 'string':
+						methodDict['impl']['c_args'] += "StringArrayToBctbxList(" + self.translate_argument_name(arg.name) + ")"
+					else:
+						methodDict['impl']['c_args'] += "ObjectArrayToBctbxList<" + listtype + ">(" + self.translate_argument_name(arg.name) + ")"
 				else:
 					methodDict['impl']['c_args'] += self.translate_argument_name(arg.name)
 				methodDict['impl']['args'] += self.translate_argument(arg, False)
@@ -203,16 +237,15 @@ class CsharpTranslator(object):
 	def translate_property_getter(self, prop, name, static=False):
 		methodDict = self.translate_method(prop, static, False)
 
-		methodElems = {}
-		methodElems['static'] = 'static ' if static else ''
-		methodElems['return'] = self.translate_type(prop.returnType, False, False)
-		methodElems['name'] = (name[3:] if len(name) > 3 else 'Instance') if name[:3] == "Get" else name
+		methodDict['property_static'] = 'static ' if static else ''
+		methodDict['property_return'] = self.translate_type(prop.returnType, False, False)
+		methodDict['property_name'] = (name[3:] if len(name) > 3 else 'Instance') if name[:3] == "Get" else name
 
 		methodDict['has_property'] = True
-		methodDict['property'] = "{static}public {return} {name}".format(**methodElems)
 		methodDict['has_getter'] = True
 		methodDict['has_setter'] = False
-		methodDict['return'] = methodElems['return']
+		methodDict['return'] = methodDict['property_return']
+		methodDict['exception'] = self.throws_exception(prop.returnType)
 		methodDict['getter_nativePtr'] = '' if static else 'nativePtr'
 		methodDict['getter_c_name'] = prop.name.to_c()
 
@@ -220,10 +253,10 @@ class CsharpTranslator(object):
 		methodDict['is_string_list'] = methodDict['list_type'] == 'string'
 		methodDict['is_class_list'] = not methodDict['list_type'] == None and not methodDict['list_type'] == 'string'
 
-		methodDict['is_string'] = methodElems['return'] == "string"
-		methodDict['is_bool'] = methodElems['return'] == "bool"
-		methodDict['is_class'] = methodElems['return'][:8] == "Linphone" and type(prop.returnType) is AbsApi.ClassType
-		methodDict['is_enum'] = methodElems['return'][:8] == "Linphone" and type(prop.returnType) is AbsApi.EnumType
+		methodDict['is_string'] = methodDict['return'] == "string"
+		methodDict['is_bool'] = methodDict['return'] == "bool"
+		methodDict['is_class'] = self.is_linphone_type(prop.returnType, False, False) and type(prop.returnType) is AbsApi.ClassType
+		methodDict['is_enum'] = self.is_linphone_type(prop.returnType, False, False) and type(prop.returnType) is AbsApi.EnumType
 		methodDict['is_generic'] = self.is_generic(methodDict)
 		methodDict['takeRef'] = 'true'
 		if type(prop.returnType.parent) is AbsApi.Method and len(prop.returnType.parent.name.words) >=1:
@@ -235,16 +268,15 @@ class CsharpTranslator(object):
 	def translate_property_setter(self, prop, name, static=False):
 		methodDict = self.translate_method(prop, static, False)
 
-		methodElems = {}
-		methodElems['static'] = 'static ' if static else ''
-		methodElems['return'] = self.translate_type(prop.args[0].type, True, False)
-		methodElems['name'] = (name[3:] if len(name) > 3 else 'Instance') if name[:3] == "Set" else name
+		methodDict['property_static'] = 'static ' if static else ''
+		methodDict['property_return'] = self.translate_type(prop.args[0].type, True, False)
+		methodDict['property_name'] = (name[3:] if len(name) > 3 else 'Instance') if name[:3] == "Set" else name
 
 		methodDict['has_property'] = True
-		methodDict['property'] = "{static}public {return} {name}".format(**methodElems)
 		methodDict['has_getter'] = False
 		methodDict['has_setter'] = True
-		methodDict['return'] = methodElems['return']
+		methodDict['return'] = methodDict['property_return']
+		methodDict['exception'] = self.throws_exception(prop.returnType)
 		methodDict['setter_nativePtr'] = '' if static else 'nativePtr, '
 		methodDict['setter_c_name'] = prop.name.to_c()
 
@@ -252,10 +284,10 @@ class CsharpTranslator(object):
 		methodDict['is_string_list'] = methodDict['list_type'] == 'string'
 		methodDict['is_class_list'] = not methodDict['list_type'] == None and not methodDict['list_type'] == 'string'
 
-		methodDict['is_string'] = methodElems['return'] == "string"
-		methodDict['is_bool'] = methodElems['return'] == "bool"
-		methodDict['is_class'] = methodElems['return'][:8] == "Linphone" and type(prop.args[0].type) is AbsApi.ClassType
-		methodDict['is_enum'] = methodElems['return'][:8] == "Linphone" and type(prop.args[0].type) is AbsApi.EnumType
+		methodDict['is_string'] = methodDict['return'] == "string"
+		methodDict['is_bool'] = methodDict['return'] == "bool"
+		methodDict['is_class'] = self.is_linphone_type(prop.args[0].type, True, False) and type(prop.args[0].type) is AbsApi.ClassType
+		methodDict['is_enum'] = self.is_linphone_type(prop.args[0].type, True, False) and type(prop.args[0].type) is AbsApi.EnumType
 		methodDict['is_generic'] = self.is_generic(methodDict)
 
 		return methodDict
@@ -270,6 +302,7 @@ class CsharpTranslator(object):
 		methodDict["second_prototype"] = methodDictSet['prototype']
 
 		methodDict['has_setter'] = True
+		methodDict['exception'] = methodDictSet['exception']
 		methodDict['setter_nativePtr'] = methodDictSet['setter_nativePtr']
 		methodDict['setter_c_name'] = methodDictSet['setter_c_name']
 
@@ -314,8 +347,9 @@ class CsharpTranslator(object):
 		listenerDict['delegate']['params_private'] = ""
 		listenerDict['delegate']['params'] = ""
 		for arg in method.args:
-			dllImportType = self.translate_type(arg.type, isArg=True, dllImport=True)
-			normalType = self.translate_type(arg.type, isArg=True, dllImport=False)
+			dllImportType = self.translate_type(arg.type, True, True)
+			normalType = self.translate_type(arg.type, True, False)
+
 			argName = self.translate_argument_name(arg.name)
 			if arg != method.args[0]:
 				listenerDict['delegate']['params_public'] += ', '
@@ -326,9 +360,9 @@ class CsharpTranslator(object):
 			else:
 				if normalType == "bool":
 					listenerDict['delegate']['params'] += argName + " == 0"
-				elif normalType[:8] == "Linphone" and type(arg.type) is AbsApi.ClassType:
+				elif self.is_linphone_type(arg.type, True, False) and type(arg.type) is AbsApi.ClassType:
 					listenerDict['delegate']['params'] += "fromNativePtr<" + normalType + ">(" + argName + ")"
-				elif normalType[:8] == "Linphone" and type(arg.type) is AbsApi.EnumType:
+				elif self.is_linphone_type(arg.type, True, False) and type(arg.type) is AbsApi.EnumType:
 					listenerDict['delegate']['params'] += "(" + normalType + ")" + argName + ""
 				else:
 					raise("Error")
@@ -339,37 +373,27 @@ class CsharpTranslator(object):
 		return listenerDict
 
 	def generate_getter_for_listener_callbacks(self, _class, classname):
-		methodDict = {}
+		methodDict = self.init_method_dict()
 		c_name = _class.name.to_snake_case(fullName=True) + '_get_callbacks'
-		classname = self.translate_class_name(classname)
 		methodDict['prototype'] = "static extern IntPtr {c_name}(IntPtr thiz);".format(classname = classname, c_name = c_name)
 
 		methodDict['has_impl'] = False
 		methodDict['has_property'] = True
-		methodDict['property'] = "public {classname} Listener".format(classname = classname)
+		methodDict['property_static'] = ''
+		methodDict['property_return'] = classname
+		methodDict['property_name'] = 'Listener'
 		methodDict['has_getter'] = True
 		methodDict['return'] = classname
 		methodDict['getter_nativePtr'] = 'nativePtr'
 		methodDict['getter_c_name'] = c_name
-		methodDict['is_string_list'] = False
-		methodDict['is_class_list'] = False
-		methodDict['list_type'] = None
-		methodDict['is_string'] = False
-		methodDict['is_bool'] = False
 		methodDict['is_class'] = True
-		methodDict['is_enum'] = False
-		methodDict['is_generic'] = False
-		methodDict['takeRef'] = 'true'
 
 		return methodDict
 
 	def generate_add_for_listener_callbacks(self, _class, classname):
-		methodDict = {}
+		methodDict = self.init_method_dict()
 		c_name = _class.name.to_snake_case(fullName=True) + '_add_callbacks'
-		classname = self.translate_class_name(classname)
 		methodDict['prototype'] = "static extern void {c_name}(IntPtr thiz, IntPtr cbs);".format(classname = classname, c_name = c_name)
-		methodDict['has_impl'] = True
-		methodDict['impl'] = {}
 		methodDict['impl']['static'] = ''
 		methodDict['impl']['type'] = 'void'
 		methodDict['impl']['name'] = 'AddListener'
@@ -378,25 +402,14 @@ class CsharpTranslator(object):
 		methodDict['impl']['nativePtr'] = 'nativePtr, '
 		methodDict['impl']['args'] = classname + ' cbs'
 		methodDict['impl']['c_args'] = 'cbs != null ? cbs.nativePtr : IntPtr.Zero'
-		methodDict['is_string_list'] = False
-		methodDict['is_class_list'] = False
-		methodDict['list_type'] = None
-		methodDict['is_string'] = False
-		methodDict['is_bool'] = False
-		methodDict['is_class'] = False
-		methodDict['is_enum'] = False
 		methodDict['is_generic'] = True
-		methodDict['takeRef'] = 'true'
 
 		return methodDict
 
 	def generate_remove_for_listener_callbacks(self, _class, classname):
-		methodDict = {}
+		methodDict = self.init_method_dict()
 		c_name = _class.name.to_snake_case(fullName=True) + '_remove_callbacks'
-		classname = self.translate_class_name(classname)
 		methodDict['prototype'] = "static extern void {c_name}(IntPtr thiz, IntPtr cbs);".format(classname = classname, c_name = c_name)
-		methodDict['has_impl'] = True
-		methodDict['impl'] = {}
 		methodDict['impl']['static'] = ''
 		methodDict['impl']['type'] = 'void'
 		methodDict['impl']['name'] = 'RemoveListener'
@@ -405,15 +418,7 @@ class CsharpTranslator(object):
 		methodDict['impl']['nativePtr'] = 'nativePtr, '
 		methodDict['impl']['args'] = classname + ' cbs'
 		methodDict['impl']['c_args'] = 'cbs != null ? cbs.nativePtr : IntPtr.Zero'
-		methodDict['is_string_list'] = False
-		methodDict['is_class_list'] = False
-		methodDict['list_type'] = None
-		methodDict['is_string'] = False
-		methodDict['is_bool'] = False
-		methodDict['is_class'] = False
-		methodDict['is_enum'] = False
 		methodDict['is_generic'] = True
-		methodDict['takeRef'] = 'true'
 
 		return methodDict
 	
@@ -421,13 +426,24 @@ class CsharpTranslator(object):
 
 	def translate_enum(self, enum):
 		enumDict = {}
-		enumDict['enumName'] = self.translate_class_name(enum.name.to_camel_case())
+		enumDict['enumName'] = enum.name.to_camel_case()
 		enumDict['values'] = []
 		i = 0
+		lastValue = None
 		for enumValue in enum.values:
 			enumValDict = {}
 			enumValDict['name'] = enumValue.name.to_camel_case()
-			enumValDict['notLast'] = i < len(enum.values) - 1
+			if type(enumValue.value) is int:
+				lastValue = enumValue.value
+				enumValDict['value'] = str(enumValue.value)
+			elif type(enumValue.value) is AbsApi.Flag:
+				enumValDict['value'] = '1<<' + str(enumValue.value.position)
+			else:
+				if lastValue is not None:
+					enumValDict['value'] = lastValue + 1
+					lastValue += 1
+				else:
+					enumValDict['value'] = i
 			enumDict['values'].append(enumValDict)
 			i += 1
 		return enumDict
@@ -437,7 +453,7 @@ class CsharpTranslator(object):
 			raise AbsApi.Error('{0} has been escaped'.format(_class.name.to_camel_case(fullName=True)))
 
 		classDict = {}
-		classDict['className'] = self.translate_class_name(_class.name.to_camel_case())
+		classDict['className'] = _class.name.to_camel_case()
 		classDict['isLinphoneFactory'] = _class.name.to_camel_case() == "Factory"
 		classDict['dllImports'] = []
 
@@ -485,7 +501,7 @@ class CsharpTranslator(object):
 			raise AbsApi.Error('{0} has been escaped'.format(interface.name.to_camel_case(fullName=True)))
 
 		interfaceDict = {}
-		interfaceDict['interfaceName'] = self.translate_class_name(interface.name.to_camel_case())
+		interfaceDict['interfaceName'] = interface.name.to_camel_case()
 		interfaceDict['methods'] = []
 		for method in interface.methods:
 			interfaceDict['methods'].append(self.translate_listener(interface, method))
