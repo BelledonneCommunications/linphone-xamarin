@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ProjectGuid>{A4C630BE-6CF3-4953-92A7-E7C6648BEDE7}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>LinphoneXamarin.Droid</RootNamespace>
+    <MonoAndroidAssetsPrefix>Assets</MonoAndroidAssetsPrefix>
+    <MonoAndroidResourcePrefix>Resources</MonoAndroidResourcePrefix>
+    <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
+    <AndroidResgenClass>Resource</AndroidResgenClass>
+    <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
+    <AndroidApplication>True</AndroidApplication>
+    <AndroidUseLatestPlatformSdk>True</AndroidUseLatestPlatformSdk>
+    <TargetFrameworkVersion>v7.1</TargetFrameworkVersion>
+    <AssemblyName>LinphoneXamarin.Droid</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>True</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;ANDROID</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AndroidLinkMode>None</AndroidLinkMode>
+    <ConsolePause>false</ConsolePause>
+    <AndroidUseSharedRuntime>True</AndroidUseSharedRuntime>
+    <EmbedAssembliesIntoApk>False</EmbedAssembliesIntoApk>
+    <BundleAssemblies>False</BundleAssemblies>
+    <AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
+    <AndroidSupportedAbis>armeabi-v7a;x86;arm64-v8a</AndroidSupportedAbis>
+    <Debugger>Xamarin</Debugger>
+    <AotAssemblies>False</AotAssemblies>
+    <EnableLLVM>False</EnableLLVM>
+    <AndroidEnableMultiDex>False</AndroidEnableMultiDex>
+    <EnableProguard>False</EnableProguard>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="Mono.Android" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MainActivity.cs" />
+    <Compile Include="Resources\Resource.designer.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidNativeLibrary Include="Libs\x86\libbctoolbox.so" />
+    <AndroidNativeLibrary Include="Libs\x86\libgnustl_shared.so" />
+    <AndroidNativeLibrary Include="Libs\x86\liblinphone.so" />
+    <AndroidNativeLibrary Include="Libs\x86\libmediastreamer_base.so" />
+    <AndroidNativeLibrary Include="Libs\x86\libmediastreamer_voip.so" />
+    <AndroidNativeLibrary Include="Libs\x86\libmssilk.so" />
+    <AndroidNativeLibrary Include="Libs\x86\libmswebrtc.so" />
+    <AndroidNativeLibrary Include="Libs\x86\libortp.so" />
+    <AndroidNativeLibrary Include="Libs\arm64-v8a\libbctoolbox.so" />
+    <AndroidNativeLibrary Include="Libs\arm64-v8a\libgnustl_shared.so" />
+    <AndroidNativeLibrary Include="Libs\arm64-v8a\liblinphone.so" />
+    <AndroidNativeLibrary Include="Libs\arm64-v8a\libmediastreamer_base.so" />
+    <AndroidNativeLibrary Include="Libs\arm64-v8a\libmediastreamer_voip.so" />
+    <AndroidNativeLibrary Include="Libs\arm64-v8a\libmssilk.so" />
+    <AndroidNativeLibrary Include="Libs\arm64-v8a\libmswebrtc.so" />
+    <AndroidNativeLibrary Include="Libs\arm64-v8a\libortp.so" />
+    <AndroidNativeLibrary Include="Libs\armeabi-v7a\libbctoolbox.so" />
+    <AndroidNativeLibrary Include="Libs\armeabi-v7a\libgnustl_shared.so" />
+    <AndroidNativeLibrary Include="Libs\armeabi-v7a\liblinphone.so" />
+    <AndroidNativeLibrary Include="Libs\armeabi-v7a\libmediastreamer_base.so" />
+    <AndroidNativeLibrary Include="Libs\armeabi-v7a\libmediastreamer_voip.so" />
+    <AndroidNativeLibrary Include="Libs\armeabi-v7a\libmssilk.so" />
+    <AndroidNativeLibrary Include="Libs\armeabi-v7a\libmswebrtc.so" />
+    <AndroidNativeLibrary Include="Libs\armeabi-v7a\libortp.so" />
+    <None Include="Resources\AboutResources.txt" />
+    <None Include="Properties\AndroidManifest.xml" />
+    <None Include="Assets\AboutAssets.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\Main.axml" />
+    <AndroidResource Include="Resources\values\Strings.xml" />
+    <AndroidResource Include="Resources\drawable-hdpi\Icon.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\Icon.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\Icon.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\Icon.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\Icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidAsset Include="Assets\linphonerc_default" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidJavaLibrary Include="Libs\liblinphone.jar" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="..\Xamarin\Xamarin.projitems" Label="Shared" Condition="Exists('..\Xamarin\Xamarin.projitems')" />
+  <Import Project="..\Xamarin\Xamarin.projitems" Label="Shared" />
+  <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
+</Project>
