@@ -1,6 +1,7 @@
 Makefile
 android
 iOS
+Xamarin/Xamarin/LinphoneWrapper.cs
 Xamarin/Xamarin.Droid/Libs/arm64-v8a
 Xamarin/Xamarin.Droid/Libs/armeabi-v7a
 Xamarin/Xamarin.Droid/Libs/x86
