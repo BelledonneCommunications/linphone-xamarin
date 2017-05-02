@@ -44,11 +44,11 @@ except Exception as e:
 class AndroidTarget(prepare.Target):
 
     def __init__(self, arch):
-        prepare.Target.__init__(self, 'android-' + arch)
+        prepare.Target.__init__(self, 'android-' + arch, 'android')
         current_path = os.path.dirname(os.path.realpath(__file__))
         self.config_file = 'configs/config-android.cmake'
         self.toolchain_file = 'toolchains/toolchain-android-' + arch + '.cmake'
-        self.output = 'liblinphone-sdk/android-' + arch
+        self.output = 'android/liblinphone-sdk/android-' + arch
         self.external_source_path = os.path.join(current_path, 'submodules')
 
 
@@ -176,8 +176,8 @@ class AndroidPreparator(prepare.Preparator):
         prepare.Preparator.clean(self)
         if os.path.isfile('Makefile'):
             os.remove('Makefile')
-        if os.path.isdir('WORK') and not os.listdir('WORK'):
-            os.rmdir('WORK')
+        if os.path.isdir('android') and not os.listdir('android'):
+            os.rmdir('android')
         if os.path.isdir('liblinphone-sdk') and not os.listdir('liblinphone-sdk'):
             os.rmdir('liblinphone-sdk')
 
@@ -196,7 +196,7 @@ class AndroidPreparator(prepare.Preparator):
 {arch}: {arch}-build
 
 {arch}-build:
-\t{generator} WORK/android-{arch}/cmake
+\t{generator} android/android-{arch}/cmake
 \t@echo "Done"
 """.format(arch=arch, generator=generator)
         makefile = """
@@ -222,7 +222,7 @@ copy-libs:
 \t\tcp -f liblinphone-sdk/android-arm/lib/libgnustl_shared.so libs/armeabi && \\
 \t\tcp -f liblinphone-sdk/android-arm/lib/lib*-armeabi.so libs/armeabi && \\
 \t\tcp -f liblinphone-sdk/android-arm/lib/mediastreamer/plugins/*.so libs/armeabi && \\
-\t\tsh WORK/android-arm/strip.sh libs/armeabi/*.so; \\
+\t\tsh android/android-arm/strip.sh libs/armeabi/*.so; \\
 \tfi
 \tif test -f "liblinphone-sdk/android-arm/bin/gdbserver"; then \\
 \t\tcp -f liblinphone-sdk/android-arm/bin/gdbserver libs-debug/armeabi && \\
@@ -241,7 +241,7 @@ copy-libs:
 \t\tcp -f liblinphone-sdk/android-armv7/lib/libgnustl_shared.so libs/armeabi-v7a && \\
 \t\tcp -f liblinphone-sdk/android-armv7/lib/lib*-armeabi-v7a.so libs/armeabi-v7a && \\
 \t\tcp -f liblinphone-sdk/android-armv7/lib/mediastreamer/plugins/*.so libs/armeabi-v7a && \\
-\t\tsh WORK/android-armv7/strip.sh libs/armeabi-v7a/*.so; \\
+\t\tsh android/android-armv7/strip.sh libs/armeabi-v7a/*.so; \\
 \tfi
 \tif test -f "liblinphone-sdk/android-armv7/bin/gdbserver"; then \\
 \t\tcp -f liblinphone-sdk/android-armv7/bin/gdbserver libs-debug/armeabi-v7a && \\
@@ -260,7 +260,7 @@ copy-libs:
 \t\tcp -f liblinphone-sdk/android-arm64/lib/libgnustl_shared.so libs/arm64-v8a && \\
 \t\tcp -f liblinphone-sdk/android-arm64/lib/lib*-arm64-v8a.so libs/arm64-v8a && \\
 \t\tcp -f liblinphone-sdk/android-arm64/lib/mediastreamer/plugins/*.so libs/arm64-v8a && \\
-\t\tsh WORK/android-arm64/strip.sh libs/arm64-v8a/*.so; \\
+\t\tsh android/android-arm64/strip.sh libs/arm64-v8a/*.so; \\
 \tfi
 \tif test -f "liblinphone-sdk/android-arm64/bin/gdbserver"; then \\
 \t\tcp -f liblinphone-sdk/android-arm64/bin/gdbserver libs-debug/arm64-v8a && \\
@@ -279,7 +279,7 @@ copy-libs:
 \t\tcp -f liblinphone-sdk/android-x86/lib/libgnustl_shared.so libs/x86 && \\
 \t\tcp -f liblinphone-sdk/android-x86/lib/lib*-x86.so libs/x86 && \\
 \t\tcp -f liblinphone-sdk/android-x86/lib/mediastreamer/plugins/*.so libs/x86 && \\
-\t\tsh WORK/android-x86/strip.sh libs/x86/*.so; \\
+\t\tsh android/android-x86/strip.sh libs/x86/*.so; \\
 \tfi
 \tif test -f "liblinphone-sdk/android-x86/bin/gdbserver"; then \\
 \t\tcp -f liblinphone-sdk/android-x86/bin/gdbserver libs-debug/x86 && \\
@@ -293,25 +293,25 @@ copy-libs-mediastreamer:
 \tif test -d "liblinphone-sdk/android-arm"; then \\
 \t\tmkdir -p submodules/mediastreamer2/java/libs/armeabi && \\
 \t\tcp -f liblinphone-sdk/android-arm/lib/*mediastreamer*.so submodules/mediastreamer2/java/libs/armeabi && \\
-\t\tsh WORK/android-arm/strip.sh submodules/mediastreamer2/java/libs/armeabi/*.so; \\
+\t\tsh android/android-arm/strip.sh submodules/mediastreamer2/java/libs/armeabi/*.so; \\
 \tfi
 \trm -rf submodules/mediastreamer2/java/libs/armeabi-v7a
 \tif test -d "liblinphone-sdk/android-armv7"; then \\
 \t\tmkdir -p submodules/mediastreamer2/java/libs/armeabi-v7a && \\
 \t\tcp -f liblinphone-sdk/android-armv7/lib/*mediastreamer*.so submodules/mediastreamer2/java/libs/armeabi-v7a && \\
-\t\tsh WORK/android-armv7/strip.sh submodules/mediastreamer2/java/libs/armeabi-v7a/*.so; \\
+\t\tsh android/android-armv7/strip.sh submodules/mediastreamer2/java/libs/armeabi-v7a/*.so; \\
 \tfi
 \trm -rf submodules/mediastreamer2/java/libs/arm64-v8a
 \tif test -d "liblinphone-sdk/android-arm64"; then \\
 \t\tmkdir -p submodules/mediastreamer2/java/libs/arm64-v8a && \\
 \t\tcp -f liblinphone-sdk/android-arm64/lib/*mediastreamer*.so submodules/mediastreamer2/java/libs/arm64-v8a && \\
-\t\tsh WORK/android-arm64/strip.sh submodules/mediastreamer2/java/libs/arm64-v8a/*.so; \\
+\t\tsh android/android-arm64/strip.sh submodules/mediastreamer2/java/libs/arm64-v8a/*.so; \\
 \tfi
 \trm -rf submodules/mediastreamer2/java/libs/x86
 \tif test -d "liblinphone-sdk/android-x86"; then \\
 \t\tmkdir -p submodules/mediastreamer2/java/libs/x86 && \\
 \t\tcp -f liblinphone-sdk/android-x86/lib/*mediastreamer*.so submodules/mediastreamer2/java/libs/x86 && \\
-\t\tsh WORK/android-x86/strip.sh submodules/mediastreamer2/java/libs/x86/*.so; \\
+\t\tsh android/android-x86/strip.sh submodules/mediastreamer2/java/libs/x86/*.so; \\
 \tfi
 
 generate-sdk: liblinphone-android-sdk
