@@ -182,11 +182,7 @@ class AndroidPreparator(prepare.Preparator):
             os.rmdir('liblinphone-sdk')
 
     def prepare(self):
-        self.download_gradle()
         prepare.Preparator.prepare(self)
-
-    def download_gradle(self):
-        os.system('./gradlew')
 
     def generate_makefile(self, generator, project_file=''):
         platforms = self.args.target
@@ -288,45 +284,7 @@ copy-libs:
 \t\tcp -f liblinphone-sdk/android-x86/bin/gdb.setup libs/x86; \\
 \tfi
 
-copy-libs-mediastreamer:
-\trm -rf submodules/mediastreamer2/java/libs/armeabi
-\tif test -d "liblinphone-sdk/android-arm"; then \\
-\t\tmkdir -p submodules/mediastreamer2/java/libs/armeabi && \\
-\t\tcp -f liblinphone-sdk/android-arm/lib/*mediastreamer*.so submodules/mediastreamer2/java/libs/armeabi && \\
-\t\tsh android/android-arm/strip.sh submodules/mediastreamer2/java/libs/armeabi/*.so; \\
-\tfi
-\trm -rf submodules/mediastreamer2/java/libs/armeabi-v7a
-\tif test -d "liblinphone-sdk/android-armv7"; then \\
-\t\tmkdir -p submodules/mediastreamer2/java/libs/armeabi-v7a && \\
-\t\tcp -f liblinphone-sdk/android-armv7/lib/*mediastreamer*.so submodules/mediastreamer2/java/libs/armeabi-v7a && \\
-\t\tsh android/android-armv7/strip.sh submodules/mediastreamer2/java/libs/armeabi-v7a/*.so; \\
-\tfi
-\trm -rf submodules/mediastreamer2/java/libs/arm64-v8a
-\tif test -d "liblinphone-sdk/android-arm64"; then \\
-\t\tmkdir -p submodules/mediastreamer2/java/libs/arm64-v8a && \\
-\t\tcp -f liblinphone-sdk/android-arm64/lib/*mediastreamer*.so submodules/mediastreamer2/java/libs/arm64-v8a && \\
-\t\tsh android/android-arm64/strip.sh submodules/mediastreamer2/java/libs/arm64-v8a/*.so; \\
-\tfi
-\trm -rf submodules/mediastreamer2/java/libs/x86
-\tif test -d "liblinphone-sdk/android-x86"; then \\
-\t\tmkdir -p submodules/mediastreamer2/java/libs/x86 && \\
-\t\tcp -f liblinphone-sdk/android-x86/lib/*mediastreamer*.so submodules/mediastreamer2/java/libs/x86 && \\
-\t\tsh android/android-x86/strip.sh submodules/mediastreamer2/java/libs/x86/*.so; \\
-\tfi
-
-generate-sdk: liblinphone-android-sdk
-
-liblinphone-android-sdk: build copy-libs
-\t./gradlew -b libLinphoneAndroidSdk.gradle androidJavadocsJar
-\t./gradlew -b libLinphoneAndroidSdk.gradle sourcesJar
-\t./gradlew -b libLinphoneAndroidSdk.gradle assembleRelease
-\t./gradlew -b libLinphoneAndroidSdk.gradle sdkZip
-
-mediastreamer2-sdk: build copy-libs-mediastreamer
-\t@cd $(TOPDIR)/submodules/mediastreamer2/java && \\
-\t./gradlew -b mediastreamerSdk.gradle assembleRelease
-\t@cd $(TOPDIR)/submodules/mediastreamer2/java && \\
-\t./gradlew -b mediastreamerSdk.gradle sdkZip
+generate-sdk: build copy-libs
 
 {arch_targets}
 
