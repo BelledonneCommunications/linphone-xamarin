@@ -193,14 +193,14 @@ class AndroidPreparator(prepare.Preparator):
         arch_targets = ""
         for arch in platforms:
             arch_targets += """
-{arch}: {arch}-build
+android-{arch}: android-{arch}-build
 
-{arch}-build:
+android-{arch}-build:
 \t{generator} android/android-{arch}/cmake
 \t@echo "Done"
 """.format(arch=arch, generator=generator)
         makefile = """
-archs={archs}
+android-archs={archs}
 TOPDIR=$(shell pwd)
 
 .PHONY: all
@@ -208,9 +208,9 @@ TOPDIR=$(shell pwd)
 
 all: generate-android-sdk
 
-build: $(addsuffix -build, $(archs))
+android-build: $(addprefix android-, $(addsuffix -build, $(android-archs)))
 
-copy-libs:
+android-copy-libs:
 \trm -rf Xamarin/Xamarin/Xamarin.Droid/Libs/armeabi-v7a
 \tif test -d "android/liblinphone-sdk/android-armv7"; then \\
 \t\tmkdir -p Xamarin/Xamarin/Xamarin.Droid/Libs/armeabi-v7a && \\
@@ -240,9 +240,14 @@ create-jar:
 \t./gradlew assembleRelease
 \t./gradlew classJar
 
-generate-android-sdk: build copy-libs create-jar
+generate-android-sdk: clean android-build android-copy-libs create-jar
 
 {arch_targets}
+
+clean: java-clean
+
+java-clean:
+	./gradlew clean
 
 help-prepare-options:
 \t@echo "prepare.py was previously executed with the following options:"
