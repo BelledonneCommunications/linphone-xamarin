@@ -8,7 +8,6 @@ Xamarin/Xamarin/Xamarin.Droid/Libs/arm64-v8a
 Xamarin/Xamarin/Xamarin.Droid/Libs/armeabi-v7a
 Xamarin/Xamarin/Xamarin.Droid/Libs/x86
 Xamarin/Xamarin/Xamarin.Droid/Libs/liblinphone.jar
-Xamarin/Xamarin/Xamarin.Droid/Libs/linphone-xamarin-class.jar
 .gradle
 bin
 *.pyc

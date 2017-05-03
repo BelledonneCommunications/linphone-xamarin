@@ -48,12 +48,12 @@ android {
 
     sourceSets {
         main {
-            manifest.srcFile 'AndroidManifest.xml'
+            manifest.srcFile 'Xamarin/Xamarin/Xamarin.Droid/Properties/AndroidManifest.xml'
             java.srcDirs = submoduleDir
             resources.srcDirs = submoduleDir
             aidl.srcDirs = submoduleDir
             renderscript.srcDirs = submoduleDir
-            jniLibs.srcDirs = ['Xamarin/Xamarin.Droid/Libs']
+            jniLibs.srcDirs = ['Xamarin/Xamarin/Xamarin.Droid/Libs']
 
             java.excludes = ['**/mediastream/MediastreamerActivity.java']
 
@@ -73,5 +73,6 @@ task classJar(type: Jar) {
     classifier = 'class'
     from 'intermediates/classes/release'
     include '**/*.class'
-    libsDirName = '../Xamarin/Xamarin.Droid/Libs'
+    libsDirName = '../Xamarin/Xamarin/Xamarin.Droid/Libs'
+    archiveName = 'liblinphone.jar'
 }
