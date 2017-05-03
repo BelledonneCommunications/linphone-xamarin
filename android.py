@@ -174,15 +174,19 @@ class AndroidPreparator(prepare.Preparator):
 
     def clean(self):
         prepare.Preparator.clean(self)
-        if os.path.isfile('Makefile'):
-            os.remove('Makefile')
+        if os.path.isfile('Makefile.android'):
+            os.remove('Makefile.android')
         if os.path.isdir('android') and not os.listdir('android'):
             os.rmdir('android')
         if os.path.isdir('liblinphone-sdk') and not os.listdir('liblinphone-sdk'):
             os.rmdir('liblinphone-sdk')
 
     def prepare(self):
+        self.download_gradle()
         prepare.Preparator.prepare(self)
+
+    def download_gradle(self):
+        os.system('./gradlew')
 
     def generate_makefile(self, generator, project_file=''):
         platforms = self.args.target
@@ -202,7 +206,7 @@ TOPDIR=$(shell pwd)
 .PHONY: all
 .NOTPARALLEL: all
 
-all: generate-sdk
+all: generate-android-sdk
 
 build: $(addsuffix -build, $(archs))
 
@@ -232,7 +236,11 @@ copy-libs:
 \t\tsh android/android-x86/strip.sh Xamarin/Xamarin/Xamarin.Droid/Libs/x86/*.so; \\
 \tfi
 
-generate-sdk: build copy-libs
+create-jar:
+\t./gradlew assembleRelease
+\t./gradlew classJar
+
+generate-android-sdk: build copy-libs create-jar
 
 {arch_targets}
 
@@ -256,7 +264,7 @@ help: help-prepare-options
 """.format(archs=' '.join(platforms), arch_opts='|'.join(platforms),
            first_arch=platforms[0], options=' '.join(sys.argv),
            arch_targets=arch_targets, generator=generator)
-        f = open('Makefile', 'w')
+        f = open('Makefile.android', 'w')
         f.write(makefile)
         f.close()
 
