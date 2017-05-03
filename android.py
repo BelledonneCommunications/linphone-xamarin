@@ -182,7 +182,11 @@ class AndroidPreparator(prepare.Preparator):
             os.rmdir('liblinphone-sdk')
 
     def prepare(self):
+        self.download_gradle()
         prepare.Preparator.prepare(self)
+
+    def download_gradle(self):
+        os.system('./gradlew')
 
     def generate_makefile(self, generator, project_file=''):
         platforms = self.args.target
@@ -232,7 +236,11 @@ copy-libs:
 \t\tsh android/android-x86/strip.sh Xamarin/Xamarin/Xamarin.Droid/Libs/x86/*.so; \\
 \tfi
 
-generate-android-sdk: build copy-libs
+create-jar:
+\t./gradlew assembleRelease
+\t./gradlew classJar
+
+generate-android-sdk: build copy-libs create-jar
 
 {arch_targets}
 
