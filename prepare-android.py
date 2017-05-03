@@ -207,29 +207,29 @@ all: generate-sdk
 build: $(addsuffix -build, $(archs))
 
 copy-libs:
-\trm -rf Xamarin/Xamarin.Droid/Libs/armeabi-v7a
+\trm -rf Xamarin/Xamarin/Xamarin.Droid/Libs/armeabi-v7a
 \tif test -d "android/liblinphone-sdk/android-armv7"; then \\
-\t\tmkdir -p Xamarin/Xamarin.Droid/Libs/armeabi-v7a && \\
-\t\tcp android/liblinphone-sdk/android-armv7/share/linphonecs/LinphoneWrapper.cs Xamarin/Xamarin && \\
-\t\tcp -f android/liblinphone-sdk/android-armv7/lib/lib*.so Xamarin/Xamarin.Droid/Libs/armeabi-v7a && \\
-\t\tcp -f android/liblinphone-sdk/android-armv7/lib/mediastreamer/plugins/*.so Xamarin/Xamarin.Droid/Libs/armeabi-v7a && \\
-\t\tsh android/android-armv7/strip.sh Xamarin/Xamarin.Droid/Libs/armeabi-v7a/*.so; \\
+\t\tmkdir -p Xamarin/Xamarin/Xamarin.Droid/Libs/armeabi-v7a && \\
+\t\tcp android/liblinphone-sdk/android-armv7/share/linphonecs/LinphoneWrapper.cs Xamarin/Xamarin/Xamarin && \\
+\t\tcp -f android/liblinphone-sdk/android-armv7/lib/lib*.so Xamarin/Xamarin/Xamarin.Droid/Libs/armeabi-v7a && \\
+\t\tcp -f android/liblinphone-sdk/android-armv7/lib/mediastreamer/plugins/*.so Xamarin/Xamarin/Xamarin.Droid/Libs/armeabi-v7a && \\
+\t\tsh android/android-armv7/strip.sh Xamarin/Xamarin/Xamarin.Droid/Libs/armeabi-v7a/*.so; \\
 \tfi
-\trm -rf Xamarin/Xamarin.Droid/Libs/arm64-v8a
+\trm -rf Xamarin/Xamarin/Xamarin.Droid/Libs/arm64-v8a
 \tif test -d "android/liblinphone-sdk/android-arm64"; then \\
-\t\tmkdir -p Xamarin/Xamarin.Droid/Libs/arm64-v8a && \\
-\t\tcp android/liblinphone-sdk/android-arm64/share/linphonecs/LinphoneWrapper.cs Xamarin/Xamarin && \\
-\t\tcp -f android/liblinphone-sdk/android-arm64/lib/lib*.so Xamarin/Xamarin.Droid/Libs/arm64-v8a && \\
-\t\tcp -f android/liblinphone-sdk/android-arm64/lib/mediastreamer/plugins/*.so Xamarin/Xamarin.Droid/Libs/arm64-v8a && \\
-\t\tsh android/android-arm64/strip.sh Xamarin/Xamarin.Droid/Libs/arm64-v8a/*.so; \\
+\t\tmkdir -p Xamarin/Xamarin/Xamarin.Droid/Libs/arm64-v8a && \\
+\t\tcp android/liblinphone-sdk/android-arm64/share/linphonecs/LinphoneWrapper.cs Xamarin/Xamarin/Xamarin && \\
+\t\tcp -f android/liblinphone-sdk/android-arm64/lib/lib*.so Xamarin/Xamarin/Xamarin.Droid/Libs/arm64-v8a && \\
+\t\tcp -f android/liblinphone-sdk/android-arm64/lib/mediastreamer/plugins/*.so Xamarin/Xamarin/Xamarin.Droid/Libs/arm64-v8a && \\
+\t\tsh android/android-arm64/strip.sh Xamarin/Xamarin/Xamarin.Droid/Libs/arm64-v8a/*.so; \\
 \tfi
-\trm -rf Xamarin/Xamarin.Droid/Libs/x86
+\trm -rf Xamarin/Xamarin/Xamarin.Droid/Libs/x86
 \tif test -d "android/liblinphone-sdk/android-x86"; then \\
-\t\tmkdir -p Xamarin/Xamarin.Droid/Libs/x86 && \\
-\t\tcp android/liblinphone-sdk/android-x86/share/linphonecs/LinphoneWrapper.cs Xamarin/Xamarin && \\
-\t\tcp -f android/liblinphone-sdk/android-x86/lib/lib*.so Xamarin/Xamarin.Droid/Libs/x86 && \\
-\t\tcp -f android/liblinphone-sdk/android-x86/lib/mediastreamer/plugins/*.so Xamarin/Xamarin.Droid/Libs/x86 && \\
-\t\tsh android/android-x86/strip.sh Xamarin/Xamarin.Droid/Libs/x86/*.so; \\
+\t\tmkdir -p Xamarin/Xamarin/Xamarin.Droid/Libs/x86 && \\
+\t\tcp android/liblinphone-sdk/android-x86/share/linphonecs/LinphoneWrapper.cs Xamarin/Xamarin/Xamarin && \\
+\t\tcp -f android/liblinphone-sdk/android-x86/lib/lib*.so Xamarin/Xamarin/Xamarin.Droid/Libs/x86 && \\
+\t\tcp -f android/liblinphone-sdk/android-x86/lib/mediastreamer/plugins/*.so Xamarin/Xamarin/Xamarin.Droid/Libs/x86 && \\
+\t\tsh android/android-x86/strip.sh Xamarin/Xamarin/Xamarin.Droid/Libs/x86/*.so; \\
 \tfi
 
 generate-sdk: build copy-libs
