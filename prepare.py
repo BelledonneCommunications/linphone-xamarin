@@ -42,37 +42,51 @@ except Exception as e:
     exit(1)
 
 def main():
-    android = AndroidPreparator()
-    if android.check_environment() != 0:
-        android.show_environment_errors()
-        return 1
-    android.parse_args()
-    android.run()
+    amakefile = ""
+    imakefile = ""
+    atarget = ""
+    itarget = ""
+    if not '-DENABLE_ANDROID=OFF' in sys.argv and not '-DENABLE_ANDROID=NO' in sys.argv:
+        android = AndroidPreparator()
+        if android.check_environment() != 0:
+            android.show_environment_errors()
+            return 1
+        android.parse_args()
+        android.run()
+        amakefile = "include Makefile.android"
+        atarget = "generate-android-sdk"
 
-    ios = IOSPreparator()
-    if ios.check_environment() != 0:
+    if not '-DENABLE_IOS=OFF' in sys.argv and not '-DENABLE_IOS=NO' in sys.argv:
+        ios = IOSPreparator()
+        if ios.check_environment() != 0:
             ios.show_environment_errors()
             return 1
-    ios.parse_args()
-    ios.run()
+        ios.parse_args()
+        ios.run()
+        imakefile = "include Makefile.ios"
+        itarget = "generate-ios-sdk"
 
-    makefile = """
+    if not '-c' in sys.argv:
+        makefile = """
 .PHONY: all
 .NOTPARALLEL: all
 
 VERSION=$(shell git --git-dir=submodules/linphone/.git --work-tree=submodules/linphone describe)
 
-include Makefile.android
-include Makefile.ios
+{amakefile}
+{imakefile}
 
-all: generate-android-sdk generate-ios-sdk sdk
+all: {atarget} {itarget} sdk
 
 sdk:
 \tzip -r liblinphone-xamarin-sdk-$(VERSION).zip Xamarin
-"""
-    f = open('Makefile', 'w')
-    f.write(makefile)
-    f.close()
+""".format(amakefile=amakefile, imakefile=imakefile, atarget=atarget, itarget=itarget)
+        f = open('Makefile', 'w')
+        f.write(makefile)
+        f.close()
+    else:
+        if os.path.isfile('Makefile'):
+            os.remove('Makefile')
     return 0
 
 if __name__ == "__main__":
