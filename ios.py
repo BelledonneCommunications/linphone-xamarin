@@ -256,7 +256,7 @@ ios-sdk:
 \tdone; \\
 
 generate-ios-sdk: $(addprefix ios-, $(addsuffix -build, $(ios-archs)))
-\t$(MAKE) ios-sdk
+\t$(MAKE) -f Makefile.ios ios-sdk
 
 {arch_targets}
 
