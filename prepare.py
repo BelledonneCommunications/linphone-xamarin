@@ -79,7 +79,7 @@ VERSION=$(shell git --git-dir=submodules/linphone/.git --work-tree=submodules/li
 all: {atarget} {itarget} sdk
 
 sdk:
-\tzip -r liblinphone-xamarin-sdk-$(VERSION).zip Xamarin
+\tzip -r liblinphone-xamarin-sdk-$(VERSION).zip LinphoneXamarin
 """.format(amakefile=amakefile, imakefile=imakefile, atarget=atarget, itarget=itarget)
         f = open('Makefile', 'w')
         f.write(makefile)

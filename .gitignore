@@ -3,11 +3,11 @@ Makefile.android
 Makefile.ios
 android
 iOS
-Xamarin/Xamarin/Xamarin/LinphoneWrapper.cs
-Xamarin/Xamarin/Xamarin.Droid/Libs/arm64-v8a
-Xamarin/Xamarin/Xamarin.Droid/Libs/armeabi-v7a
-Xamarin/Xamarin/Xamarin.Droid/Libs/x86
-Xamarin/Xamarin/Xamarin.Droid/Libs/liblinphone.jar
+LinphoneXamarin/LinphoneXamarin/LinphoneXamarin/LinphoneWrapper.cs
+LinphoneXamarin/LinphoneXamarin/LinphoneXamarin.Android/Libs/arm64-v8a
+LinphoneXamarin/LinphoneXamarin/LinphoneXamarin.Android/Libs/armeabi-v7a
+LinphoneXamarin/LinphoneXamarin/LinphoneXamarin.Android/Libs/x86
+LinphoneXamarin/LinphoneXamarin/LinphoneXamarin.Android/Libs/liblinphone.jar
 .gradle
 bin
 *.pyc
