@@ -240,9 +240,14 @@ create-jar:
 \t./gradlew assembleRelease
 \t./gradlew classJar
 
-generate-android-sdk: android-build android-copy-libs create-jar
+generate-android-sdk: clean android-build android-copy-libs create-jar
 
 {arch_targets}
+
+clean: java-clean
+
+java-clean:
+	./gradlew clean
 
 help-prepare-options:
 \t@echo "prepare.py was previously executed with the following options:"
