@@ -254,6 +254,7 @@ ios-sdk:
 \t\techo "[{archs}] Mixing `basename $$archive` in $$destpath"; \\
 \t\tlipo -create -output $$destpath/$$framework_name $$armv7_path/$$framework_name $$arm64_path/$$framework_name $$x86_64_path/$$framework_name; \\
 \tdone; \\
+\tcp -rf iOS/liblinphone-sdk/apple-darwin/Frameworks Xamarin/Xamarin/Xamarin.IOS && \\
 
 generate-ios-sdk: $(addprefix ios-, $(addsuffix -build, $(ios-archs)))
 \t$(MAKE) -f Makefile.ios ios-sdk
