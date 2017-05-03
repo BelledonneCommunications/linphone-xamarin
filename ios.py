@@ -234,6 +234,7 @@ sdk:
 \tarchives=`find iOS/liblinphone-sdk/{first_arch}-apple-darwin.ios -name '*.framework'` && \\
 \trm -rf iOS/liblinphone-sdk/apple-darwin && \\
 \tmkdir -p iOS/liblinphone-sdk/apple-darwin && \\
+\tcp iOS/liblinphone-sdk/{first_arch}-apple-darwin.ios/share/linphonecs/LinphoneWrapper.cs Xamarin/Xamarin/Xamarin && \\
 \tcp -rf iOS/liblinphone-sdk/{first_arch}-apple-darwin.ios/share iOS/liblinphone-sdk/apple-darwin/. && \\
 \tcp -rf iOS/liblinphone-sdk/{first_arch}-apple-darwin.ios/lib iOS/liblinphone-sdk/apple-darwin/. && \\
 \tcp -rf iOS/liblinphone-sdk/{first_arch}-apple-darwin.ios/include iOS/liblinphone-sdk/apple-darwin/. && \\
