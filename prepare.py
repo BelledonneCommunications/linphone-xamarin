@@ -52,12 +52,14 @@ def main():
 .PHONY: all
 .NOTPARALLEL: all
 
+VERSION=$(shell git --git-dir=submodules/linphone/.git --work-tree=submodules/linphone describe)
+
 include Makefile.android
 
 all: generate-android-sdk sdk
 
 sdk:
-\tzip -r liblinphone-xamarin-sdk.zip Xamarin
+\tzip -r liblinphone-xamarin-sdk-$(VERSION).zip Xamarin
 """
     f = open('Makefile', 'w')
     f.write(makefile)
