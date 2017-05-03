@@ -227,10 +227,10 @@ archs={archs}
 LINPHONE_IPHONE_VERSION=$(shell git describe --always)
 
 .PHONY: all
-.SILENT: sdk
+.SILENT: IOSsdk
 all: generate-ios-sdk
 
-sdk:
+IOSsdk:
 \tarchives=`find iOS/liblinphone-sdk/{first_arch}-apple-darwin.ios -name '*.framework'` && \\
 \trm -rf iOS/liblinphone-sdk/apple-darwin && \\
 \tmkdir -p iOS/liblinphone-sdk/apple-darwin && \\
@@ -256,7 +256,7 @@ sdk:
 \tdone; \\
 
 generate-ios-sdk: $(addsuffix -build, $(archs))
-\t$(MAKE) sdk
+\t$(MAKE) IOSsdk
 
 {arch_targets}
 
@@ -273,7 +273,7 @@ help: help-prepare-options
 \t@echo "Available targets:"
 \t@echo ""
 \t@echo "   * all or generate-ios-sdk: builds all architectures and creates the liblinphone SDK"
-\t@echo "   * sdk: creates the liblinphone SDK. Use this only after a full build"
+\t@echo "   * IOSsdk: creates the liblinphone SDK. Use this only after a full build"
 \t@echo ""
 """.format(archs=' '.join(platforms), arch_opts='|'.join(platforms),
            first_arch=platforms[0], options=' '.join(sys.argv),
