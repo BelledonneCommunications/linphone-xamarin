@@ -120,8 +120,8 @@ class IOSPreparator(prepare.Preparator):
 
     def clean(self):
         prepare.Preparator.clean(self)
-        if os.path.isfile('Makefile'):
-            os.remove('Makefile')
+        if os.path.isfile('Makefile.ios'):
+            os.remove('Makefile.ios')
         if os.path.isdir('iOS') and not os.listdir('iOS'):
             os.rmdir('iOS')
         #if os.path.isdir('liblinphone-sdk'):
