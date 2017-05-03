@@ -30,6 +30,7 @@ from distutils.spawn import find_executable
 from logging import error, warning, info
 from subprocess import Popen
 from android import AndroidPreparator
+from ios import IOSPreparator
 sys.dont_write_bytecode = True
 sys.path.insert(0, 'submodules/cmake-builder')
 try:
@@ -48,6 +49,13 @@ def main():
     android.parse_args()
     android.run()
 
+    ios = IOSPreparator()
+    if ios.check_environment() != 0:
+            ios.show_environment_errors()
+            return 1
+    ios.parse_args()
+    ios.run()
+
     makefile = """
 .PHONY: all
 .NOTPARALLEL: all
@@ -55,8 +63,9 @@ def main():
 VERSION=$(shell git --git-dir=submodules/linphone/.git --work-tree=submodules/linphone describe)
 
 include Makefile.android
+include Makefile.ios
 
-all: generate-android-sdk sdk
+all: generate-android-sdk generate-ios-sdk sdk
 
 sdk:
 \tzip -r liblinphone-xamarin-sdk-$(VERSION).zip Xamarin
