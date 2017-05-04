@@ -15,7 +15,7 @@ namespace LinphoneXamarin
         {
             get
             {
-                return ((LinphoneXamarin.App)LinphoneXamarin.App.Current).LinphoneCore;
+                return ((App)App.Current).LinphoneCore;
             }
         }
         private CoreListener Listener;

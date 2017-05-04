@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 
 using Xamarin.Forms;
@@ -20,7 +17,7 @@ namespace LinphoneXamarin
             listener.OnGlobalStateChanged = OnGlobal;
             LinphoneCore = Factory.Instance.CreateCore(listener, rc_path, null);
 
-            MainPage = new LinphoneXamarin.MainPage();
+            MainPage = new MainPage();
 		}
 
         private void LinphoneCoreIterate()
@@ -31,7 +28,7 @@ namespace LinphoneXamarin
                 {
                     LinphoneCore.Iterate();
                 });
-                System.Threading.Thread.Sleep(50);
+               Thread.Sleep(50);
             }
         }
 
