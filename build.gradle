@@ -71,7 +71,7 @@ android {
 
 task classJar(type: Jar) {
     classifier = 'class'
-    from 'intermediates/classes/release'
+    from 'bin/intermediates/classes/release'
     include '**/*.class'
     libsDirName = '../LinphoneXamarin/LinphoneXamarin/LinphoneXamarin.Android/Libs'
     archiveName = 'liblinphone.jar'
