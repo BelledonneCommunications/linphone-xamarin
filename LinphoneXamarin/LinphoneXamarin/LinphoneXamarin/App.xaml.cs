@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 using Xamarin.Forms;
 
@@ -18,6 +19,18 @@ namespace LinphoneXamarin
 			MainPage = new LinphoneXamarin.MainPage();
 		}
 
+        private void LinphoneCoreIterate()
+        {
+            while (true)
+            {
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    Core.Iterate();
+                });
+                System.Threading.Thread.Sleep(50);
+            }
+        }
+
         private void OnGlobal(Core lc, GlobalState gstate, string message)
         {
             Console.WriteLine("Global state changed: " + gstate);
@@ -29,6 +42,10 @@ namespace LinphoneXamarin
             CoreListener listener = Factory.Instance.CreateCoreListener();
             listener.OnGlobalStateChanged = OnGlobal;
             Core = Factory.Instance.CreateCore(listener, null, null);
+
+            Thread iterate = new Thread(LinphoneCoreIterate);
+            iterate.IsBackground = false;
+            iterate.Start();
         }
 
 		protected override void OnSleep ()

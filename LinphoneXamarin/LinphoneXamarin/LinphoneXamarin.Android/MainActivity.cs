@@ -15,17 +15,6 @@ namespace LinphoneXamarin
 	[Activity (Label = "LinphoneXamarin", Icon = "@drawable/icon", Theme="@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
 	public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
 	{
-        private LinphoneXamarin.App app;
-
-        private void LinphoneCoreIterate()
-        {
-            while (true)
-            {
-                RunOnUiThread(() => app.Core.Iterate());
-                System.Threading.Thread.Sleep(50);
-            }
-        }
-
         protected override void OnCreate (Bundle bundle)
 		{
             Java.Lang.JavaSystem.LoadLibrary("bctoolbox");
@@ -36,20 +25,16 @@ namespace LinphoneXamarin
 
             // This is mandatory for Android
             LinphoneAndroid.setAndroidContext(JNIEnv.Handle, this.Handle);
+            // This is to display Linphone logs in adb logcat
             LinphoneAndroid.setNativeLogHandler();
 
             TabLayoutResource = Resource.Layout.Tabbar;
-			ToolbarResource = Resource.Layout.Toolbar; 
+            ToolbarResource = Resource.Layout.Toolbar; 
 
-			base.OnCreate (bundle);
+            base.OnCreate (bundle);
 
-			global::Xamarin.Forms.Forms.Init (this, bundle);
-            app = new LinphoneXamarin.App();
-            LoadApplication (app);
-
-            Thread coreIterate = new Thread(LinphoneCoreIterate);
-            coreIterate.IsBackground = false;
-            coreIterate.Start();
+            global::Xamarin.Forms.Forms.Init (this, bundle);
+            LoadApplication (new LinphoneXamarin.App());
         }
 	}
 }
