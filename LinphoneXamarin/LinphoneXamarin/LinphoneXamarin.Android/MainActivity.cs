@@ -9,6 +9,8 @@ using Android.OS;
 
 using Linphone;
 using System.Threading;
+using Android.Content.Res;
+using System.IO;
 
 namespace LinphoneXamarin
 {
@@ -33,8 +35,24 @@ namespace LinphoneXamarin
 
             base.OnCreate (bundle);
 
-            global::Xamarin.Forms.Forms.Init (this, bundle);
-            LoadApplication (new LinphoneXamarin.App());
+            AssetManager assets = Assets;
+            string path = FilesDir.AbsolutePath;
+            string rc_path = path + "/default_rc";
+            using (var br = new BinaryReader(Application.Context.Assets.Open("linphonerc_default")))
+            {
+                using (var bw = new BinaryWriter(new FileStream(rc_path, FileMode.Create)))
+                {
+                    byte[] buffer = new byte[2048];
+                    int length = 0;
+                    while ((length = br.Read(buffer, 0, buffer.Length)) > 0)
+                    {
+                        bw.Write(buffer, 0, length);
+                    }
+                }
+            }
+
+            Xamarin.Forms.Forms.Init (this, bundle);
+            LoadApplication (new LinphoneXamarin.App(rc_path));
         }
 	}
 }

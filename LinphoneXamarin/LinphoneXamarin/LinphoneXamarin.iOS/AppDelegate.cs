@@ -23,7 +23,7 @@ namespace LinphoneXamarin.iOS
 		public override bool FinishedLaunching(UIApplication app, NSDictionary options)
 		{
 			global::Xamarin.Forms.Forms.Init ();
-			LoadApplication (new LinphoneXamarin.App ());
+			LoadApplication (new LinphoneXamarin.App (null));
 
 			return base.FinishedLaunching (app, options);
 		}
