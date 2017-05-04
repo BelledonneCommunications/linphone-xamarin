@@ -5,7 +5,7 @@ using System.Linq;
 using Foundation;
 using UIKit;
 
-namespace LinphoneXamarin.iOS
+namespace LinphoneXamarin
 {
 	// The UIApplicationDelegate for the application. This class is responsible for launching the 
 	// User Interface of the application, as well as listening (and optionally responding) to 
@@ -23,7 +23,7 @@ namespace LinphoneXamarin.iOS
 		public override bool FinishedLaunching(UIApplication app, NSDictionary options)
 		{
 			global::Xamarin.Forms.Forms.Init ();
-			LoadApplication (new LinphoneXamarin.App (null));
+			LoadApplication (new LinphoneXamarin.App ());
 
 			return base.FinishedLaunching (app, options);
 		}

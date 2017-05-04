@@ -7,15 +7,15 @@ using Linphone;
 
 namespace LinphoneXamarin
 {
-	public partial class App : Application
+	public partial class App : Xamarin.Forms.Application
 	{
         public Core LinphoneCore { get; set; }
 
-		public App (string rc_path)
+		public App ()
         {
             CoreListener listener = Factory.Instance.CreateCoreListener();
             listener.OnGlobalStateChanged = OnGlobal;
-            LinphoneCore = Factory.Instance.CreateCore(listener, rc_path, null);
+            LinphoneCore = Factory.Instance.CreateCore(listener, null, null);
 
             MainPage = new MainPage();
 		}

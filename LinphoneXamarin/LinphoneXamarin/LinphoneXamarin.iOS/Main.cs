@@ -5,7 +5,7 @@ using System.Linq;
 using Foundation;
 using UIKit;
 
-namespace LinphoneXamarin.iOS
+namespace LinphoneXamarin
 {
 	public class Application
 	{
