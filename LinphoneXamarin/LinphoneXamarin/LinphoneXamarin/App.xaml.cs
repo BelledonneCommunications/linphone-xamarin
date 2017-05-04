@@ -11,11 +11,11 @@ namespace LinphoneXamarin
 	{
         public Core LinphoneCore { get; set; }
 
-		public App ()
+		public App (string rc_path = null)
         {
             CoreListener listener = Factory.Instance.CreateCoreListener();
             listener.OnGlobalStateChanged = OnGlobal;
-            LinphoneCore = Factory.Instance.CreateCore(listener, null, null);
+            LinphoneCore = Factory.Instance.CreateCore(listener, rc_path, null);
 
             MainPage = new MainPage();
 		}
