@@ -12,11 +12,15 @@ namespace LinphoneXamarin
 {
 	public partial class App : Application
 	{
-        public Core Core;
+        public Core LinphoneCore { get; set; }
 
 		public App ()
-		{
-			MainPage = new LinphoneXamarin.MainPage();
+        {
+            CoreListener listener = Factory.Instance.CreateCoreListener();
+            listener.OnGlobalStateChanged = OnGlobal;
+            LinphoneCore = Factory.Instance.CreateCore(listener, null, null);
+
+            MainPage = new LinphoneXamarin.MainPage();
 		}
 
         private void LinphoneCoreIterate()
@@ -25,7 +29,7 @@ namespace LinphoneXamarin
             {
                 Device.BeginInvokeOnMainThread(() =>
                 {
-                    Core.Iterate();
+                    LinphoneCore.Iterate();
                 });
                 System.Threading.Thread.Sleep(50);
             }
@@ -39,10 +43,6 @@ namespace LinphoneXamarin
         protected override void OnStart ()
 		{
             // Handle when your app starts
-            CoreListener listener = Factory.Instance.CreateCoreListener();
-            listener.OnGlobalStateChanged = OnGlobal;
-            Core = Factory.Instance.CreateCore(listener, null, null);
-
             Thread iterate = new Thread(LinphoneCoreIterate);
             iterate.IsBackground = false;
             iterate.Start();

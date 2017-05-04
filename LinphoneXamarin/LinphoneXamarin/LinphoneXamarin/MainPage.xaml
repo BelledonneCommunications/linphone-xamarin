@@ -4,8 +4,19 @@
              xmlns:local="clr-namespace:LinphoneXamarin"
              x:Class="LinphoneXamarin.MainPage">
 
-	<Label Text="Welcome to Linphone Xamarin!" 
-           VerticalOptions="Center" 
-           HorizontalOptions="Center" />
+    <StackLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" Orientation="Vertical" Spacing="15">
+        <Label Text="Welcome to Linphone Xamarin!" HorizontalOptions="Center" />
+
+        <Entry x:Name="username" Placeholder="Username" />
+        <Entry x:Name="password" Placeholder="Password" IsPassword="true"/>
+        <Entry x:Name="domain" Placeholder="Domain" Text="sip.linphone.org"/>
+        <Button x:Name="register" Text="Register" Clicked="OnRegisterClicked" HorizontalOptions="Center" />
+        <Label x:Name="registration_status" HorizontalOptions="Center" />
+
+        <Entry x:Name="address" Placeholder="Address" />
+        <Button x:Name="call" Text="Start Call" Clicked="OnCallClicked" HorizontalOptions="Center" />
+        <Label x:Name="call_status" HorizontalOptions="Center" />
+        <Label x:Name="call_stats" HorizontalOptions="Center" />
+    </StackLayout>
 
 </ContentPage>
