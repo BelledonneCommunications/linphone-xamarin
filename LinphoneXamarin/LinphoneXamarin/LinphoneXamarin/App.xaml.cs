@@ -7,7 +7,7 @@ using Linphone;
 
 namespace LinphoneXamarin
 {
-	public partial class App : Xamarin.Forms.Application
+	public partial class App : Application
 	{
         public Core LinphoneCore { get; set; }
 

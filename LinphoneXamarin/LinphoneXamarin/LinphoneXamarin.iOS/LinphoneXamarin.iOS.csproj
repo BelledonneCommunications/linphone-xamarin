@@ -10,7 +10,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>LinphoneXamarin</RootNamespace>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
-    <AssemblyName>LinphoneXamarin.iOS</AssemblyName>
+    <AssemblyName>LinphoneXamarin</AssemblyName>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
   </PropertyGroup>
@@ -24,7 +24,7 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <MtouchArch>x86_64</MtouchArch>
-    <MtouchLink>Full</MtouchLink>
+    <MtouchLink>None</MtouchLink>
     <MtouchDebug>true</MtouchDebug>
     <MtouchExtraArgs></MtouchExtraArgs>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
@@ -36,7 +36,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <MtouchLink>None</MtouchLink>
-    <MtouchArch>i386, x86_64</MtouchArch>
+    <MtouchArch>x86_64</MtouchArch>
     <ConsolePause>false</ConsolePause>
     <MtouchExtraArgs></MtouchExtraArgs>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
@@ -56,10 +56,9 @@
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
     <IOSDebugOverWiFi>False</IOSDebugOverWiFi>
     <IOSDebuggerPort>10000</IOSDebuggerPort>
-<AssemblyName>LinphoneXamarin</AssemblyName>
-<MtouchLink>Full</MtouchLink>
+<MtouchLink>None</MtouchLink>
 <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-<MtouchExtraArgs>--gsharedvt=true</MtouchExtraArgs>
+<MtouchExtraArgs></MtouchExtraArgs>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugType>none</DebugType>
@@ -71,10 +70,10 @@
     <ConsolePause>false</ConsolePause>
     <CodesignKey>iPhone Developer</CodesignKey>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
-<AssemblyName>LinphoneXamarin</AssemblyName>
 <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-<MtouchUseLlvm>false</MtouchUseLlvm>
-<MtouchExtraArgs>--gsharedvt=true</MtouchExtraArgs>
+<MtouchUseLlvm>true</MtouchUseLlvm>
+<MtouchExtraArgs></MtouchExtraArgs>
+<MtouchLink>None</MtouchLink>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Ad-Hoc|iPhone' ">
     <DebugType>none</DebugType>
@@ -88,9 +87,9 @@
     <CodesignProvision>Automatic:AdHoc</CodesignProvision>
     <CodesignKey>iPhone Distribution</CodesignKey>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
-<AssemblyName>LinphoneXamarin</AssemblyName>
-<MtouchExtraArgs>--gsharedvt=true</MtouchExtraArgs>
+<MtouchExtraArgs></MtouchExtraArgs>
 <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+<MtouchLink>None</MtouchLink>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'AppStore|iPhone' ">
     <DebugType>none</DebugType>
@@ -103,9 +102,9 @@
     <CodesignProvision>Automatic:AppStore</CodesignProvision>
     <CodesignKey>iPhone Distribution</CodesignKey>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
-<AssemblyName>LinphoneXamarin</AssemblyName>
-<MtouchExtraArgs>--gsharedvt=true</MtouchExtraArgs>
+<MtouchExtraArgs></MtouchExtraArgs>
 <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+<MtouchLink>None</MtouchLink>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Main.cs" />

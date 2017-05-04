@@ -47,11 +47,7 @@
 		<string>Icon-Small@2x.png</string>
 		<string>Icon-Small@3x.png</string>
 	</array>
-	<key>UILaunchStoryboardName</key>
-	<string>LaunchScreen.storyboard</string>
 	<key>CFBundleName</key>
 	<string>LinphoneXamarin</string>
-	<key>UIMainStoryboardFile</key>
-	<string>LaunchScreen</string>
 </dict>
 </plist>
