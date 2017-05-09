@@ -23,7 +23,7 @@ namespace LinphoneXamarin
             // This is mandatory for Android
             LinphoneAndroid.setAndroidContext(JNIEnv.Handle, this.Handle);
             // This is to display Linphone logs in adb logcat
-            LinphoneAndroid.setNativeLogHandler();
+            LinphoneWrapper.setNativeLogHandler();
 
             TabLayoutResource = Resource.Layout.Tabbar;
             ToolbarResource = Resource.Layout.Toolbar; 
