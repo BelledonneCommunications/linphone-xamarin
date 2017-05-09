@@ -13,6 +13,8 @@ namespace LinphoneXamarin
 
 		public App (string rc_path = null)
         {
+            LinphoneWrapper.setNativeLogHandler();
+
             CoreListener listener = Factory.Instance.CreateCoreListener();
             listener.OnGlobalStateChanged = OnGlobal;
             LinphoneCore = Factory.Instance.CreateCore(listener, rc_path, null);
