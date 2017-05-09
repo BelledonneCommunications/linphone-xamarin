@@ -38,7 +38,14 @@ namespace LinphoneXamarin
 
             if (lc.CallsNb > 0)
             {
-                call.Text = "Terminate Call";
+                if (state == CallState.IncomingReceived)
+                {
+                    call.Text = "Answer Call (" + lcall.RemoteAddressAsString + ")";
+                }
+                else
+                {
+                    call.Text = "Terminate Call";
+                }
             }
             else
             {
@@ -94,7 +101,15 @@ namespace LinphoneXamarin
             }
             else
             {
-                LinphoneCore.TerminateAllCalls();
+                Call call = LinphoneCore.CurrentCall;
+                if (call.State == CallState.IncomingReceived)
+                {
+                    LinphoneCore.AcceptCall(call);
+                }
+                else
+                {
+                    LinphoneCore.TerminateAllCalls();
+                }
             }
         }
     }
