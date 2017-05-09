@@ -22,7 +22,7 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>MinimumOSVersion</key>
-	<string>8.0</string>
+	<string>10.3</string>
 	<key>CFBundleDisplayName</key>
 	<string>LinphoneXamarin</string>
 	<key>CFBundleIdentifier</key>
@@ -49,5 +49,7 @@
 	</array>
 	<key>CFBundleName</key>
 	<string>LinphoneXamarin</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Make audio call</string>
 </dict>
 </plist>
