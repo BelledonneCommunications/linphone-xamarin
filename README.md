@@ -16,6 +16,13 @@ The Xamarin SDK embed the following:
 
 If you want to support an architecture that is not included in our SDK (for example armv5), you can compile the libraries by yourself (see [Linphone C# wrapper](https://wiki.linphone.org/xwiki/wiki/public/view/Lib/Linphone%20C%23%20wrapper/)).
 
+## Building the SDK
+
+To build the sdk, run the following commands :
+./prepare.py -c && ./prepare.py && make
+
+In order to only build the SDK for iOS or Android, you can add the following options to your ./prepare.py call : "-DENABLE_IOS=OFF" or "-DENABLE_ANDROID=OFF".
+
 ## Getting started
 
 Once you have our SDK (either built by yourself or downloaded from our snapshots), you can either start your application using the preconfigured solution in the SDK, or you may already have a Xamarin solution and want to add Linphone to it.
