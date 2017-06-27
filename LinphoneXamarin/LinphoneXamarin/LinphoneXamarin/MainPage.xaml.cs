@@ -22,7 +22,7 @@ namespace LinphoneXamarin
 
         private void OnRegistration(Core lc, ProxyConfig config, RegistrationState state, string message)
         {
-            Console.WriteLine("Registration state changed: " + state);
+            // Console.WriteLine("Registration state changed: " + state);
             registration_status.Text = "Registration state changed: " + state;
 
             if (state == RegistrationState.Ok)
@@ -33,7 +33,7 @@ namespace LinphoneXamarin
 
         private void OnCall(Core lc, Call lcall, CallState state, string message)
         {
-            Console.WriteLine("Call state changed: " + state);
+            // Console.WriteLine("Call state changed: " + state);
             call_status.Text = "Call state changed: " + state;
 
             if (lc.CallsNb > 0)
@@ -56,7 +56,7 @@ namespace LinphoneXamarin
 
         private void OnStats(Core lc, Call call, CallStats stats)
         {
-            Console.WriteLine("Call stats: " + stats.DownloadBandwidth + " kbits/s / " + stats.UploadBandwidth + " kbits/s");
+            // Console.WriteLine("Call stats: " + stats.DownloadBandwidth + " kbits/s / " + stats.UploadBandwidth + " kbits/s");
             call_stats.Text = "Call stats: " + stats.DownloadBandwidth + " kbits/s / " + stats.UploadBandwidth + " kbits/s";
         }
 
