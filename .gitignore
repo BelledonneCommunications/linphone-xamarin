@@ -9,7 +9,6 @@ LinphoneXamarin/LinphoneXamarin/LinphoneXamarin.Android/Libs/armeabi-v7a
 LinphoneXamarin/LinphoneXamarin/LinphoneXamarin.Android/Libs/x86
 LinphoneXamarin/LinphoneXamarin/LinphoneXamarin.Android/Libs/liblinphone.jar
 LinphoneXamarin/LinphoneXamarin/LinphoneXamarin.iOS/Frameworks
-LinphoneXamarin/LinphoneXamarin/LinphoneXamarin.UWP/*.dll
 .gradle
 bin
 *.pyc
