@@ -6,7 +6,6 @@ using Xamarin.Forms;
 using Linphone;
 using Windows.System.Threading;
 using Windows.UI.Core;
-using System.Diagnostics;
 
 namespace LinphoneXamarin
 {
@@ -41,11 +40,7 @@ namespace LinphoneXamarin
 
         private void OnGlobal(Core lc, GlobalState gstate, string message)
         {
-#if WINDOWS_UWP
-            Debug.WriteLine("Global state changed: " + gstate);
-#else
-            Console.WriteLine("Global state changed: " + gstate);
-#endif
+            // Console.WriteLine("Global state changed: " + gstate);
         }
 
         protected override void OnStart ()

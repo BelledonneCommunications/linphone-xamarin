@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Xamarin.Forms;
 
 using Linphone;
-using System.Diagnostics;
 
 namespace LinphoneXamarin
 {
@@ -23,11 +22,7 @@ namespace LinphoneXamarin
 
         private void OnRegistration(Core lc, ProxyConfig config, RegistrationState state, string message)
         {
-#if WINDOWS_UWP
-            Debug.WriteLine("Registration state changed: " + state);
-#else
-            Console.WriteLine("Registration state changed: " + state);
-#endif
+            // Console.WriteLine("Registration state changed: " + state);
             registration_status.Text = "Registration state changed: " + state;
 
             if (state == RegistrationState.Ok)
@@ -38,11 +33,7 @@ namespace LinphoneXamarin
 
         private void OnCall(Core lc, Call lcall, CallState state, string message)
         {
-#if WINDOWS_UWP
-            Debug.WriteLine("Call state changed: " + state);
-#else
-            Console.WriteLine("Call state changed: " + state);
-#endif
+            // Console.WriteLine("Call state changed: " + state);
             call_status.Text = "Call state changed: " + state;
 
             if (lc.CallsNb > 0)
@@ -65,11 +56,7 @@ namespace LinphoneXamarin
 
         private void OnStats(Core lc, Call call, CallStats stats)
         {
-#if WINDOWS_UWP
-            Debug.WriteLine("Call stats: " + stats.DownloadBandwidth + " kbits/s / " + stats.UploadBandwidth + " kbits/s");
-#else
-            Console.WriteLine("Call stats: " + stats.DownloadBandwidth + " kbits/s / " + stats.UploadBandwidth + " kbits/s");
-#endif
+            // Console.WriteLine("Call stats: " + stats.DownloadBandwidth + " kbits/s / " + stats.UploadBandwidth + " kbits/s");
             call_stats.Text = "Call stats: " + stats.DownloadBandwidth + " kbits/s / " + stats.UploadBandwidth + " kbits/s";
         }
 
