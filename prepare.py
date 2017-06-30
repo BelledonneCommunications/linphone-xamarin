@@ -31,7 +31,6 @@ from logging import error, warning, info
 from subprocess import Popen
 from android import AndroidPreparator
 from ios import IOSPreparator
-from uwp import UWPPreparator
 sys.dont_write_bytecode = True
 sys.path.insert(0, 'submodules/cmake-builder')
 try:
@@ -42,14 +41,11 @@ except Exception as e:
         "git submodule sync && git submodule update --init --recursive".format(e))
     exit(1)
 
-
 def main():
     amakefile = ""
     imakefile = ""
-    umakefile = ""
     atarget = ""
     itarget = ""
-    utarget = ""
     if not '-DENABLE_ANDROID=OFF' in sys.argv and not '-DENABLE_ANDROID=NO' in sys.argv:
         android = AndroidPreparator()
         if android.check_environment() != 0:
@@ -70,16 +66,6 @@ def main():
         imakefile = "include Makefile.ios"
         itarget = "generate-ios-sdk"
 
-    if not '-DENABLE_UWP=OFF' in sys.argv and not '-DENABLE_UWP=NO' in sys.argv:
-        uwp = UWPPreparator()
-        if uwp.check_environment() != 0:
-            uwp.show_environment_errors()
-            return 1
-        uwp.parse_args()
-        uwp.run()
-        umakefile = "include Makefile.uwp"
-        utarget = "generate-uwp-sdk"
-
     if not '-c' in sys.argv:
         makefile = """
 .PHONY: all
@@ -89,13 +75,12 @@ VERSION=$(shell git --git-dir=submodules/linphone/.git --work-tree=submodules/li
 
 {amakefile}
 {imakefile}
-{umakefile}
 
-all: {atarget} {itarget} {utarget} sdk
+all: {atarget} {itarget} sdk
 
 sdk:
 \tzip -r liblinphone-xamarin-sdk-$(VERSION).zip LinphoneXamarin README.md
-""".format(amakefile=amakefile, imakefile=imakefile, umakefile=umakefile, atarget=atarget, itarget=itarget, utarget=utarget)
+""".format(amakefile=amakefile, imakefile=imakefile, atarget=atarget, itarget=itarget)
         f = open('Makefile', 'w')
         f.write(makefile)
         f.close()
