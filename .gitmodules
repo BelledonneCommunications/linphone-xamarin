@@ -58,9 +58,6 @@
 [submodule "submodules/externals/libjpeg-turbo"]
 	path = submodules/externals/libjpeg-turbo
 	url = git://git.linphone.org/libjpeg-turbo
-[submodule "submodules/externals/libmatroska-c"]
-	path = submodules/externals/libmatroska-c
-	url = git://git.linphone.org/libmatroska-c
 [submodule "submodules/externals/libvpx"]
 	path = submodules/externals/libvpx
 	url = git://git.linphone.org/libvpx
@@ -88,3 +85,6 @@
 [submodule "submodules/externals/openh264"]
 	path = submodules/externals/openh264
 	url = https://github.com/cisco/openh264
+[submodule "submodules\\bcmatroska2"]
+	path = submodules/bcmatroska2
+	url = git://git.linphone.org/bcmatroska2.git
