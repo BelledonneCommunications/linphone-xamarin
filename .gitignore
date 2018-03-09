@@ -8,6 +8,7 @@ LinphoneXamarin/LinphoneXamarin/LinphoneXamarin.Android/Libs/arm64-v8a
 LinphoneXamarin/LinphoneXamarin/LinphoneXamarin.Android/Libs/armeabi-v7a
 LinphoneXamarin/LinphoneXamarin/LinphoneXamarin.Android/Libs/x86
 LinphoneXamarin/LinphoneXamarin/LinphoneXamarin.Android/Libs/liblinphone.jar
+LinphoneXamarin/LinphoneXamarin/Liblinphone/Jars/liblinphone.jar
 LinphoneXamarin/LinphoneXamarin/LinphoneXamarin.iOS/Frameworks
 .gradle
 bin

@@ -4,18 +4,20 @@ using System.Threading;
 using Xamarin.Forms;
 
 using Linphone;
+#if WINDOWS_UWP
 using System.Diagnostics;
 using Windows.System.Threading;
 using Windows.UI.Core;
 using Windows.ApplicationModel.Core;
+#endif
 
 namespace LinphoneXamarin
 {
-	public partial class App : Application
-	{
+    public partial class App : Application
+    {
         public Core LinphoneCore { get; set; }
 
-		public App (string rc_path = null)
+        public App (string rc_path = null)
         {
             LinphoneWrapper.setNativeLogHandler();
 
@@ -25,9 +27,17 @@ namespace LinphoneXamarin
             LinphoneCore = Factory.Instance.CreateCore(listener, rc_path, null);
             LinphoneCore.NetworkReachable = true;
             MainPage = new MainPage();
-		}
+        }
 
+        public StackLayout getLayoutView() {
+            return MainPage.FindByName<StackLayout>("stack_layout");
+        }
+
+#if WINDOWS_UWP
         private void LinphoneCoreIterate(ThreadPoolTimer timer) {
+#else
+        private void LinphoneCoreIterate() {
+#endif
             while (true)
             {
 #if WINDOWS_UWP
@@ -55,7 +65,7 @@ namespace LinphoneXamarin
         }
 
         protected override void OnStart ()
-		{
+        {
             // Handle when your app starts
 #if WINDOWS_UWP
             TimeSpan period = TimeSpan.FromSeconds(1);
@@ -68,13 +78,13 @@ namespace LinphoneXamarin
         }
 
         protected override void OnSleep ()
-		{
-			// Handle when your app sleeps
-		}
+        {
+            // Handle when your app sleeps
+        }
 
-		protected override void OnResume ()
-		{
-			// Handle when your app resumes
-		}
-	}
+        protected override void OnResume ()
+        {
+            // Handle when your app resumes
+        }
+    }
 }

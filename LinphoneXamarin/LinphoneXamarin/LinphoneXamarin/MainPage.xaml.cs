@@ -33,6 +33,7 @@ namespace LinphoneXamarin
             if (state == RegistrationState.Ok)
             {
                 register.IsEnabled = false;
+                this.FindByName<StackLayout>("stack_registrar").IsVisible = false;
             }
         }
 
@@ -54,6 +55,11 @@ namespace LinphoneXamarin
                 else
                 {
                     call.Text = "Terminate Call";
+                }
+                if (lcall.CurrentParams.VideoEnabled) {
+                    video.Text = "Stop Video";
+                } else {
+                    video.Text = "Start Video";
                 }
             }
             else
@@ -122,6 +128,19 @@ namespace LinphoneXamarin
                 else
                 {
                     LinphoneCore.TerminateAllCalls();
+                }
+            }
+        }
+
+        private void OnVideoClicked(object sender, EventArgs e) {
+            if (LinphoneCore.CallsNb > 0) {
+                Call call = LinphoneCore.CurrentCall;
+                if (call.State == CallState.StreamsRunning) {
+                    LinphoneCore.VideoAdaptiveJittcompEnabled = true;
+                    CallParams param = LinphoneCore.CreateCallParams(call);
+                    param.VideoEnabled = !call.CurrentParams.VideoEnabled;
+                    param.VideoDirection = MediaDirection.SendRecv;
+                    LinphoneCore.UpdateCall(call, param);
                 }
             }
         }
