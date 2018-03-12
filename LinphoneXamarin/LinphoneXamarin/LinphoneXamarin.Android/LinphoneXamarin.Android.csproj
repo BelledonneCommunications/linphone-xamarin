@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\..\packages\Xamarin.Forms.2.5.0.122203\build\netstandard1.0\Xamarin.Forms.props" Condition="Exists('..\..\packages\Xamarin.Forms.2.5.0.122203\build\netstandard1.0\Xamarin.Forms.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -74,30 +73,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidNativeLibrary Include="Libs\arm64-v8a\libbctoolbox.so" />
-    <AndroidNativeLibrary Include="Libs\arm64-v8a\libgnustl_shared.so" />
-    <AndroidNativeLibrary Include="Libs\arm64-v8a\liblinphone.so" />
-    <AndroidNativeLibrary Include="Libs\arm64-v8a\libmediastreamer_base.so" />
-    <AndroidNativeLibrary Include="Libs\arm64-v8a\libmediastreamer_voip.so" />
-    <AndroidNativeLibrary Include="Libs\arm64-v8a\libmssilk.so" />
-    <AndroidNativeLibrary Include="Libs\arm64-v8a\libmswebrtc.so" />
-    <AndroidNativeLibrary Include="Libs\arm64-v8a\libortp.so" />
-    <AndroidNativeLibrary Include="Libs\armeabi-v7a\libbctoolbox.so" />
-    <AndroidNativeLibrary Include="Libs\armeabi-v7a\libgnustl_shared.so" />
-    <AndroidNativeLibrary Include="Libs\armeabi-v7a\liblinphone.so" />
-    <AndroidNativeLibrary Include="Libs\armeabi-v7a\libmediastreamer_base.so" />
-    <AndroidNativeLibrary Include="Libs\armeabi-v7a\libmediastreamer_voip.so" />
-    <AndroidNativeLibrary Include="Libs\armeabi-v7a\libmssilk.so" />
-    <AndroidNativeLibrary Include="Libs\armeabi-v7a\libmswebrtc.so" />
-    <AndroidNativeLibrary Include="Libs\armeabi-v7a\libortp.so" />
-    <AndroidNativeLibrary Include="Libs\x86\libbctoolbox.so" />
-    <AndroidNativeLibrary Include="Libs\x86\libgnustl_shared.so" />
-    <AndroidNativeLibrary Include="Libs\x86\liblinphone.so" />
-    <AndroidNativeLibrary Include="Libs\x86\libmediastreamer_base.so" />
-    <AndroidNativeLibrary Include="Libs\x86\libmediastreamer_voip.so" />
-    <AndroidNativeLibrary Include="Libs\x86\libmssilk.so" />
-    <AndroidNativeLibrary Include="Libs\x86\libmswebrtc.so" />
-    <AndroidNativeLibrary Include="Libs\x86\libortp.so" />
     <AndroidAsset Include="Assets\linphonerc_default" />
     <None Include="Resources\AboutResources.txt" />
     <None Include="Assets\AboutAssets.txt" />
@@ -117,9 +92,6 @@
     <AndroidResource Include="Resources\values\styles.xml">
       <SubType>Designer</SubType>
     </AndroidResource>
-  </ItemGroup>
-  <ItemGroup>
-    <AndroidJavaLibrary Include="Libs\liblinphone.jar" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Liblinphone\Liblinphone.csproj">
