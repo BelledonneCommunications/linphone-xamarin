@@ -58,11 +58,12 @@ When you created your Xamarin solution, you may have chosen the PCL project inst
 
 For the C# wrapper to work, it needs to find the Linphone native libraries. On Android, here's the procedure to add them to the project:
 
-1. Create a "Libs" directory in the root directory of the project ;
-1. Create a directory for each architecture you want to support named with the eabi code (armeabi-v7a, arm64, armv5, x86, etc...) ;
-1. Add in each directory the libraries (.so) ;
-1. For each .so, set the Build Action to AndroidNativeLibrary ;
-1. In the "Libs" directory, add the liblinphone.jar and set it's Build Action to AndroidJavaLibrary.
+1. Create a [Binding Aar](https://developer.xamarin.com/guides/android/advanced_topics/binding-a-java-library/binding-an-aar/) with the liblinphone-sdk.aar(You can find it in the zip [here](https://www.linphone.org/releases/android/liblinphone-android-sdk-latest.zip)).
+1. Add to the Binding Aar project in Transforms/Metadata.xml
+```
+<remove-node path="/api/package[@name='org.linphone.core']"/>
+```
+1. Add to your Android project the reference of the Binding Aar created.
 
 On Android, you must manually load the libraries before the first call to Linphone API. Here's the code:
 ```java
@@ -90,3 +91,33 @@ For the C# wrapper to work, it needs to find the Linphone native libraries. On I
 1. Right click on your Xamarin.iOS project then select add -> add native references and select all the frameworks you imported in the project.
 
 Do not forget to add your required permissions in your project Info.plist (i.e: use of microphone etc...) or your app will crash !
+
+#### UWP project
+
+With or without Xamarin, our wrapper can be used in an UWP project.
+
+Her's how to create an UWP project:
+
+1. Follow the instructions available [here](https://developer.xamarin.com/guides/xamarin-forms/platform-features/windows/installation/universal/). If you don't want to use Xamarin, skip step 2 and stop after step 3.
+1. Add a reference in the UWP project to the shared project LinphoneXamarin.
+1. Download the nuget package [here](http://linphone.org/snapshots/windows10/LinphoneSDKlatest.nupkg).
+1. Install the nuget package of LinphoneSdk for your UWP project(Instruction [here](https://wiki.linphone.org/xwiki/wiki/public/view/Lib/Getting%20started/Windows%20UWP/#HInstalllocalnugetpackage)).
+
+
+### Adding video
+
+#### Android
+
+1. Adding a 'Org.Linphone.Mediastream.Video.Display.GL2JNIView' to the [Xamarin.Forms.Layout](https://developer.xamarin.com/guides/xamarin-forms/user-interface/layouts/) where will be displayed the video.
+1. Create a 'Org.Linphone.Mediastream.Video.AndroidVideoWindowsImpl':
+```java
+Org.Linphone.Mediastream.Video.AndroidVideoWindowsImpl(
+  Org.Linphone.Mediastream.Video.Display.GL2JNIView,
+  Org.Linphone.Mediastream.Video.Display.GL2JNIView,
+  Org.Linphone.Mediastream.Video.AndroidVideoWindowsImpl.IVideoWindowsListener)
+```
+1. Set 'NativeVideoWindowId' of LinphoneCore to the created 'AndroidVideoWindowsImpl' ptr(Object.Handler).
+
+#### UWP
+
+To get/set NativeVideoWindowId and NativePreviewWindowId, you must use NativeVideoWindowIdString and NativePreviewWindowIdString
