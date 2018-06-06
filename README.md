@@ -1,3 +1,5 @@
+[![pipeline status](https://gitlab.linphone.org/BC/public/linphone-xamarin/badges/master/pipeline.svg)](https://gitlab.linphone.org/BC/public/linphone-xamarin/commits/master)
+
 # Xamarin SDK
 
 To use Linphone with Xamarin, you need the Xamarin SDK which contains the native libraries for Android and iOS (for each architecture) and the C# wrapper that matches those libraries.
