@@ -50,6 +50,10 @@ class AndroidTarget(prepare.Target):
         self.toolchain_file = 'toolchains/toolchain-android-' + arch + '.cmake'
         self.output = 'android/liblinphone-sdk/android-' + arch
         self.external_source_path = os.path.join(current_path, 'submodules')
+        external_builders_path = os.path.join(current_path, 'cmake_builder')
+        self.additional_args = [
+            "-DLINPHONE_BUILDER_EXTERNAL_BUILDERS_PATH=" + external_builders_path
+        ]
 
 
 class AndroidArmTarget(AndroidTarget):
@@ -91,14 +95,18 @@ android_targets = {
     'x86_64': AndroidX86_64Target()
 }
 
+android_virtual_targets = {
+    'all': ['arm', 'armv7', 'arm64', 'x86', 'x86_64']
+}
+
 class AndroidPreparator(prepare.Preparator):
 
     def __init__(self, targets=android_targets):
-        prepare.Preparator.__init__(self, targets, default_targets=['armv7', 'arm64', 'x86'])
-        self.min_supported_ndk = 10
-        self.max_supported_ndk = 14
+        prepare.Preparator.__init__(self, targets, default_targets=['armv7', 'arm64'], virtual_targets=android_virtual_targets)
+        self.min_supported_ndk = 16
+        self.max_supported_ndk = 17
         self.unsupported_ndk_version = None
-        self.min_cmake_version = "3.7"
+        self.min_cmake_version = "3.10"
         self.release_with_debug_info = True
         self.veryclean = True
         self.show_gpl_disclaimer = True
@@ -121,8 +129,13 @@ class AndroidPreparator(prepare.Preparator):
             self.additional_args += ["-DENABLE_OPUS=YES"]
             self.additional_args += ["-DENABLE_SILK=YES"]
             self.additional_args += ["-DENABLE_SPEEX=YES"]
+            self.additional_args += ["-DENABLE_FFMPEG=YES"]
+            self.additional_args += ["-DENABLE_H263=YES"]
+            self.additional_args += ["-DENABLE_H263P=YES"]
+            self.additional_args += ["-DENABLE_MPEG4=YES"]
             self.additional_args += ["-DENABLE_OPENH264=YES"]
             self.additional_args += ["-DENABLE_VPX=YES"]
+            # self.additional_args += ["-DENABLE_X264=YES"] # Do not activate x264 because it has text relocation issues
 
     def list_feature_target(self):
         return android_targets['armv7']
@@ -147,8 +160,19 @@ class AndroidPreparator(prepare.Preparator):
             if len(python_config_files) > 0:
                 version = open(python_config_files[0]).readlines()[0]
                 res = re.match('^.*/(aosp-)?ndk-r(\d+).*$', version)
-                version = int(res.group(2))
-                retval = False
+                if res is not None: # Will be if NDK < 16
+                    version = int(res.group(2))
+                    retval = False
+                else:
+                    release_file = os.path.join(ndk_path, 'source.properties') # Since NDK 16
+                    if os.path.isfile(release_file):
+                        version = open(release_file).read().strip()
+                        res = re.findall(r'(?:(\d+))', version)
+                        version = int(res[0])
+                        retval = False
+                    else:
+                        error("Could not get Android NDK version!")
+                        sys.exit(-1)
             else:
                 error("Could not get Android NDK version!")
                 sys.exit(-1)
@@ -210,6 +234,11 @@ all: generate-android-sdk
 
 android-build: $(addprefix android-, $(addsuffix -build, $(android-archs)))
 
+clean: java-clean
+
+java-clean:
+\t./gradlew clean
+
 android-copy-libs:
 \trm -rf LinphoneXamarin/LinphoneXamarin/LinphoneXamarin.Android/Libs/armeabi-v7a
 \tif test -d "android/liblinphone-sdk/android-armv7"; then \\
@@ -236,18 +265,14 @@ android-copy-libs:
 \t\tsh android/android-x86/strip.sh LinphoneXamarin/LinphoneXamarin/LinphoneXamarin.Android/Libs/x86/*.so; \\
 \tfi
 
+generate-android-sdk: clean android-build android-copy-libs create-jar
+
 create-jar:
 \t./gradlew assembleRelease
 \t./gradlew classJar
 
-generate-android-sdk: clean android-build android-copy-libs create-jar
 
 {arch_targets}
-
-clean: java-clean
-
-java-clean:
-	./gradlew clean
 
 help-prepare-options:
 \t@echo "prepare.py was previously executed with the following options:"
