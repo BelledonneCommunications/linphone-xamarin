@@ -37,9 +37,6 @@
 	path = submodules/externals/libxml2
 	url = https://gitlab.linphone.org/BC/public/external/libxml2.git
 	ignore = dirty
-[submodule "submodules/externals/libupnp"]
-	path = submodules/externals/libupnp
-	url = https://gitlab.linphone.org/BC/public/external/libupnp.git
 [submodule "submodules/externals/opus"]
 	path = submodules/externals/opus
 	url = https://gitlab.linphone.org/BC/public/external/opus.git
