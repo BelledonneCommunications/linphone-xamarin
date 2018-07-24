@@ -7,9 +7,6 @@
 [submodule "submodules/externals/speex"]
 	path = submodules/externals/speex
 	url = https://gitlab.linphone.org/BC/public/external/speex.git
-[submodule "submodules/msx264"]
-	path = submodules/msx264
-	url = https://gitlab.linphone.org/BC/public/msx264.git
 [submodule "submodules/externals/opencore-amr"]
 	path = submodules/externals/opencore-amr
 	url = https://gitlab.linphone.org/BC/public/external/opencore-amr.git
