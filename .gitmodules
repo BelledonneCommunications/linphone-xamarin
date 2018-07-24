@@ -7,10 +7,6 @@
 [submodule "submodules/externals/speex"]
 	path = submodules/externals/speex
 	url = https://gitlab.linphone.org/BC/public/external/speex.git
-[submodule "submodules/externals/ffmpeg"]
-	path = submodules/externals/ffmpeg
-	url = https://gitlab.linphone.org/BC/public/external/ffmpeg.git
-	ignore = dirty
 [submodule "submodules/externals/x264"]
 	path = submodules/externals/x264
 	url = https://gitlab.linphone.org/BC/public/external/x264.git
