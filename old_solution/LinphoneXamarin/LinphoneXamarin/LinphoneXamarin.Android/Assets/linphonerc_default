@@ -1,0 +1,12 @@
+﻿[net]
+download_bw=380
+upload_bw=380
+
+[sip]
+contact="Linphone Xamarin" <sip:linphone.xamarin@unknown-host>
+use_info=0
+use_ipv6=1
+keepalive_period=30000
+sip_port=-1
+sip_tcp_port=-1
+sip_tls_port=-1
