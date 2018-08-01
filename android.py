@@ -310,6 +310,7 @@ generate-android-sdk: clean android-build android-copy-libs create-jar
 
 create-jar:
 \t./gradlew assembleRelease
+\tcp ./bin/outputs/aar/liblinphone-sdk-*.aar Xamarin/Xamarin/Liblinphone/liblinphone-sdk.aar
 
 {arch_targets}
 
