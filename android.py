@@ -240,37 +240,76 @@ java-clean:
 \t./gradlew clean
 
 android-copy-libs:
-\trm -rf LinphoneXamarin/LinphoneXamarin/LinphoneXamarin.Android/Libs/armeabi-v7a
+\trm -rf android/liblinphone-sdk/res
+\trm -rf android/libs-debug/armeabi
+\trm -rf android/libs/armeabi
+\tif test -d "android/liblinphone-sdk/android-arm"; then \\
+\t\tmkdir -p android/libs-debug/armeabi && \\
+\t\tcp -f android/liblinphone-sdk/android-arm/lib/lib*.so android/libs-debug/armeabi && \\
+\t\tcp -f android/liblinphone-sdk/android-arm/lib/mediastreamer/plugins/*.so android/libs-debug/armeabi && \\
+\t\tmkdir -p android/libs/armeabi && \\
+\t\tcp -f android/liblinphone-sdk/android-arm/lib/lib*.so android/libs/armeabi && \\
+\t\tcp -f android/liblinphone-sdk/android-arm/lib/mediastreamer/plugins/*.so android/libs/armeabi && \\
+\t\tcp android/liblinphone-sdk/android-arm/share/linphonecs/LinphoneWrapper.cs Xamarin/Xamarin/Xamarin/ && \\
+\t\tsh android/android-arm/strip.sh android/libs/armeabi/*.so; \\
+\tfi
+\tif test -f "android/liblinphone-sdk/android-arm/lib/wrap.sh"; then \\
+\t\tmkdir -p android/liblinphone-sdk/res/lib/armeabi && \\
+\t\tcp -f android/liblinphone-sdk/android-arm/lib/wrap.sh android/liblinphone-sdk/res/lib/armeabi; \\
+\tfi
+\trm -rf android/libs-debug/armeabi-v7a
+\trm -rf android/libs/armeabi-v7a
 \tif test -d "android/liblinphone-sdk/android-armv7"; then \\
-\t\tmkdir -p LinphoneXamarin/LinphoneXamarin/LinphoneXamarin.Android/Libs/armeabi-v7a && \\
-\t\tcp android/liblinphone-sdk/android-armv7/share/linphonecs/LinphoneWrapper.cs LinphoneXamarin/LinphoneXamarin/LinphoneXamarin && \\
-\t\tcp -f android/liblinphone-sdk/android-armv7/lib/lib*.so LinphoneXamarin/LinphoneXamarin/LinphoneXamarin.Android/Libs/armeabi-v7a && \\
-\t\tcp -f android/liblinphone-sdk/android-armv7/lib/mediastreamer/plugins/*.so LinphoneXamarin/LinphoneXamarin/LinphoneXamarin.Android/Libs/armeabi-v7a && \\
-\t\tsh android/android-armv7/strip.sh LinphoneXamarin/LinphoneXamarin/LinphoneXamarin.Android/Libs/armeabi-v7a/*.so; \\
+\t\tmkdir -p android/libs-debug/armeabi-v7a && \\
+\t\tcp -f android/liblinphone-sdk/android-armv7/lib/lib*.so android/libs-debug/armeabi-v7a && \\
+\t\tcp -f android/liblinphone-sdk/android-armv7/lib/mediastreamer/plugins/*.so android/libs-debug/armeabi-v7a && \\
+\t\tmkdir -p android/libs/armeabi-v7a && \\
+\t\tcp -f android/liblinphone-sdk/android-armv7/lib/lib*.so android/libs/armeabi-v7a && \\
+\t\cp -f android/liblinphone-sdk/android-armv7/lib/mediastreamer/plugins/*.so android/libs/armeabi-v7a && \\
+\t\tcp android/liblinphone-sdk/android-armv7/share/linphonecs/LinphoneWrapper.cs Xamarin/Xamarin/Xamarin/ && \\
+\t\tsh android/android-armv7/strip.sh android/libs/armeabi-v7a/*.so; \\
 \tfi
-\trm -rf LinphoneXamarin/LinphoneXamarin/LinphoneXamarin.Android/Libs/arm64-v8a
+\tif test -f "android/liblinphone-sdk/android-armv7/lib/wrap.sh"; then \\
+\t\tmkdir -p android/liblinphone-sdk/res/lib/armeabi-v7a && \\
+\t\tcp -f android/liblinphone-sdk/android-armv7/lib/wrap.sh android/liblinphone-sdk/res/lib/armeabi-v7a; \\
+\tfi
+\trm -rf android/libs-debug/arm64-v8a
+\trm -rf android/libs/arm64-v8a
 \tif test -d "android/liblinphone-sdk/android-arm64"; then \\
-\t\tmkdir -p LinphoneXamarin/LinphoneXamarin/LinphoneXamarin.Android/Libs/arm64-v8a && \\
-\t\tcp android/liblinphone-sdk/android-arm64/share/linphonecs/LinphoneWrapper.cs LinphoneXamarin/LinphoneXamarin/LinphoneXamarin && \\
-\t\tcp -f android/liblinphone-sdk/android-arm64/lib/lib*.so LinphoneXamarin/LinphoneXamarin/LinphoneXamarin.Android/Libs/arm64-v8a && \\
-\t\tcp -f android/liblinphone-sdk/android-arm64/lib/mediastreamer/plugins/*.so LinphoneXamarin/LinphoneXamarin/LinphoneXamarin.Android/Libs/arm64-v8a && \\
-\t\tsh android/android-arm64/strip.sh LinphoneXamarin/LinphoneXamarin/LinphoneXamarin.Android/Libs/arm64-v8a/*.so; \\
+\t\tmkdir -p android/libs-debug/arm64-v8a && \\
+\t\tcp -f android/liblinphone-sdk/android-arm64/lib/lib*.so android/libs-debug/arm64-v8a && \\
+\t\tcp -f android/liblinphone-sdk/android-arm64/lib/mediastreamer/plugins/*.so android/libs-debug/arm64-v8a && \\
+\t\tmkdir -p android/libs/arm64-v8a && \\
+\t\tcp -f android/liblinphone-sdk/android-arm64/lib/lib*.so android/libs/arm64-v8a && \\
+\t\tcp -f android/liblinphone-sdk/android-arm64/lib/mediastreamer/plugins/*.so android/libs/arm64-v8a && \\
+\t\tcp android/liblinphone-sdk/android-arm64/share/linphonecs/LinphoneWrapper.cs Xamarin/Xamarin/Xamarin/ && \\
+\t\tsh android/android-arm64/strip.sh android/libs/arm64-v8a/*.so; \\
 \tfi
-\trm -rf LinphoneXamarin/LinphoneXamarin/LinphoneXamarin.Android/Libs/x86
+\tif test -f "android/liblinphone-sdk/android-arm64/lib/wrap.sh"; then \\
+\t\tmkdir -p android/liblinphone-sdk/res/lib/arm64-v8a && \\
+\t\tcp -f android/liblinphone-sdk/android-arm64/lib/wrap.sh android/liblinphone-sdk/res/lib/arm64-v8a; \\
+\tfi
+\trm -rf android/libs-debug/x86
+\trm -rf android/libs/x86
 \tif test -d "android/liblinphone-sdk/android-x86"; then \\
-\t\tmkdir -p LinphoneXamarin/LinphoneXamarin/LinphoneXamarin.Android/Libs/x86 && \\
-\t\tcp android/liblinphone-sdk/android-x86/share/linphonecs/LinphoneWrapper.cs LinphoneXamarin/LinphoneXamarin/LinphoneXamarin && \\
-\t\tcp -f android/liblinphone-sdk/android-x86/lib/lib*.so LinphoneXamarin/LinphoneXamarin/LinphoneXamarin.Android/Libs/x86 && \\
-\t\tcp -f android/liblinphone-sdk/android-x86/lib/mediastreamer/plugins/*.so LinphoneXamarin/LinphoneXamarin/LinphoneXamarin.Android/Libs/x86 && \\
-\t\tsh android/android-x86/strip.sh LinphoneXamarin/LinphoneXamarin/LinphoneXamarin.Android/Libs/x86/*.so; \\
+\t\tmkdir -p android/libs-debug/x86 && \\
+\t\tcp -f android/liblinphone-sdk/android-x86/lib/lib*.so android/libs-debug/x86 && \\
+\t\tcp -f android/liblinphone-sdk/android-x86/lib/mediastreamer/plugins/*.so android/libs-debug/x86 && \\
+\t\tmkdir -p android/libs/x86 && \\
+\t\tcp -f android/liblinphone-sdk/android-x86/lib/lib*.so android/libs/x86 && \\
+\t\tcp -f android/liblinphone-sdk/android-x86/lib/mediastreamer/plugins/*.so android/libs/x86 && \\
+\t\tcp android/liblinphone-sdk/android-x86/share/linphonecs/LinphoneWrapper.cs Xamarin/Xamarin/Xamarin/ && \\
+\t\tsh android/android-x86/strip.sh android/libs/x86/*.so; \\
+\tfi
+\tif test -f "android/liblinphone-sdk/android-x86/lib/wrap.sh"; then \\
+\t\tmkdir -p android/liblinphone-sdk/res/lib/x86 && \\
+\t\tcp -f android/liblinphone-sdk/android-x86/lib/wrap.sh android/liblinphone-sdk/res/lib/x86; \\
 \tfi
 
 generate-android-sdk: clean android-build android-copy-libs create-jar
 
 create-jar:
 \t./gradlew assembleRelease
-\t./gradlew classJar
-
 
 {arch_targets}
 
@@ -297,8 +336,6 @@ help: help-prepare-options
         f = open('Makefile.android', 'w')
         f.write(makefile)
         f.close()
-
-
 
 def main():
     preparator = AndroidPreparator()

@@ -1,14 +1,14 @@
 // Project information
 buildDir = 'bin'
-
 buildscript {
     repositories {
         jcenter()
         mavenCentral()
         mavenLocal()
+        google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.0'
+        classpath 'com.android.tools.build:gradle:3.1.0'
     }
 }
 
@@ -17,26 +17,73 @@ allprojects {
         jcenter()
         mavenCentral()
         mavenLocal()
+        google()
     }
+}
+
+configurations {
+    javadocDeps
 }
 
 apply plugin: 'com.android.library'
 
 dependencies {
-    compile group: 'org.apache.commons', name: 'commons-compress', version: '1.5'
+    implementation 'org.apache.commons:commons-compress:1.16.1'
+    javadocDeps 'org.apache.commons:commons-compress:1.16.1'
 }
 
-def submoduleDir = ['submodules/mediastreamer2/java/src',
-                    'submodules/linphone/java/j2se',
-                    'submodules/linphone/java/common',
-                    'submodules/linphone/java/impl',
-                    'submodules/linphone/coreapi/help/java']
+def srcDir = ['./submodules/mediastreamer2/java/src']
+def rootSdk = 'android/liblinphone-sdk/'
+
+if (file('android/liblinphone-sdk/android-arm64/share/linphonej/java/org/linphone/core/Factory.java').exists() )
+    rootSdk += 'android-arm64'
+else if (file('android/liblinphone-sdk/android-arm/share/linphonej/java/org/linphone/core/Factory.java').exists() )
+    rootSdk += 'android-arm'
+else if (file('android/liblinphone-sdk/android-armv7/share/linphonej/java/org/linphone/core/Factory.java').exists() )
+    rootSdk += 'android-armv7'
+else if (file('android/liblinphone-sdk/android-x86/share/linphonej/java/org/linphone/core/Factory.java').exists() )
+    rootSdk += 'android-x86'
+else {
+    println ("native sdk not ready yet")
+    rootSdk = ""
+}
+
+srcDir += [rootSdk+'/share/linphonej/java/org/linphone/core/']
+srcDir += ['./submodules/linphone/wrappers/java/classes/']
+
+def excludePackage = []
+
+excludePackage.add('**/gdb.*')
+excludePackage.add('**/libopenh264**')
+excludePackage.add('**/**tester**')
+excludePackage.add('**/LICENSE.txt')
 
 android {
+    buildTypes {
+        release {}
+        debug {}
+    }
+
     defaultConfig {
-        compileSdkVersion 25
-        buildToolsVersion "25.0.2"
+        compileSdkVersion 28
+        buildToolsVersion "28.0.0"
         multiDexEnabled true
+        setProperty("archivesBaseName", "liblinphone-sdk")
+    }
+
+    // Signing
+    signingConfigs {
+        release {
+        }
+    }
+    buildTypes {
+        release {
+        }
+        packaged {
+            initWith release
+            signingConfig null
+            //matchingFallbacks = ['debug', 'release']
+        }
     }
 
     lintOptions {
@@ -48,18 +95,19 @@ android {
 
     sourceSets {
         main {
-            manifest.srcFile 'LinphoneXamarin/LinphoneXamarin/LinphoneXamarin.Android/Properties/AndroidManifest.xml'
-            java.srcDirs = submoduleDir
-            resources.srcDirs = submoduleDir
-            aidl.srcDirs = submoduleDir
-            renderscript.srcDirs = submoduleDir
-            jniLibs.srcDirs = ['LinphoneXamarin/LinphoneXamarin/LinphoneXamarin.Android/Libs']
+            manifest.srcFile 'AndroidManifestLibrary.xml'
+            java.srcDirs = srcDir
+            aidl.srcDirs = srcDir
+            assets.srcDirs = ["${buildDir}/sdk-assets/assets/"]
+            renderscript.srcDirs = srcDir
+            jniLibs.srcDirs = ['./android/libs']
+            resources.srcDir("res")
 
             java.excludes = ['**/mediastream/MediastreamerActivity.java']
 
             // Exclude some useless files
             packagingOptions {
-                exclude '**/gdb.*'
+                excludes = excludePackage
             }
         }
         debug.setRoot('build-types/debug')
@@ -69,10 +117,57 @@ android {
 
 ///////////// Task /////////////
 
-task classJar(type: Jar) {
-    classifier = 'class'
-    from 'bin/intermediates/classes/release'
-    include '**/*.class'
-    libsDirName = '../LinphoneXamarin/LinphoneXamarin/LinphoneXamarin.Android/Libs'
-    archiveName = 'liblinphone.jar'
+task(releaseJavadoc, type: Javadoc, dependsOn: "assembleRelease") {
+    source = srcDir
+    excludes = ['**/mediastream/MediastreamerActivity.java',
+                '**/**.html',
+                '**/**.aidl']
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    classpath += files(android.libraryVariants.release.javaCompile.classpath.files)
+    classpath += configurations.javadocDeps
+    options.encoding = 'UTF-8'
 }
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.srcDirs
+}
+
+task androidJavadocsJar(type: Jar, dependsOn: releaseJavadoc) {
+    classifier = 'javadoc'
+    from releaseJavadoc.destinationDir
+}
+
+task sdkZip(type: Zip) {
+    String appName = "liblinphone-android-sdk"
+    String gitSha = 'git describe --always'.execute().text.trim()
+    String newSdkName = appName + "-" + gitSha + ".zip"
+
+    from('bin/libs',
+         'bin/outputs/aar')
+    include '*'
+    archiveName newSdkName
+}
+
+task copyAssets(type: Sync) {
+    from rootSdk
+    into "${buildDir}/sdk-assets/assets/org.linphone.core"
+    include '**/*.png'
+    include '**/*.pem'
+    include '**/*.mkv'
+    include '**/*.wav'
+    include '**/*_grammar'
+
+    //rename '(.*)', '$1'.toLowerCase()
+    eachFile {
+        path = path.toLowerCase() //to workaround case insensitive fs (macosx)
+        println("Syncing sdk asset ${sourcePath} to ${path}")
+    }
+    doFirst {
+        println("Syncing sdk assets into root dir ${destinationDir}")
+     }
+    // do not copy those
+    includeEmptyDirs = false
+
+}
+project.tasks['preBuild'].dependsOn 'copyAssets'
