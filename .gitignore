@@ -257,3 +257,5 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+
+Xamarin/Xamarin/Liblinphone/liblinphone-sdk.aar
