@@ -258,4 +258,6 @@ ModelManifest.xml
 # FAKE - F# Make
 .fake/
 
+# Generate files, do not commit
+Xamarin/Xamarin/Xamarin/LinphoneWrapper.cs
 Xamarin/Xamarin/Liblinphone/liblinphone-sdk.aar

@@ -18,14 +18,25 @@ namespace Xamarin
             InitializeComponent();
 
             LinphoneWrapper.setNativeLogHandler();
+            Factory.Instance.EnableLogCollection(LogCollectionState.Enabled);
             
             CoreListener listener = Factory.Instance.CreateCoreListener();
             listener.OnGlobalStateChanged = OnGlobal;
+#if ANDROID
+            // Giving app context in CreateCore is mandatory for Android to be able to load grammars (and other assets) from AAR
+            Core = Factory.Instance.CreateCore(listener, ConfigFilePath, null, IntPtr.Zero, LinphoneAndroid.AndroidContext);
+#else
             Core = Factory.Instance.CreateCore(listener, ConfigFilePath, null);
+#endif
             Core.NetworkReachable = true;
 
             MainPage = new MainPage();
-		}
+        }
+
+        public StackLayout getLayoutView()
+        {
+            return MainPage.FindByName<StackLayout>("stack_layout");
+        }
 
         private void OnGlobal(Core lc, GlobalState gstate, string message)
         {
