@@ -5,13 +5,15 @@ using Android.OS;
 using Android.Content.Res;
 using System.IO;
 using Linphone;
+using Org.Linphone.Mediastream.Video;
+using Xamarin.Forms.Platform.Android;
 
 namespace Xamarin.Droid
 {
     [Activity(Label = "Xamarin", Icon = "@mipmap/icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
-        //GL2JNIView captureCamera;
+        Org.Linphone.Mediastream.Video.Display.GL2JNIView captureCamera;
 
         protected override void OnCreate(Bundle bundle)
         {
@@ -50,12 +52,12 @@ namespace Xamarin.Droid
             App app = new App(); // Do not add an arg to App constructor
             app.ConfigFilePath = rc_path;
 
-            /*captureCamera = new GL2JNIView(this);
+            captureCamera = new Org.Linphone.Mediastream.Video.Display.GL2JNIView(this);
             captureCamera.Holder.SetFixedSize(1920, 1080);
             AndroidVideoWindowImpl androidView = new AndroidVideoWindowImpl(captureCamera, null, null);
             app.Core.NativeVideoWindowId = androidView.Handle;
             app.Core.VideoDisplayEnabled = true;
-            app.getLayoutView().Children.Add(captureCamera);*/
+            app.getLayoutView().Children.Add(captureCamera.ToView());
 
             LoadApplication(app);
         }

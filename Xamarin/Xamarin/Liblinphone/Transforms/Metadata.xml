@@ -6,5 +6,51 @@
   This sample removes the method: android.support.v4.content.CursorLoader.loadInBackground:
   <remove-node path="/api/package[@name='android.support.v4.content']/class[@name='CursorLoader']/method[@name='loadInBackground']" />
   -->
-  <remove-node path="/api/package[@name='org.linphone.core']" />
+  <attr path="/api/package[@name='org.linphone.core']/
+        interface[@name='ChatRoomListener']/method[@name='onStateChanged']"
+        name="argsType">ChatRoomStateChangedEventArgs2</attr>
+
+  <attr path="/api/package[@name='org.linphone.core']/
+        interface[@name='CallListener']/method[@name='onStateChanged']"
+      name="argsType">CallStateChangedEventArgs2</attr>
+  
+  <attr path="/api/package[@name='org.linphone.core']/
+        interface[@name='ChatMessageListener']/method[@name='onStateChanged']"
+        name="argsType">ChatMessageStateChangedEventArgs</attr>
+
+  <attr path="/api/package[@name='org.linphone.core']/
+        interface[@name='CoreListener']/method[@name='onStateChanged']"
+      name="argsType">CoreStateChangedEventArgs</attr>
+
+  <attr path="/api/package[@name='org.linphone.core']/
+        interface[@name='CoreListener']/method[@name='onTransferStateChanged']"
+      name="argsType">CoreTransferStateChangedEventArgs</attr>
+
+  <attr path="/api/package[@name='org.linphone.core']/
+        interface[@name='CallListener']/method[@name='onTransferStateChanged']"
+      name="argsType">CallTransferStateChangedEventArgs</attr>
+
+  <attr path="/api/package[@name='org.linphone.core']/
+        interface[@name='CoreListener']/method[@name='onDtmfReceived']"
+      name="argsType">CoreDtmfReceivedEventArgs</attr>
+
+  <attr path="/api/package[@name='org.linphone.core']/
+        interface[@name='CallListener']/method[@name='onDtmfReceived']"
+      name="argsType">CallDtmfReceivedEventArgs</attr>
+
+  <attr path="/api/package[@name='org.linphone.core']/
+        interface[@name='CoreListener']/method[@name='onMessageReceived']"
+      name="argsType">CoreMessageReceivedEventArgs</attr>
+
+  <attr path="/api/package[@name='org.linphone.core']/
+        interface[@name='ChatRoomListener']/method[@name='onMessageReceived']"
+      name="argsType">ChatRoomMessageReceivedEventArgs</attr>
+
+  <attr path="/api/package[@name='org.linphone.core']/
+        interface[@name='CoreListener']/method[@name='onIsComposingReceived']"
+      name="argsType">CoreIsComposingReceivedEventArgs</attr>
+
+  <attr path="/api/package[@name='org.linphone.core']/
+        interface[@name='ChatRoomListener']/method[@name='onIsComposingReceived']"
+      name="argsType">ChatRoomIsComposingReceivedEventArgs</attr>
 </metadata>
