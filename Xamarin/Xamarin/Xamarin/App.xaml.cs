@@ -7,7 +7,6 @@ using Xamarin.Forms.Xaml;
 
 #if ANDROID
 using Android.Util;
-using Android.Content;
 #endif
 
 [assembly: XamlCompilation (XamlCompilationOptions.Compile)]
@@ -94,11 +93,7 @@ namespace Xamarin
 
         private void OnGlobal(Core lc, GlobalState gstate, string message)
         {
-#if WINDOWS_UWP
             Debug.WriteLine("Global state changed: " + gstate);
-#else
-            Console.WriteLine("Global state changed: " + gstate);
-#endif
         }
 
 #if WINDOWS_UWP
