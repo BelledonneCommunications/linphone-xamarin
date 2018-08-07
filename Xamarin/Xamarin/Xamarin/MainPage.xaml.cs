@@ -33,7 +33,7 @@ namespace Xamarin
             if (state == RegistrationState.Ok)
             {
                 register.IsEnabled = false;
-                this.FindByName<StackLayout>("stack_registrar").IsVisible = false;
+                stack_registrar.IsVisible = false;
             }
         }
 

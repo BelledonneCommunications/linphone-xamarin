@@ -7,12 +7,16 @@ using System.IO;
 using Linphone;
 using Org.Linphone.Mediastream.Video;
 using Xamarin.Forms.Platform.Android;
+using Android;
+using Android.Util;
+using System.Collections.Generic;
 
 namespace Xamarin.Droid
 {
     [Activity(Label = "Xamarin", Icon = "@mipmap/icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
+        int PERMISSIONS_REQUEST = 101;
         Org.Linphone.Mediastream.Video.Display.GL2JNIView captureCamera;
 
         protected override void OnCreate(Bundle bundle)
@@ -60,6 +64,37 @@ namespace Xamarin.Droid
             app.getLayoutView().Children.Add(captureCamera.ToView());
 
             LoadApplication(app);
+        }
+
+        protected override void OnResume()
+        {
+            base.OnResume();
+            List<string> Permissions = new List<string>();
+            if (this.CheckSelfPermission(Manifest.Permission.Camera) != Permission.Granted)
+            {
+                Permissions.Add(Manifest.Permission.Camera);
+            }
+            if (this.CheckSelfPermission(Manifest.Permission.RecordAudio) != Permission.Granted)
+            {
+                Permissions.Add(Manifest.Permission.RecordAudio);
+            }
+            if (Permissions.Count > 0)
+            {
+                this.RequestPermissions(Permissions.ToArray(), PERMISSIONS_REQUEST);
+            }
+        }
+
+        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
+        {
+            if (requestCode == PERMISSIONS_REQUEST)
+            {
+                int i = 0;
+                foreach (string permission in permissions)
+                {
+                    Log.Info("LinphoneXamarin", "Permission " + permission + " : " + grantResults[i]);
+                    i += 1;
+                }
+            }
         }
     }
 }
