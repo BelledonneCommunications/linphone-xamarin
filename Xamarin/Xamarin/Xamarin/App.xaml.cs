@@ -4,6 +4,10 @@ using System.Threading;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
+#if ANDROID
+using Android.Util;
+#endif
+
 [assembly: XamlCompilation (XamlCompilationOptions.Compile)]
 namespace Xamarin
 {
@@ -19,7 +23,8 @@ namespace Xamarin
 
             LinphoneWrapper.setNativeLogHandler();
             Factory.Instance.EnableLogCollection(LogCollectionState.Enabled);
-            
+            LoggingService.Instance.Listener.OnLogMessageWritten = OnLog;
+
             CoreListener listener = Factory.Instance.CreateCoreListener();
             listener.OnGlobalStateChanged = OnGlobal;
 #if ANDROID
@@ -36,6 +41,49 @@ namespace Xamarin
         public StackLayout getLayoutView()
         {
             return MainPage.FindByName<StackLayout>("stack_layout");
+        }
+
+        private void OnLog(LoggingService logService, string domain, LogLevel lev, string message)
+        {
+            string now = DateTime.Now.ToString("hh:mm:ss");
+            string log = now + " [";
+            switch (lev)
+            {
+                case LogLevel.Debug:
+                    log += "DEBUG";
+#if ANDROID
+                    Log.Debug(domain, message);
+#endif
+                    break;
+                case LogLevel.Error:
+                    log += "ERROR";
+#if ANDROID
+                    Log.Error(domain, message);
+#endif
+                    break;
+                case LogLevel.Message:
+                    log += "MESSAGE";
+#if ANDROID
+                    Log.Info(domain, message);
+#endif
+                    break;
+                case LogLevel.Warning:
+                    log += "WARNING";
+#if ANDROID
+                    Log.Warn(domain, message);
+#endif
+                    break;
+                case LogLevel.Fatal:
+                    log += "FATAL";
+#if ANDROID
+                    Log.Error(domain, message);
+#endif
+                    break;
+                default:
+                    break;
+            }
+            log += "] (" + domain + ") " + message;
+            Console.WriteLine(log);
         }
 
         private void OnGlobal(Core lc, GlobalState gstate, string message)
