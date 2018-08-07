@@ -10,6 +10,9 @@ using Xamarin.Forms.Platform.Android;
 using Android;
 using Android.Util;
 using System.Collections.Generic;
+using Xamarin.Forms;
+using Android.Views;
+using Android.Widget;
 
 namespace Xamarin.Droid
 {
@@ -17,7 +20,8 @@ namespace Xamarin.Droid
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
         int PERMISSIONS_REQUEST = 101;
-        Org.Linphone.Mediastream.Video.Display.GL2JNIView captureCamera;
+        Org.Linphone.Mediastream.Video.Display.GL2JNIView displayCamera;
+        SurfaceView captureCamera;
 
         protected override void OnCreate(Bundle bundle)
         {
@@ -39,7 +43,7 @@ namespace Xamarin.Droid
             AssetManager assets = Assets;
             string path = FilesDir.AbsolutePath;
             string rc_path = path + "/default_rc";
-            using (var br = new BinaryReader(Application.Context.Assets.Open("linphonerc_default")))
+            using (var br = new BinaryReader(Assets.Open("linphonerc_default")))
             {
                 using (var bw = new BinaryWriter(new FileStream(rc_path, FileMode.Create)))
                 {
@@ -56,12 +60,30 @@ namespace Xamarin.Droid
             App app = new App(); // Do not add an arg to App constructor
             app.ConfigFilePath = rc_path;
 
-            captureCamera = new Org.Linphone.Mediastream.Video.Display.GL2JNIView(this);
-            captureCamera.Holder.SetFixedSize(1920, 1080);
-            AndroidVideoWindowImpl androidView = new AndroidVideoWindowImpl(captureCamera, null, null);
+            LinearLayout fl = new LinearLayout(this);
+            ViewGroup.LayoutParams lparams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
+            fl.LayoutParameters = lparams;
+
+            displayCamera = new Org.Linphone.Mediastream.Video.Display.GL2JNIView(this);
+            ViewGroup.LayoutParams dparams = new ViewGroup.LayoutParams(640, 480);
+            displayCamera.LayoutParameters = dparams;
+            displayCamera.Holder.SetFixedSize(640, 480);
+
+            captureCamera = new SurfaceView(this);
+            ViewGroup.LayoutParams cparams = new ViewGroup.LayoutParams(320, 240);
+            captureCamera.LayoutParameters = cparams;
+            captureCamera.Holder.SetFixedSize(320, 240);
+
+            fl.AddView(displayCamera);
+            fl.AddView(captureCamera);
+
+            AndroidVideoWindowImpl androidView = new AndroidVideoWindowImpl(displayCamera, captureCamera, null);
             app.Core.NativeVideoWindowId = androidView.Handle;
+            app.Core.NativePreviewWindowId = captureCamera.Handle;
+            app.getLayoutView().Children.Add(fl);
+
             app.Core.VideoDisplayEnabled = true;
-            app.getLayoutView().Children.Add(captureCamera.ToView());
+            app.Core.VideoCaptureEnabled = true;
 
             LoadApplication(app);
         }

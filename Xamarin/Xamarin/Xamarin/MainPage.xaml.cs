@@ -54,10 +54,12 @@ namespace Xamarin
                 if (state == CallState.IncomingReceived)
                 {
                     call.Text = "Answer Call (" + lcall.RemoteAddressAsString + ")";
+                    video_call.Text = "Answer Call with Video";
                 }
                 else
                 {
                     call.Text = "Terminate Call";
+                    video_call.Text = "Terminate Call";
                 }
                 if (lcall.CurrentParams.VideoEnabled)
                 {
@@ -73,6 +75,7 @@ namespace Xamarin
                 video.IsEnabled = false;
                 call.Text = "Start Call";
                 call_stats.Text = "";
+                video_call.Text = "Start Video Call";
             }
         }
 
@@ -150,6 +153,31 @@ namespace Xamarin
                 if (call.State == CallState.IncomingReceived)
                 {
                     Core.AcceptCall(call);
+                }
+                else
+                {
+                    Core.TerminateAllCalls();
+                }
+            }
+        }
+
+        private void OnVideoCallClicked(object sender, EventArgs e)
+        {
+            if (Core.CallsNb == 0)
+            {
+                var addr = Core.InterpretUrl(address.Text);
+                CallParams CallParams = Core.CreateCallParams(null);
+                CallParams.VideoEnabled = true;
+                Core.InviteAddressWithParams(addr, CallParams);
+            }
+            else
+            {
+                Call call = Core.CurrentCall;
+                if (call.State == CallState.IncomingReceived)
+                {
+                    CallParams CallParams = Core.CreateCallParams(call);
+                    CallParams.VideoEnabled = true;
+                    Core.AcceptCallWithParams(call, CallParams);
                 }
                 else
                 {

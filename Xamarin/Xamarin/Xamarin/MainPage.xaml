@@ -17,6 +17,7 @@
 
         <Entry x:Name="address" Placeholder="Address" />
         <Button x:Name="call" Text="Start Call" Clicked="OnCallClicked" HorizontalOptions="Center" />
+        <Button x:Name="video_call" Text="Start Video Call" Clicked="OnVideoCallClicked" HorizontalOptions="Center" />
         <Label x:Name="call_status" HorizontalOptions="Center" />
         <Label x:Name="call_stats" HorizontalOptions="Center" />
 
