@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 using Xamarin.Forms;
 
 namespace Xamarin
@@ -21,7 +22,11 @@ namespace Xamarin
 
         private void OnRegistration(Core lc, ProxyConfig config, RegistrationState state, string message)
         {
+#if WINDOWS_UWP
+            Debug.WriteLine("Registration state changed: " + state);
+#else
             Console.WriteLine("Registration state changed: " + state);
+#endif
 
             registration_status.Text = "Registration state changed: " + state;
 
@@ -34,7 +39,11 @@ namespace Xamarin
 
         private void OnCall(Core lc, Call lcall, CallState state, string message)
         {
+#if WINDOWS_UWP
+            Debug.WriteLine("Call state changed: " + state);
+#else
             Console.WriteLine("Call state changed: " + state);
+#endif
 
             call_status.Text = "Call state changed: " + state;
 
@@ -66,9 +75,28 @@ namespace Xamarin
 
         private void OnStats(Core lc, Call call, CallStats stats)
         {
+#if WINDOWS_UWP
+            Debug.WriteLine("Call stats: " + stats.DownloadBandwidth + " kbits/s / " + stats.UploadBandwidth + " kbits/s");
+#else
             Console.WriteLine("Call stats: " + stats.DownloadBandwidth + " kbits/s / " + stats.UploadBandwidth + " kbits/s");
+#endif
 
             call_stats.Text = "Call stats: " + stats.DownloadBandwidth + " kbits/s / " + stats.UploadBandwidth + " kbits/s";
+        }
+
+        private void OnLogCollectionUpload(Core lc, CoreLogCollectionUploadState state, string info)
+        {
+#if WINDOWS_UWP
+            Debug.WriteLine("Logs upload state changed: " + state + ", url is " + info);
+#else
+            Console.WriteLine("Logs upload state changed: " + state + ", url is " + info);
+#endif
+            logsUrl.Text = info;
+            var tapGestureRecognizer = new TapGestureRecognizer();
+            tapGestureRecognizer.Tapped += (s, e) => {
+                Device.OpenUri(new Uri(((Label)s).Text));
+            };
+            logsUrl.GestureRecognizers.Add(tapGestureRecognizer);
         }
 
         public MainPage()
@@ -81,6 +109,7 @@ namespace Xamarin
             Listener.OnRegistrationStateChanged = OnRegistration;
             Listener.OnCallStateChanged = OnCall;
             Listener.OnCallStatsUpdated = OnStats;
+            Listener.OnLogCollectionUploadStateChanged = OnLogCollectionUpload;
             Core.AddListener(Listener);
         }
 
@@ -140,6 +169,12 @@ namespace Xamarin
                     Core.UpdateCall(call, param);
                 }
             }
+        }
+
+        private void onUploadLogsCliked(object sender, EventArgs e)
+        {
+            Core.LogCollectionUploadServerUrl = "https://www.linphone.org:444/lft.php";
+            Core.UploadLogCollection();
         }
     }
 }

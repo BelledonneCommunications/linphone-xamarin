@@ -1,11 +1,13 @@
 using Linphone;
 using System;
 using System.Threading;
+using System.Diagnostics;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
 #if ANDROID
 using Android.Util;
+using Android.Content;
 #endif
 
 [assembly: XamlCompilation (XamlCompilationOptions.Compile)]
@@ -30,6 +32,8 @@ namespace Xamarin
 #if ANDROID
             // Giving app context in CreateCore is mandatory for Android to be able to load grammars (and other assets) from AAR
             Core = Factory.Instance.CreateCore(listener, ConfigFilePath, null, IntPtr.Zero, LinphoneAndroid.AndroidContext);
+            // Required to be able to store logs as file
+            Core.SetLogCollectionPath(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData));
 #else
             Core = Factory.Instance.CreateCore(listener, ConfigFilePath, null);
 #endif
@@ -83,35 +87,57 @@ namespace Xamarin
                     break;
             }
             log += "] (" + domain + ") " + message;
-            Console.WriteLine(log);
+#if WINDOWS_UWP
+            Debug.WriteLine(log);
+#endif
         }
 
         private void OnGlobal(Core lc, GlobalState gstate, string message)
         {
+#if WINDOWS_UWP
+            Debug.WriteLine("Global state changed: " + gstate);
+#else
             Console.WriteLine("Global state changed: " + gstate);
+#endif
         }
 
+#if WINDOWS_UWP
+        private void LinphoneCoreIterate(ThreadPoolTimer timer) {
+#else
         private void LinphoneCoreIterate()
         {
+#endif
             while (true)
             {
+#if WINDOWS_UWP
+                CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.High,
+                () => {
+                    LinphoneCore.Iterate();
+                });
+#else
                 Device.BeginInvokeOnMainThread(() =>
                 {
                     Core.Iterate();
                 });
                 Thread.Sleep(50);
+#endif
             }
         }
 
         protected override void OnStart ()
 		{
             // Handle when your app starts
+#if WINDOWS_UWP
+            TimeSpan period = TimeSpan.FromSeconds(1);
+            ThreadPoolTimer PeriodicTimer = ThreadPoolTimer.CreatePeriodicTimer(LinphoneCoreIterate , period);
+#else
             Thread iterate = new Thread(LinphoneCoreIterate);
             iterate.IsBackground = false;
             iterate.Start();
+#endif
         }
 
-		protected override void OnSleep ()
+        protected override void OnSleep ()
 		{
 			// Handle when your app sleeps
 		}

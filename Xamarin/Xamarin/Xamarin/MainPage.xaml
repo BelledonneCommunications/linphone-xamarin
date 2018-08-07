@@ -21,6 +21,10 @@
         <Label x:Name="call_stats" HorizontalOptions="Center" />
 
         <Button x:Name="video" Text="Start Video" Clicked="OnVideoClicked" HorizontalOptions="Center" />
+        <StackLayout Orientation="Horizontal" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
+            <Button x:Name="logs" Text="Upload Logs" Clicked="onUploadLogsCliked" HorizontalOptions="Center" />
+            <Label x:Name="logsUrl" Text="" HorizontalOptions="Center" />
+        </StackLayout>
     </StackLayout>
 
 </ContentPage>
