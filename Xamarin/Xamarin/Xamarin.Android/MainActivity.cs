@@ -72,7 +72,7 @@ namespace Xamarin.Droid
             captureCamera = new SurfaceView(this);
             ViewGroup.LayoutParams cparams = new ViewGroup.LayoutParams(320, 240);
             captureCamera.LayoutParameters = cparams;
-            captureCamera.Holder.SetFixedSize(320, 240);
+            captureCamera.Holder.SetFixedSize(240, 320);
 
             fl.AddView(displayCamera);
             fl.AddView(captureCamera);

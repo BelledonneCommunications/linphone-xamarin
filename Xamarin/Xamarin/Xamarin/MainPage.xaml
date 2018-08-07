@@ -21,7 +21,11 @@
         <Label x:Name="call_status" HorizontalOptions="Center" />
         <Label x:Name="call_stats" HorizontalOptions="Center" />
 
-        <Button x:Name="video" Text="Start Video" Clicked="OnVideoClicked" HorizontalOptions="Center" IsEnabled="False" />
+        <StackLayout Orientation="Horizontal" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
+            <Button x:Name="video" Text="Start Video" Clicked="OnVideoClicked" HorizontalOptions="Center" IsEnabled="False" />
+            <Button x:Name="camera" Text="Change Camera" Clicked="OnCameraClicked" HorizontalOptions="Center" IsEnabled="False" />
+        </StackLayout>
+        
         <StackLayout Orientation="Horizontal" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
             <Button x:Name="logs" Text="Upload Logs" Clicked="onUploadLogsCliked" HorizontalOptions="Center" />
             <Label x:Name="logsUrl" Text="" HorizontalOptions="Center" />

@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using Xamarin.Forms;
+using Android.Util;
 
 namespace Xamarin
 {
@@ -50,7 +51,7 @@ namespace Xamarin
             if (lc.CallsNb > 0)
             {
                 video.IsEnabled = state == CallState.StreamsRunning;
-                
+
                 if (state == CallState.IncomingReceived)
                 {
                     call.Text = "Answer Call (" + lcall.RemoteAddressAsString + ")";
@@ -77,6 +78,7 @@ namespace Xamarin
                 call_stats.Text = "";
                 video_call.Text = "Start Video Call";
             }
+            camera.IsEnabled = video.IsEnabled;
         }
 
         private void OnStats(Core lc, Call call, CallStats stats)
@@ -198,6 +200,56 @@ namespace Xamarin
                     param.VideoEnabled = !call.CurrentParams.VideoEnabled;
                     param.VideoDirection = MediaDirection.SendRecv;
                     Core.UpdateCall(call, param);
+                }
+            }
+        }
+
+        private void OnCameraClicked(object sender, EventArgs e)
+        {
+            if (Core.CallsNb > 0)
+            {
+                Call call = Core.CurrentCall;
+                if (call.State == CallState.StreamsRunning)
+                {
+                    try
+                    {
+                        string currentDevice = Core.VideoDevice;
+                        IEnumerable<string> devices = Core.VideoDevicesList;
+                        int index = 0;
+                        foreach (string d in devices)
+                        {
+                            if (d == currentDevice)
+                            {
+                                break;
+                            }
+                            index++;
+                        }
+
+                        String newDevice;
+                        if (index == 1)
+                        {
+                            newDevice = devices.ElementAt(0);
+                        }
+                        else if (devices.Count() > 1)
+                        {
+                            newDevice = devices.ElementAt(1);
+                        }
+                        else
+                        { 
+                            newDevice = devices.ElementAt(index);
+                        }
+                        Core.VideoDevice = newDevice;
+
+                        Core.UpdateCall(call, call.Params);
+                    }
+                    catch (ArithmeticException)
+                    {
+#if WINDOWS_UWP
+                        Debug.WriteLine("Cannot swtich camera : no camera");
+#else
+                        Console.WriteLine("Cannot swtich camera : no camera");
+#endif
+                    }
                 }
             }
         }
