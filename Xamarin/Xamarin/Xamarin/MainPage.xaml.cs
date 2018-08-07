@@ -49,6 +49,8 @@ namespace Xamarin
 
             if (lc.CallsNb > 0)
             {
+                video.IsEnabled = state == CallState.StreamsRunning;
+                
                 if (state == CallState.IncomingReceived)
                 {
                     call.Text = "Answer Call (" + lcall.RemoteAddressAsString + ")";
@@ -68,6 +70,7 @@ namespace Xamarin
             }
             else
             {
+                video.IsEnabled = false;
                 call.Text = "Start Call";
                 call_stats.Text = "";
             }
