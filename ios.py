@@ -234,7 +234,7 @@ ios-sdk:
 \tarchives=`find iOS/liblinphone-sdk/{first_arch}-apple-darwin.ios -name '*.framework'` && \\
 \trm -rf iOS/liblinphone-sdk/apple-darwin && \\
 \tmkdir -p iOS/liblinphone-sdk/apple-darwin && \\
-\tcp iOS/liblinphone-sdk/{first_arch}-apple-darwin.ios/share/linphonecs/LinphoneWrapper.cs LinphoneXamarin/LinphoneXamarin/LinphoneXamarin && \\
+\tcp iOS/liblinphone-sdk/{first_arch}-apple-darwin.ios/share/linphonecs/LinphoneWrapper.cs Xamarin/Xamarin/Xamarin && \\
 \tcp -rf iOS/liblinphone-sdk/{first_arch}-apple-darwin.ios/share iOS/liblinphone-sdk/apple-darwin/. && \\
 \tcp -rf iOS/liblinphone-sdk/{first_arch}-apple-darwin.ios/lib iOS/liblinphone-sdk/apple-darwin/. && \\
 \tcp -rf iOS/liblinphone-sdk/{first_arch}-apple-darwin.ios/include iOS/liblinphone-sdk/apple-darwin/. && \\
@@ -254,7 +254,7 @@ ios-sdk:
 \t\techo "[{archs}] Mixing `basename $$archive` in $$destpath"; \\
 \t\tlipo -create -output $$destpath/$$framework_name $$armv7_path/$$framework_name $$arm64_path/$$framework_name $$x86_64_path/$$framework_name; \\
 \tdone; \\
-\tcp -rf iOS/liblinphone-sdk/apple-darwin/Frameworks LinphoneXamarin/LinphoneXamarin/LinphoneXamarin.iOS \\
+\tcp -rf iOS/liblinphone-sdk/apple-darwin/Frameworks Xamarin/Xamarin/Xamarin.iOS \\
 
 generate-ios-sdk: $(addprefix ios-, $(addsuffix -build, $(ios-archs)))
 \t$(MAKE) -f Makefile.ios ios-sdk
