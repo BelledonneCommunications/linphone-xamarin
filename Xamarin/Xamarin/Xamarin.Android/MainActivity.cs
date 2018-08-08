@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using Xamarin.Forms;
 using Android.Views;
 using Android.Widget;
+using System.Security.AccessControl;
 
 namespace Xamarin.Droid
 {
@@ -43,16 +44,11 @@ namespace Xamarin.Droid
             AssetManager assets = Assets;
             string path = FilesDir.AbsolutePath;
             string rc_path = path + "/default_rc";
-            using (var br = new BinaryReader(Assets.Open("linphonerc_default")))
+            if (!File.Exists(rc_path))
             {
-                using (var bw = new BinaryWriter(new FileStream(rc_path, FileMode.Create)))
+                using (StreamReader sr = new StreamReader(assets.Open("linphonerc_default")))
                 {
-                    byte[] buffer = new byte[2048];
-                    int length = 0;
-                    while ((length = br.Read(buffer, 0, buffer.Length)) > 0)
-                    {
-                        bw.Write(buffer, 0, length);
-                    }
+                    File.WriteAllText(rc_path, sr.ReadToEnd());
                 }
             }
 

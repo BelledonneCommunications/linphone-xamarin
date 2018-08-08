@@ -8,9 +8,10 @@
         <Label x:Name="welcome" Text="Welcome to Linphone Xamarin!" HorizontalOptions="Center" />
 
         <StackLayout x:Name="stack_registrar">
-            <Entry x:Name="username" Placeholder="Username" />
-            <Entry x:Name="password" Placeholder="Password" IsPassword="true"/>
+            <Entry x:Name="username" Placeholder="Username" Text="" />
+            <Entry x:Name="password" Placeholder="Password" IsPassword="true" Text=""/>
             <Entry x:Name="domain" Placeholder="Domain" Text="sip.linphone.org"/>
+            <Picker x:Name="transport"/>
             <Button x:Name="register" Text="Register" Clicked="OnRegisterClicked" HorizontalOptions="Center" />
             <Label x:Name="registration_status" HorizontalOptions="Center" />
         </StackLayout>

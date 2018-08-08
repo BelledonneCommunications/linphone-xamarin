@@ -18,6 +18,8 @@ namespace Xamarin
         }
         private CoreListener Listener;
 
+        private Dictionary<string, TransportType> Transports;
+
         private void OnRegistration(Core lc, ProxyConfig config, RegistrationState state, string message)
         {
             Debug.WriteLine("Registration state changed: " + state);
@@ -101,6 +103,16 @@ namespace Xamarin
             Listener.OnCallStatsUpdated = OnStats;
             Listener.OnLogCollectionUploadStateChanged = OnLogCollectionUpload;
             Core.AddListener(Listener);
+            
+            Transports = new Dictionary<string, TransportType>
+            {
+                { "UDP", TransportType.Udp }, { "TCP", TransportType.Tcp }, { "TLS", TransportType.Tls },
+            };
+            foreach (string protocol in Transports.Keys)
+            {
+                transport.Items.Add(protocol);
+            }
+            transport.SelectedIndex = 2;
         }
 
         private void OnRegisterClicked(object sender, EventArgs e)
@@ -112,6 +124,7 @@ namespace Xamarin
             var identity = Factory.Instance.CreateAddress("sip:sample@domain.tld");
             identity.Username = username.Text;
             identity.Domain = domain.Text;
+            identity.Transport = Transports.Values.ElementAt(transport.SelectedIndex);
             proxyConfig.Edit();
             proxyConfig.IdentityAddress = identity;
             proxyConfig.ServerAddr = domain.Text;
