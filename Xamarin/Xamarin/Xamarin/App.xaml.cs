@@ -11,6 +11,7 @@ namespace Xamarin
 	public partial class App : Application
     {
         public string ConfigFilePath { get; set; }
+        public string FactoryFilePath { get; set; }
 
         public LinphoneManager Manager { get; set; }
 
@@ -27,7 +28,7 @@ namespace Xamarin
             InitializeComponent();
 
             Manager = new LinphoneManager();
-            Manager.Init(ConfigFilePath);
+            Manager.Init(ConfigFilePath, FactoryFilePath);
 
             MainPage = new MainPage();
         }

@@ -51,10 +51,20 @@ namespace Xamarin.Droid
                     File.WriteAllText(rc_path, sr.ReadToEnd());
                 }
             }
+            string factory_path = path + "/factory_rc";
+            if (!File.Exists(factory_path))
+            {
+                using (StreamReader sr = new StreamReader(assets.Open("linphonerc_factory")))
+                {
+                    File.WriteAllText(factory_path, sr.ReadToEnd());
+                }
+            }
 
             global::Xamarin.Forms.Forms.Init(this, bundle);
             App app = new App(); // Do not add an arg to App constructor
             app.ConfigFilePath = rc_path;
+            app.FactoryFilePath = factory_path;
+            app.Manager.AndroidContext = this;
 
             LinearLayout fl = new LinearLayout(this);
             ViewGroup.LayoutParams lparams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
