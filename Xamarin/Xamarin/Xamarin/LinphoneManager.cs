@@ -25,12 +25,18 @@ namespace Xamarin
 
         public LinphoneManager()
         {
-            LinphoneWrapper.setNativeLogHandler();
-            Factory.Instance.EnableLogCollection(LogCollectionState.Enabled);
-            LoggingService.Instance.LogLevel = LogLevel.Debug;
+            Debug.WriteLine("==== Phone information dump ====");
+#if ANDROID
+            Debug.WriteLine("DEVICE=" + global::Android.OS.Build.Device);
+            Debug.WriteLine("MODEL=" + global::Android.OS.Build.Model);
+            Debug.WriteLine("MANUFACTURER=" + global::Android.OS.Build.Manufacturer);
+            Debug.WriteLine("SDK=" + global::Android.OS.Build.VERSION.Sdk);
+#endif
+            //LinphoneWrapper.setNativeLogHandler();
+            LoggingService.Instance.LogLevel = LogLevel.Message;
             LoggingService.Instance.Listener.OnLogMessageWritten = OnLog;
 
-            Debug.WriteLine("LinphoneWrapper.cs version is " + LinphoneWrapper.VERSION);
+            Debug.WriteLine("C# WRAPPER=" + LinphoneWrapper.VERSION);
         }
 
         public void Init(string configPath, string factoryPath)
