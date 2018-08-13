@@ -61,9 +61,9 @@ namespace Xamarin.Droid
             }
 
             global::Xamarin.Forms.Forms.Init(this, bundle);
+            App.ConfigFilePath = rc_path;
+            App.FactoryFilePath = factory_path;
             App app = new App(); // Do not add an arg to App constructor
-            app.ConfigFilePath = rc_path;
-            app.FactoryFilePath = factory_path;
             app.Manager.AndroidContext = this;
 
             LinearLayout fl = new LinearLayout(this);

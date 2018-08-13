@@ -1,7 +1,4 @@
-﻿[net]
-download_bw=380
-upload_bw=380
-
+﻿# I don't know why but the first line is often corrupted, leaving it blank or with a comment prevent the first section to not being parsed...
 [sip]
 contact="Linphone Xamarin" <sip:linphone.xamarin@unknown-host>
 use_info=0
@@ -10,3 +7,5 @@ keepalive_period=30000
 sip_port=-1
 sip_tcp_port=-1
 sip_tls_port=-1
+
+#Same for the end line, last line can be corrupted otherwise...

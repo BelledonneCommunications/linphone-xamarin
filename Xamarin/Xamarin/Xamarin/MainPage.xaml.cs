@@ -247,7 +247,6 @@ namespace Xamarin
 
         private void onUploadLogsCliked(object sender, EventArgs e)
         {
-            Core.LogCollectionUploadServerUrl = "https://www.linphone.org:444/lft.php";
             Core.UploadLogCollection();
         }
     }

@@ -10,8 +10,8 @@ namespace Xamarin
 {
 	public partial class App : Application
     {
-        public string ConfigFilePath { get; set; }
-        public string FactoryFilePath { get; set; }
+        public static string ConfigFilePath { get; set; }
+        public static string FactoryFilePath { get; set; }
 
         public LinphoneManager Manager { get; set; }
 
