@@ -265,7 +265,7 @@ android-copy-libs:
 \t\tcp -f android/liblinphone-sdk/android-armv7/lib/mediastreamer/plugins/*.so android/libs-debug/armeabi-v7a && \\
 \t\tmkdir -p android/libs/armeabi-v7a && \\
 \t\tcp -f android/liblinphone-sdk/android-armv7/lib/lib*.so android/libs/armeabi-v7a && \\
-\t\cp -f android/liblinphone-sdk/android-armv7/lib/mediastreamer/plugins/*.so android/libs/armeabi-v7a && \\
+\t\tcp -f android/liblinphone-sdk/android-armv7/lib/mediastreamer/plugins/*.so android/libs/armeabi-v7a && \\
 \t\tcp android/liblinphone-sdk/android-armv7/share/linphonecs/LinphoneWrapper.cs Xamarin/Xamarin/Xamarin/ && \\
 \t\tsh android/android-armv7/strip.sh android/libs/armeabi-v7a/*.so; \\
 \tfi
