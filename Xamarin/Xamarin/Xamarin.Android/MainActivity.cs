@@ -13,7 +13,7 @@ using System.Collections.Generic;
 using Xamarin.Forms;
 using Android.Views;
 using Android.Widget;
-using System.Security.AccessControl;
+using System;
 
 namespace Xamarin.Droid
 {
@@ -97,18 +97,21 @@ namespace Xamarin.Droid
         protected override void OnResume()
         {
             base.OnResume();
-            List<string> Permissions = new List<string>();
-            if (this.CheckSelfPermission(Manifest.Permission.Camera) != Permission.Granted)
+            if (Int32.Parse(global::Android.OS.Build.VERSION.Sdk) >= 23)
             {
-                Permissions.Add(Manifest.Permission.Camera);
-            }
-            if (this.CheckSelfPermission(Manifest.Permission.RecordAudio) != Permission.Granted)
-            {
-                Permissions.Add(Manifest.Permission.RecordAudio);
-            }
-            if (Permissions.Count > 0)
-            {
-                this.RequestPermissions(Permissions.ToArray(), PERMISSIONS_REQUEST);
+                List<string> Permissions = new List<string>();
+                if (this.CheckSelfPermission(Manifest.Permission.Camera) != Permission.Granted)
+                {
+                    Permissions.Add(Manifest.Permission.Camera);
+                }
+                if (this.CheckSelfPermission(Manifest.Permission.RecordAudio) != Permission.Granted)
+                {
+                    Permissions.Add(Manifest.Permission.RecordAudio);
+                }
+                if (Permissions.Count > 0)
+                {
+                    this.RequestPermissions(Permissions.ToArray(), PERMISSIONS_REQUEST);
+                }
             }
         }
 
