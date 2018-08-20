@@ -113,6 +113,13 @@ namespace Xamarin
                 transport.Items.Add(protocol);
             }
             transport.SelectedIndex = 2;
+
+            if (Core.DefaultProxyConfig.State == RegistrationState.Ok)
+            {
+                register.IsEnabled = false;
+                stack_registrar.IsVisible = false;
+            }
+            registration_status.Text = "Registration state: " + Core.DefaultProxyConfig.State;
         }
 
         private void OnRegisterClicked(object sender, EventArgs e)

@@ -13,8 +13,8 @@
             <Entry x:Name="domain" Placeholder="Domain" Text="sip.linphone.org"/>
             <Picker x:Name="transport"/>
             <Button x:Name="register" Text="Register" Clicked="OnRegisterClicked" HorizontalOptions="Center" />
-            <Label x:Name="registration_status" HorizontalOptions="Center" />
         </StackLayout>
+        <Label x:Name="registration_status" HorizontalOptions="Center" />
 
         <Entry x:Name="address" Placeholder="Address" />
         <Button x:Name="call" Text="Start Call" Clicked="OnCallClicked" HorizontalOptions="Center" />

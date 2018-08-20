@@ -48,7 +48,8 @@ namespace Xamarin.Droid
             {
                 using (StreamReader sr = new StreamReader(assets.Open("linphonerc_default")))
                 {
-                    File.WriteAllText(rc_path, sr.ReadToEnd());
+                    string content = sr.ReadToEnd();
+                    File.WriteAllText(rc_path, content);
                 }
             }
             string factory_path = path + "/factory_rc";
@@ -56,7 +57,8 @@ namespace Xamarin.Droid
             {
                 using (StreamReader sr = new StreamReader(assets.Open("linphonerc_factory")))
                 {
-                    File.WriteAllText(factory_path, sr.ReadToEnd());
+                    string content = sr.ReadToEnd();
+                    File.WriteAllText(factory_path, content);
                 }
             }
 
