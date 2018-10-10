@@ -35,6 +35,7 @@ namespace Xamarin
             //LinphoneWrapper.setNativeLogHandler();
             LoggingService.Instance.LogLevel = LogLevel.Message;
             LoggingService.Instance.Listener.OnLogMessageWritten = OnLog;
+            Factory.Instance.EnableLogCollection(LogCollectionState.Enabled);
 
             Debug.WriteLine("C# WRAPPER=" + LinphoneWrapper.VERSION);
         }
@@ -133,6 +134,14 @@ namespace Xamarin
         private void OnGlobal(Core lc, GlobalState gstate, string message)
         {
             Debug.WriteLine("Global state changed: " + gstate);
+            if (gstate == GlobalState.On)
+            {
+                MediastreamerFactory factory = lc.MsFactory;
+                factory.enableFilterFromName("MSMediaCodecH264Dec", false);
+                factory.enableFilterFromName("MSMediaCodecH264Enc", false);
+                factory.enableFilterFromName("MSOpenH264Dec", true);
+                factory.enableFilterFromName("MSOpenH264Enc", true);
+            }
         }
     }
 }
