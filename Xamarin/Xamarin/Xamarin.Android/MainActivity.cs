@@ -29,8 +29,7 @@ namespace Xamarin.Droid
             Java.Lang.JavaSystem.LoadLibrary("c++_shared");
             Java.Lang.JavaSystem.LoadLibrary("bctoolbox");
             Java.Lang.JavaSystem.LoadLibrary("ortp");
-            Java.Lang.JavaSystem.LoadLibrary("mediastreamer_base");
-            Java.Lang.JavaSystem.LoadLibrary("mediastreamer_voip");
+            Java.Lang.JavaSystem.LoadLibrary("mediastreamer");
             Java.Lang.JavaSystem.LoadLibrary("linphone");
 
             // This is mandatory for Android
