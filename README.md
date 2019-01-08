@@ -12,7 +12,7 @@ The Xamarin SDK embed the following:
 
 * The C# wrapper (named LinphoneWrapper.cs) ;
 * The Android libraries for armv7, arm64 and x86 ;
-* The Linphone java classes as a jar (liblinphone.jar) which is required for Android ;
+* The Linphone java classes as a jar (liblinphone-sdk.aar) which is required for Android ;
 * The iOS libraries for armv7, arm64 and x86_64 (as frameworks) ;
 * A sample solution using a shared project that contains a Xamarin Forms application along with Android and iOS projects.
 
@@ -20,10 +20,9 @@ If you want to support an architecture that is not included in our SDK (for exam
 
 ## Building the SDK
 
-To build the sdk, run the following commands :
-./prepare.py -c && ./prepare.py && make
-
-In order to only build the SDK for iOS or Android, you can add the following options to your ./prepare.py call : "-DENABLE_IOS=OFF" or "-DENABLE_ANDROID=OFF".
+To build the sdk, go to linphone-sdk folder and follow README instructions.
+Then copy (or create a symbolic link) from ./linphone-sdk/android-arm64/share/linphonecs/LinphoneWrapper.cs to Xamarin/Xamarin/Xamarin/LinphoneWrapper.cs
+Do the same for ./linphone-sdk/bin/outputs/aar/linphone-sdk-android-debug.aar to Xamarin/Xamarin/Liblinphone/liblinphone-sdk.aar
 
 ## Getting started
 
@@ -44,6 +43,7 @@ The iOS project does the same thing that the Android one, but for iOS (obviously
 ### Adding linphone to your existing solution
 
 If you already have a Xamarin solution and want to add Linphone to it, here are the changes you need to make in order to be able to use Linphone API.
+
 #### Shared project
 
 If you have a shared project (Xamarin forms or not), you can add the LinphoneWrapper.cs file (the C# wrapper that is automatically generated) into this project.
@@ -71,8 +71,7 @@ On Android, you must manually load the libraries before the first call to Linpho
 ```java
 Java.Lang.JavaSystem.LoadLibrary("bctoolbox");
 Java.Lang.JavaSystem.LoadLibrary("ortp");
-Java.Lang.JavaSystem.LoadLibrary("mediastreamer_base");
-Java.Lang.JavaSystem.LoadLibrary("mediastreamer_voip");
+Java.Lang.JavaSystem.LoadLibrary("mediastreamer");
 Java.Lang.JavaSystem.LoadLibrary("linphone");
 ```
 
