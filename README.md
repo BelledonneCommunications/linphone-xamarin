@@ -20,9 +20,9 @@ If you want to support an architecture that is not included in our SDK (for exam
 
 ## Building the SDK
 
-To build the sdk, go to linphone-sdk folder and follow README instructions.
-Then copy (or create a symbolic link) from ./linphone-sdk/android-arm64/share/linphonecs/LinphoneWrapper.cs to Xamarin/Xamarin/Xamarin/LinphoneWrapper.cs
-Do the same for ./linphone-sdk/bin/outputs/aar/linphone-sdk-android-debug.aar to Xamarin/Xamarin/Liblinphone/liblinphone-sdk.aar
+To build the sdk, go to linphone-sdk folder and follow README instructions for Android (don't forget to enable the C# wrapper in the cmake options).
+Then copy (or create a symbolic link) from ./linphone-sdk/bin/sdk-assets/assets/org.linphone.core/LinphoneWrapper.cs to ./Xamarin/Xamarin/Xamarin/LinphoneWrapper.cs
+Do the same for ./linphone-sdk/bin/outputs/aar/linphone-sdk-android-debug.aar to ./Xamarin/Xamarin/Liblinphone/liblinphone-sdk.aar
 
 ## Getting started
 
