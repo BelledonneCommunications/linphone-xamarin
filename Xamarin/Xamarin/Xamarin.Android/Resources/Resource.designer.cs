@@ -4058,6 +4058,12 @@ namespace Xamarin.Droid
 			// aapt resource value: 0x7f0a0035
 			public const int character_counter_pattern = 2131361845;
 			
+			// aapt resource value: 0x7f0a003c
+			public const int linphone_sdk_branch = 2131361852;
+			
+			// aapt resource value: 0x7f0a003d
+			public const int linphone_sdk_version = 2131361853;
+			
 			// aapt resource value: 0x7f0a0000
 			public const int mr_button_content_description = 2131361792;
 			
