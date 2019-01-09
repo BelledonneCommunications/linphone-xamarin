@@ -5,7 +5,6 @@ using Android.OS;
 using Android.Content.Res;
 using System.IO;
 using Linphone;
-using Org.Linphone.Mediastream.Video;
 using Xamarin.Forms.Platform.Android;
 using Android;
 using Android.Util;
@@ -21,8 +20,8 @@ namespace Xamarin.Droid
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
         int PERMISSIONS_REQUEST = 101;
-        Org.Linphone.Mediastream.Video.Display.GL2JNIView displayCamera;
-        SurfaceView captureCamera;
+        TextureView displayCamera;
+        TextureView captureCamera;
 
         protected override void OnCreate(Bundle bundle)
         {
@@ -71,23 +70,20 @@ namespace Xamarin.Droid
             ViewGroup.LayoutParams lparams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
             fl.LayoutParameters = lparams;
 
-            displayCamera = new Org.Linphone.Mediastream.Video.Display.GL2JNIView(this);
+            displayCamera = new TextureView(this);
             ViewGroup.LayoutParams dparams = new ViewGroup.LayoutParams(640, 480);
             displayCamera.LayoutParameters = dparams;
-            displayCamera.Holder.SetFixedSize(640, 480);
 
-            captureCamera = new SurfaceView(this);
+            captureCamera = new TextureView(this);
             ViewGroup.LayoutParams cparams = new ViewGroup.LayoutParams(320, 240);
             captureCamera.LayoutParameters = cparams;
-            captureCamera.Holder.SetFixedSize(240, 320);
 
             fl.AddView(displayCamera);
             fl.AddView(captureCamera);
-
-            AndroidVideoWindowImpl androidView = new AndroidVideoWindowImpl(displayCamera, captureCamera, null);
-            app.Core.NativeVideoWindowId = androidView.Handle;
-            app.Core.NativePreviewWindowId = captureCamera.Handle;
             app.getLayoutView().Children.Add(fl);
+
+            app.Core.NativeVideoWindowId = displayCamera.Handle;
+            app.Core.NativePreviewWindowId = captureCamera.Handle;
 
             app.Core.VideoDisplayEnabled = true;
             app.Core.VideoCaptureEnabled = true;

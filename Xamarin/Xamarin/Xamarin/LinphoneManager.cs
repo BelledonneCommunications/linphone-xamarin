@@ -17,6 +17,8 @@ namespace Xamarin
     {
         public Core Core { get; set; }
 
+        private LoggingServiceListener LogServiceListener;
+
 #if ANDROID
         public Activity AndroidContext { get; set; }
 #endif
@@ -34,7 +36,8 @@ namespace Xamarin
 #endif
             //LinphoneWrapper.setNativeLogHandler();
             LoggingService.Instance.LogLevel = LogLevel.Message;
-            LoggingService.Instance.Listener.OnLogMessageWritten = OnLog;
+            LogServiceListener = LoggingService.Instance.Listener;
+            LogServiceListener.OnLogMessageWritten = OnLog;
 
             Debug.WriteLine("C# WRAPPER=" + LinphoneWrapper.VERSION);
         }
