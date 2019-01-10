@@ -1,0 +1,88 @@
+#################################################
+# Base configuration
+#################################################
+
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+  MAKEFILE_JOBS: 5
+  CCACHE_SIZE: 4G
+  DEFAULT_CMAKE_OPTIONS: -DENABLE_ARCH_SUFFIX=OFF -DENABLE_CSHARP_WRAPPER=ON
+
+#################################################
+# MacOsX
+#################################################
+
+job-ios-framework:
+
+  stage: build
+  tags: [ "macosx" ]
+
+  variables:
+    CMAKE_GENERATOR: Unix Makefiles
+    ADDITIONAL_BUILD_OPTIONS: -j$MAKEFILE_JOBS
+
+  script:
+    - ccache -s
+    - mkdir -p build-ios
+    - cd build-ios
+    - cmake .. -G "$CMAKE_GENERATOR" -DLINPHONESDK_PLATFORM=IOS $DEFAULT_CMAKE_OPTIONS
+    - cmake --build . --target sdk -- $ADDITIONAL_BUILD_OPTIONS
+    - ccache -s
+
+  artifacts:
+    paths:
+      - build-ios/linphone-sdk.podspec
+    when: always
+    expire_in: 1 day
+
+#################################################
+# Android
+#################################################
+
+job-android-sdk:
+
+  cache:
+    key: $CI_JOB_NAME
+    paths:
+      - ccache/
+
+  stage: build
+  tags: [ "docker-android" ]
+  image: gitlab.linphone.org:4567/bc/public/linphone-sdk/bc-dev-android:r16b
+
+  variables:
+    CMAKE_GENERATOR: Unix Makefiles
+    ADDITIONAL_BUILD_OPTIONS: -j$MAKEFILE_JOBS
+
+  before_script:
+    - mkdir -p ccache
+    - echo "max_size = $CCACHE_SIZE" > ccache/ccache.conf
+    - export CCACHE_BASEDIR=${PWD}
+    - export CCACHE_DIR=${PWD}/ccache
+    - ccache -s
+
+  script:
+    - sdkmanager
+    - mkdir -p build-android
+    - cd build-android
+    - cmake .. -G "$CMAKE_GENERATOR" -DLINPHONESDK_PLATFORM=Android $DEFAULT_CMAKE_OPTIONS
+    - cmake --build . --target sdk -- $ADDITIONAL_BUILD_OPTIONS
+
+  after_script:
+    - export CCACHE_DIR=${PWD}/ccache
+    - ccache -s
+
+  artifacts:
+    paths:
+      - build-android/linphone-sdk/bin/outputs/aar/*.aar
+    when: always
+    expire_in: 1 day
+
+#cp ./bin/outputs/aar/liblinphone-sdk-*.aar Xamarin/Xamarin/Liblinphone/liblinphone-sdk.aar
+#zip -r liblinphone-xamarin-sdk-3.12.0-2987-g66419a35f.zip Xamarin README.md
+
+
+stages:
+ - build
+# - package
+# - deploy
