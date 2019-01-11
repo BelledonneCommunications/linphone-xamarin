@@ -78,6 +78,7 @@ job-android-sdk:
   artifacts:
     paths:
       - linphone-sdk/build-android/linphone-sdk/bin/outputs/aar/*.aar
+      - linphone-sdk/build-android/linphone-sdk/android-arm64/share/linphonecs/
     when: always
     expire_in: 1 day
 
@@ -95,7 +96,8 @@ job-package:
     - job-ios-framework
 
   script:
-    - cp linphone-sdk/build-android/linphone-sdk//bin/outputs/aar/linphone-sdk-android-*.aar Xamarin/Xamarin/Liblinphone/liblinphone-sdk.aar
+    - cp linphone-sdk/build-android/linphone-sdk/bin/outputs/aar/linphone-sdk-android-*.aar Xamarin/Xamarin/Liblinphone/liblinphone-sdk.aar
+    - cp linphone-sdk/build-android/linphone-sdk/android-arm64/share/linphonecs/*.cs Xamarin/Xamarin/Xamarin/
     - cp -r linphone-sdk/build-ios/linphone-sdk/apple-darwin/Frameworks Xamarin/Xamarin/Xamarin.iOS/
     - cd linphone-sdk
     - GIT_DESCRIBE=$(git describe)
