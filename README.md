@@ -109,15 +109,10 @@ Her's how to create an UWP project:
 
 #### Android
 
-1. Adding a 'Org.Linphone.Mediastream.Video.Display.GL2JNIView' to the [Xamarin.Forms.Layout](https://developer.xamarin.com/guides/xamarin-forms/user-interface/layouts/) where will be displayed the video.
-1. Create a 'Org.Linphone.Mediastream.Video.AndroidVideoWindowsImpl':
-```java
-Org.Linphone.Mediastream.Video.AndroidVideoWindowsImpl(
-  Org.Linphone.Mediastream.Video.Display.GL2JNIView,
-  Org.Linphone.Mediastream.Video.Display.GL2JNIView,
-  Org.Linphone.Mediastream.Video.AndroidVideoWindowsImpl.IVideoWindowsListener)
-```
-1. Set 'NativeVideoWindowId' of LinphoneCore to the created 'AndroidVideoWindowsImpl' ptr(Object.Handler).
+1. Add a TextureView to the [Xamarin.Forms.Layout](https://developer.xamarin.com/guides/xamarin-forms/user-interface/layouts/) where will be displayed the video.
+2. Set Core.NativeVideoWindowId to the created TextureView ptr(Object.Handler).
+3. Ensure Core.VideoDisplayEnabled is set to true.
+4. Do the same to display the captured video using Core.NativePreviewWindowId and Core.VideoCaptureEnabled.
 
 #### UWP
 
