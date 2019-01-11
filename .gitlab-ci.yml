@@ -6,6 +6,7 @@ variables:
   GIT_SUBMODULE_STRATEGY: recursive
   MAKEFILE_JOBS: 5
   CCACHE_SIZE: 4G
+  BUILD_TYPE: RELEASE
   DEFAULT_CMAKE_OPTIONS: -DENABLE_ARCH_SUFFIX=OFF -DENABLE_CSHARP_WRAPPER=ON
 
 #################################################
@@ -26,13 +27,13 @@ job-ios-framework:
     - cd linphone-sdk
     - mkdir -p build-ios
     - cd build-ios
-    - cmake .. -G "$CMAKE_GENERATOR" -DLINPHONESDK_PLATFORM=IOS $DEFAULT_CMAKE_OPTIONS
+    - cmake .. -G "$CMAKE_GENERATOR" -DLINPHONESDK_PLATFORM=IOS -DCMAKE_BUILD_TYPE=$BUILD_TYPE $DEFAULT_CMAKE_OPTIONS
     - cmake --build . --target sdk -- $ADDITIONAL_BUILD_OPTIONS
     - ccache -s
 
   artifacts:
     paths:
-      - linphone-sdk/build-ios/linphone-sdk.podspec
+      - linphone-sdk/build-ios/linphone-sdk/arm64-apple-darwin.ios/Frameworks
     when: always
     expire_in: 1 day
 
@@ -67,7 +68,7 @@ job-android-sdk:
     - sdkmanager
     - mkdir -p build-android
     - cd build-android
-    - cmake .. -G "$CMAKE_GENERATOR" -DLINPHONESDK_PLATFORM=Android $DEFAULT_CMAKE_OPTIONS
+    - cmake .. -G "$CMAKE_GENERATOR" -DLINPHONESDK_PLATFORM=Android -DCMAKE_BUILD_TYPE=$BUILD_TYPE $DEFAULT_CMAKE_OPTIONS
     - cmake --build . --target sdk -- $ADDITIONAL_BUILD_OPTIONS
 
   after_script:
@@ -80,11 +81,34 @@ job-android-sdk:
     when: always
     expire_in: 1 day
 
-#cp ./bin/outputs/aar/liblinphone-sdk-*.aar Xamarin/Xamarin/Liblinphone/liblinphone-sdk.aar
-#zip -r liblinphone-xamarin-sdk-3.12.0-2987-g66419a35f.zip Xamarin README.md
+#################################################
+# Package
+#################################################
 
+job-package:
+
+  stage: package
+  tags: [ "linux-deploy" ]
+
+  dependencies:
+    - job-android-sdk
+    - job-ios-framework
+
+  script:
+    - cp linphone-sdk/build-android/linphone-sdk//bin/outputs/aar/liblinphone-sdk-*.aar Xamarin/Xamarin/Liblinphone/liblinphone-sdk.aar
+    - cp -r linphone-sdk/build-ios/linphone-sdk/arm64-apple-darwin.ios/Frameworks Xamarin/Xamarin/Xamarin.iOS/
+    - cd linphone-sdk
+    - GIT_DESCRIBE=$(git describe)
+    - cd ..
+    - zip -r liblinphone-xamarin-sdk-$GIT_DESCRIBE.zip Xamarin README.md
+
+  artifacts:
+    paths:
+      - liblinphone-xamarin-sdk-*.zip
+    when: always
+    expire_in: 1 week
 
 stages:
  - build
-# - package
+ - package
 # - deploy
