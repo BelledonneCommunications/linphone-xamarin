@@ -95,7 +95,7 @@ job-package:
     - job-ios-framework
 
   script:
-    - cp linphone-sdk/build-android/linphone-sdk//bin/outputs/aar/liblinphone-sdk-*.aar Xamarin/Xamarin/Liblinphone/liblinphone-sdk.aar
+    - cp linphone-sdk/build-android/linphone-sdk//bin/outputs/aar/linphone-sdk-android-*.aar Xamarin/Xamarin/Liblinphone/liblinphone-sdk.aar
     - cp -r linphone-sdk/build-ios/linphone-sdk/arm64-apple-darwin.ios/Frameworks Xamarin/Xamarin/Xamarin.iOS/
     - cd linphone-sdk
     - GIT_DESCRIBE=$(git describe)
