@@ -108,7 +108,21 @@ job-package:
     when: always
     expire_in: 1 week
 
+#################################################
+# Deploy
+#################################################
+
+job-deploy:
+  stage: deploy
+  tags: [ "deploy" ]
+
+  dependencies:
+    - job-package
+
+  script:
+    - scp liblinphone-xamarin-sdk-*.zip $DEPLOY_SERVER:$XAMARIN_UPLOAD_DIRECTORY/
+
 stages:
  - build
  - package
-# - deploy
+ - deploy
