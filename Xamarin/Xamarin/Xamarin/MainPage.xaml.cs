@@ -16,7 +16,6 @@ namespace Xamarin
                 return ((App)App.Current).Core;
             }
         }
-        private CoreListener Listener;
 
         private Dictionary<string, TransportType> Transports;
 
@@ -97,12 +96,12 @@ namespace Xamarin
 
             welcome.Text = "Linphone Xamarin version: " + Core.Version;
 
-            Listener = Factory.Instance.CreateCoreListener();
-            Listener.OnRegistrationStateChanged = OnRegistration;
-            Listener.OnCallStateChanged = OnCall;
-            Listener.OnCallStatsUpdated = OnStats;
-            Listener.OnLogCollectionUploadStateChanged = OnLogCollectionUpload;
-            Core.AddListener(Listener);
+            CoreListener listener = Factory.Instance.CreateCoreListener();
+            listener.OnRegistrationStateChanged = OnRegistration;
+            listener.OnCallStateChanged = OnCall;
+            listener.OnCallStatsUpdated = OnStats;
+            listener.OnLogCollectionUploadStateChanged = OnLogCollectionUpload;
+            Core.AddListener(listener);
             
             Transports = new Dictionary<string, TransportType>
             {
@@ -142,6 +141,40 @@ namespace Xamarin
             Core.DefaultProxyConfig = proxyConfig;
 
             Core.RefreshRegisters();
+        }
+
+        public void OnChatMessageSent(ChatRoom room, EventLog log)
+        {
+            Debug.WriteLine("Chat message sent !");
+        }
+
+        public void OnMessageReceived(ChatRoom room, EventLog log)
+        {
+            Debug.WriteLine("Chat message received !");
+        }
+
+        public void OnMessageStateChanged(ChatMessage msg, ChatMessageState state)
+        {
+            Debug.WriteLine("Chat message state changed: " + state);
+        }
+
+        public void OnMessageClicked(object sender, EventArgs e)
+        {
+            ProxyConfig proxyConfig = Core.DefaultProxyConfig;
+            if (proxyConfig != null)
+            {
+                Address remoteAddr = Factory.Instance.CreateAddress(address.Text);
+                if (remoteAddr != null)
+                {
+                    ChatRoom room = Core.GetChatRoom(remoteAddr, proxyConfig.IdentityAddress);
+
+                    ChatMessage message = room.CreateMessage(chatMessage.Text);
+                    message.Listener.OnMsgStateChanged = OnMessageStateChanged;
+
+                    message.Send();
+                }
+            }
+            
         }
 
         private void OnCallClicked(object sender, EventArgs e)

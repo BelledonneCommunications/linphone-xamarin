@@ -17,8 +17,6 @@ namespace Xamarin
     {
         public Core Core { get; set; }
 
-        private LoggingServiceListener LogServiceListener;
-
 #if ANDROID
         public Activity AndroidContext { get; set; }
 #endif
@@ -36,8 +34,7 @@ namespace Xamarin
 #endif
             //LinphoneWrapper.setNativeLogHandler();
             LoggingService.Instance.LogLevel = LogLevel.Message;
-            LogServiceListener = LoggingService.Instance.Listener;
-            LogServiceListener.OnLogMessageWritten = OnLog;
+            LoggingService.Instance.Listener.OnLogMessageWritten = OnLog;
 
             Debug.WriteLine("C# WRAPPER=" + LinphoneWrapper.VERSION);
         }
@@ -136,6 +133,10 @@ namespace Xamarin
         private void OnGlobal(Core lc, GlobalState gstate, string message)
         {
             Debug.WriteLine("Global state changed: " + gstate);
+            if (gstate == GlobalState.On)
+            {
+                lc.MsFactory.addDevicesInfo(global::Android.OS.Build.Manufacturer, global::Android.OS.Build.Model, global::Android.OS.Build.Device, 1 << 1, 0, 0);
+            }
         }
     }
 }

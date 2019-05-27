@@ -21,6 +21,9 @@
         <Button x:Name="video_call" Text="Start Video Call" Clicked="OnVideoCallClicked" HorizontalOptions="Center" />
         <Label x:Name="call_status" HorizontalOptions="Center" />
         <Label x:Name="call_stats" HorizontalOptions="Center" />
+        
+        <Entry x:Name="chatMessage" Placeholder="Chat message" />
+        <Button x:Name="sendMessage" Text="Send message" Clicked="OnMessageClicked" HorizontalOptions="Center" />
 
         <StackLayout Orientation="Horizontal" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
             <Button x:Name="video" Text="Start Video" Clicked="OnVideoClicked" HorizontalOptions="Center" IsEnabled="False" />
