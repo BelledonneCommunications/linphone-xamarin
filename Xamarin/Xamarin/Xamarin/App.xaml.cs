@@ -6,7 +6,7 @@ using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
 [assembly: XamlCompilation (XamlCompilationOptions.Compile)]
-namespace Xamarin
+namespace TutoXamarin
 {
 	public partial class App : Application
     {

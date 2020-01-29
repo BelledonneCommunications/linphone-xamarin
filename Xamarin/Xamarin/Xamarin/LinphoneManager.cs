@@ -11,7 +11,7 @@ using Android.Util;
 using Android.App;
 #endif
 
-namespace Xamarin
+namespace TutoXamarin
 {
     public class LinphoneManager
     {
@@ -23,7 +23,7 @@ namespace Xamarin
         
 
 #if ANDROID
-        public Activity AndroidContext { get; set; }
+        public static Activity AndroidContext { get; set; }
 #endif
 
         private System.Timers.Timer Timer;
@@ -50,7 +50,7 @@ namespace Xamarin
 
 #if ANDROID
             // Giving app context in CreateCore is mandatory for Android to be able to load grammars (and other assets) from AAR
-            Core = Factory.Instance.CreateCore(configPath, factoryPath, LinphoneAndroid.AndroidContext);
+            Core = Factory.Instance.CreateCore(configPath, factoryPath, AndroidContext.Handle);
             // Required to be able to store logs as file
             Core.SetLogCollectionPath(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
 #else

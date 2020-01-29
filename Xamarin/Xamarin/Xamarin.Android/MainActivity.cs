@@ -4,7 +4,6 @@ using Android.Runtime;
 using Android.OS;
 using Android.Content.Res;
 using System.IO;
-using Linphone;
 using Xamarin.Forms.Platform.Android;
 using Android;
 using Android.Util;
@@ -14,7 +13,7 @@ using Android.Views;
 using Android.Widget;
 using System;
 
-namespace Xamarin.Droid
+namespace TutoXamarin.Android
 {
     [Activity(Label = "Xamarin", Icon = "@mipmap/icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
@@ -30,9 +29,6 @@ namespace Xamarin.Droid
             Java.Lang.JavaSystem.LoadLibrary("ortp");
             Java.Lang.JavaSystem.LoadLibrary("mediastreamer");
             Java.Lang.JavaSystem.LoadLibrary("linphone");
-
-            // This is mandatory for Android
-            LinphoneAndroid.setAndroidContext(JNIEnv.Handle, this.Handle);
 
             TabLayoutResource = Resource.Layout.Tabbar;
             ToolbarResource = Resource.Layout.Toolbar;
@@ -63,8 +59,11 @@ namespace Xamarin.Droid
             global::Xamarin.Forms.Forms.Init(this, bundle);
             App.ConfigFilePath = rc_path;
             App.FactoryFilePath = factory_path;
+
+            // This is absolutely mandatory!!!
+            LinphoneManager.AndroidContext = this;
+
             App app = new App(); // Do not add an arg to App constructor
-            app.Manager.AndroidContext = this;
 
             LinearLayout fl = new LinearLayout(this);
             ViewGroup.LayoutParams lparams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Diagnostics;
 using Xamarin.Forms;
 
-namespace Xamarin
+namespace TutoXamarin
 {
 	public partial class MainPage : ContentPage
 	{

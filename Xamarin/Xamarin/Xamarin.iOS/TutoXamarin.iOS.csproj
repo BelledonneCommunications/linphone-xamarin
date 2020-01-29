@@ -9,9 +9,9 @@
     <ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <TemplateGuid>{6143fdea-f3c2-4a09-aafa-6e230626515e}</TemplateGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Xamarin.iOS</RootNamespace>
+    <RootNamespace>TutoXamarin.iOS</RootNamespace>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
-    <AssemblyName>Xamarin.iOS</AssemblyName>
+    <AssemblyName>TutoXamarin.iOS</AssemblyName>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
   </PropertyGroup>
@@ -151,7 +151,7 @@
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
-    <Reference Include="Xamarin.iOS" />
+    <Reference Include="TutoXamarin.iOS" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Xamarin.Forms">
@@ -197,5 +197,5 @@
     </NativeReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
-  <Import Project="..\Xamarin\Xamarin.projitems" Label="Shared" />
+  <Import Project="..\Xamarin\TutoXamarin.projitems" Label="Shared" />
 </Project>
