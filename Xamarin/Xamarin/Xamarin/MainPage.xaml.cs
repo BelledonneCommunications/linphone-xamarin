@@ -96,12 +96,11 @@ namespace Xamarin
 
             welcome.Text = "Linphone Xamarin version: " + Core.Version;
 
-            CoreListener listener = Factory.Instance.CreateCoreListener();
-            listener.OnRegistrationStateChanged = OnRegistration;
-            listener.OnCallStateChanged = OnCall;
-            listener.OnCallStatsUpdated = OnStats;
-            listener.OnLogCollectionUploadStateChanged = OnLogCollectionUpload;
-            Core.AddListener(listener);
+            Core.Listener.OnRegistrationStateChanged += OnRegistration;
+            Core.Listener.OnCallStateChanged += OnCall;
+            Core.Listener.OnCallStatsUpdated += OnStats;
+            Core.Listener.OnLogCollectionUploadStateChanged += OnLogCollectionUpload;
+            
             
             Transports = new Dictionary<string, TransportType>
             {

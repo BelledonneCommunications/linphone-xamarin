@@ -16,6 +16,11 @@ namespace Xamarin
     public class LinphoneManager
     {
         public Core Core { get; set; }
+        LoggingService LoggingService
+        {
+            get; set;
+        }
+        
 
 #if ANDROID
         public Activity AndroidContext { get; set; }
@@ -33,25 +38,25 @@ namespace Xamarin
             Debug.WriteLine("SDK=" + global::Android.OS.Build.VERSION.Sdk);
 #endif
             //LinphoneWrapper.setNativeLogHandler();
-            LoggingService.Instance.LogLevel = LogLevel.Message;
-            LoggingService.Instance.Listener.OnLogMessageWritten = OnLog;
+            LoggingService = LoggingService.Instance;
+            LoggingService.LogLevel = LogLevel.Message;
+            LoggingService.Listener.OnLogMessageWritten = OnLog;
 
             Debug.WriteLine("C# WRAPPER=" + LinphoneWrapper.VERSION);
         }
 
         public void Init(string configPath, string factoryPath)
         {
-            CoreListener listener = Factory.Instance.CreateCoreListener();
-            listener.OnGlobalStateChanged = OnGlobal;
+            
 #if ANDROID
             // Giving app context in CreateCore is mandatory for Android to be able to load grammars (and other assets) from AAR
             Core = Factory.Instance.CreateCore(listener, configPath, factoryPath, IntPtr.Zero, LinphoneAndroid.AndroidContext);
             // Required to be able to store logs as file
             Core.SetLogCollectionPath(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
 #else
-            Core = Factory.Instance.CreateCore(listener, configPath, factoryPath);
+            Core = Factory.Instance.CreateCore(configPath, factoryPath, IntPtr.Zero);
+            Core.Listener.OnGlobalStateChanged += OnGlobal;
 #endif
-            Core.NetworkReachable = true;
         }
 
         public void Start()
@@ -64,6 +69,10 @@ namespace Xamarin
             Timer.Interval = 20;
             Timer.Elapsed += OnTimedEvent;
             Timer.Enabled = true;
+
+            //Core.NetworkReachable = true;
+            Core.Start();
+
 #endif
         }
 
@@ -93,41 +102,24 @@ namespace Xamarin
             {
                 case LogLevel.Debug:
                     log += "DEBUG";
-#if ANDROID
-                    Log.Debug(domain, message);
-#endif
                     break;
                 case LogLevel.Error:
                     log += "ERROR";
-#if ANDROID
-                    Log.Error(domain, message);
-#endif
                     break;
                 case LogLevel.Message:
                     log += "MESSAGE";
-#if ANDROID
-                    Log.Info(domain, message);
-#endif
                     break;
                 case LogLevel.Warning:
                     log += "WARNING";
-#if ANDROID
-                    Log.Warn(domain, message);
-#endif
                     break;
                 case LogLevel.Fatal:
                     log += "FATAL";
-#if ANDROID
-                    Log.Error(domain, message);
-#endif
                     break;
                 default:
                     break;
             }
             log += "] (" + domain + ") " + message;
-#if WINDOWS_UWP
             Debug.WriteLine(log);
-#endif
         }
 
         private void OnGlobal(Core lc, GlobalState gstate, string message)
@@ -135,7 +127,7 @@ namespace Xamarin
             Debug.WriteLine("Global state changed: " + gstate);
             if (gstate == GlobalState.On)
             {
-                lc.MsFactory.addDevicesInfo(global::Android.OS.Build.Manufacturer, global::Android.OS.Build.Model, global::Android.OS.Build.Device, 1 << 1, 0, 0);
+                //lc.MsFactory.addDevicesInfo(global::Android.OS.Build.Manufacturer, global::Android.OS.Build.Model, global::Android.OS.Build.Device, 1 << 1, 0, 0);
             }
         }
     }

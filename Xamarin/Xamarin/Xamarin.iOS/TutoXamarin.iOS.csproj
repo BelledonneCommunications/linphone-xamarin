@@ -25,10 +25,10 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <MtouchArch>x86_64</MtouchArch>
-    <MtouchLink>None</MtouchLink>
+    <MtouchLink>SdkOnly</MtouchLink>
     <MtouchDebug>true</MtouchDebug>
     <CodesignProvision>VS: WildCard Development</CodesignProvision>
-    <CodesignKey>iPhone Developer: Benjamin Reis (79E334HYJ8)</CodesignKey>
+    <CodesignKey>iPhone Developer: jehan monnier (JE7WX5SP6H)</CodesignKey>
 <AssemblyName>LinphoneXamarin.iOS</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
@@ -41,7 +41,7 @@
     <MtouchArch>x86_64</MtouchArch>
     <ConsolePause>false</ConsolePause>
     <CodesignProvision>VS: WildCard Development</CodesignProvision>
-    <CodesignKey>iPhone Developer: Benjamin Reis (79E334HYJ8)</CodesignKey>
+    <CodesignKey>iPhone Developer: jehan monnier (JE7WX5SP6H)</CodesignKey>
 <AssemblyName>LinphoneXamarin.iOS</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
@@ -54,10 +54,9 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <MtouchArch>ARM64</MtouchArch>
-    <CodesignKey>iPhone Developer: Benjamin Reis (79E334HYJ8)</CodesignKey>
+    <CodesignKey>iPhone Developer: jehan monnier (JE7WX5SP6H)</CodesignKey>
     <MtouchDebug>true</MtouchDebug>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
-    <CodesignProvision>VS: WildCard Development</CodesignProvision>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugType>none</DebugType>
@@ -67,7 +66,7 @@
     <WarningLevel>4</WarningLevel>
     <MtouchArch>ARM64</MtouchArch>
     <ConsolePause>false</ConsolePause>
-    <CodesignKey>iPhone Developer: Benjamin Reis (79E334HYJ8)</CodesignKey>
+    <CodesignKey>iPhone Developer: jehan monnier (JE7WX5SP6H)</CodesignKey>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
     <CodesignProvision>VS: WildCard Development</CodesignProvision>
   </PropertyGroup>
@@ -81,7 +80,7 @@
     <MtouchArch>ARM64</MtouchArch>
     <BuildIpa>True</BuildIpa>
     <CodesignProvision>VS: WildCard Development</CodesignProvision>
-    <CodesignKey>iPhone Developer: Benjamin Reis (79E334HYJ8)</CodesignKey>
+    <CodesignKey>iPhone Developer: jehan monnier (JE7WX5SP6H)</CodesignKey>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'AppStore|iPhone' ">
@@ -93,7 +92,7 @@
     <ConsolePause>False</ConsolePause>
     <MtouchArch>ARM64</MtouchArch>
     <CodesignProvision>VS: WildCard Development</CodesignProvision>
-    <CodesignKey>iPhone Developer: Benjamin Reis (79E334HYJ8)</CodesignKey>
+    <CodesignKey>iPhone Developer: jehan monnier (JE7WX5SP6H)</CodesignKey>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
   </PropertyGroup>
   <ItemGroup>
@@ -176,23 +175,23 @@
       <Kind>Framework</Kind>
       <SmartLink>False</SmartLink>
     </NativeReference>
-    <NativeReference Include="Frameworks\mediastreamer_base.framework">
-      <Kind>Framework</Kind>
-      <SmartLink>False</SmartLink>
-    </NativeReference>
-    <NativeReference Include="Frameworks\mediastreamer_voip.framework">
-      <Kind>Framework</Kind>
-      <SmartLink>False</SmartLink>
-    </NativeReference>
     <NativeReference Include="Frameworks\mediastreamer2.framework">
       <Kind>Framework</Kind>
       <SmartLink>False</SmartLink>
     </NativeReference>
-    <NativeReference Include="Frameworks\mswebrtc.framework">
+    <NativeReference Include="Frameworks\ortp.framework">
       <Kind>Framework</Kind>
       <SmartLink>False</SmartLink>
     </NativeReference>
-    <NativeReference Include="Frameworks\ortp.framework">
+    <NativeReference Include="..\..\..\..\..\workspace-macosx\linphone-sdk\WORK-IOS-XCODE\linphone-sdk\apple-darwin\Frameworks\belle-sip.framework">
+      <Kind>Framework</Kind>
+      <SmartLink>False</SmartLink>
+    </NativeReference>
+    <NativeReference Include="..\..\..\..\..\workspace-macosx\linphone-sdk\WORK-IOS-XCODE\linphone-sdk\apple-darwin\Frameworks\lime.framework">
+      <Kind>Framework</Kind>
+      <SmartLink>False</SmartLink>
+    </NativeReference>
+    <NativeReference Include="..\..\..\..\..\workspace-macosx\linphone-sdk\WORK-IOS-XCODE\linphone-sdk\apple-darwin\Frameworks\belcard.framework">
       <Kind>Framework</Kind>
       <SmartLink>False</SmartLink>
     </NativeReference>
