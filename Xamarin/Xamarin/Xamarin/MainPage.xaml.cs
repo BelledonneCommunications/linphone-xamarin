@@ -162,7 +162,7 @@ namespace TutoXamarin
             ProxyConfig proxyConfig = Core.DefaultProxyConfig;
             if (proxyConfig != null)
             {
-                Address remoteAddr = Factory.Instance.CreateAddress(address.Text);
+                Address remoteAddr = Core.InterpretUrl(address.Text);
                 if (remoteAddr != null)
                 {
                     ChatRoom room = Core.GetChatRoom(remoteAddr, proxyConfig.IdentityAddress);

@@ -5,6 +5,7 @@ mtu=1300
 download_bw=0
 upload_bw=0
 force_ice_disablement=0
+auto_net_state_mon=1
 
 [rtp]
 audio_rtp_port=7076

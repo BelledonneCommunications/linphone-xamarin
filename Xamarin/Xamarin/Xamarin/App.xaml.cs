@@ -23,12 +23,12 @@ namespace TutoXamarin
             }
         }
 
-        public App ()
+        public App (IntPtr context)
         {
             InitializeComponent();
 
             Manager = new LinphoneManager();
-            Manager.Init(ConfigFilePath, FactoryFilePath);
+            Manager.Init(ConfigFilePath, FactoryFilePath, context);
 
             MainPage = new MainPage();
         }

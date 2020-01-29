@@ -16,7 +16,7 @@ using System;
 namespace TutoXamarin.Android
 {
     [Activity(Label = "Xamarin", Icon = "@mipmap/icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
-    public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
+    public class MainActivity : FormsAppCompatActivity
     {
         int PERMISSIONS_REQUEST = 101;
         TextureView displayCamera;
@@ -56,14 +56,16 @@ namespace TutoXamarin.Android
                 }
             }
 
-            global::Xamarin.Forms.Forms.Init(this, bundle);
+            Forms.Init(this, bundle);
             App.ConfigFilePath = rc_path;
             App.FactoryFilePath = factory_path;
 
-            // This is absolutely mandatory!!!
-            LinphoneManager.AndroidContext = this;
+            App app = new App(this.Handle);
 
-            App app = new App(); // Do not add an arg to App constructor
+            System.Diagnostics.Debug.WriteLine("DEVICE=" + Build.Device);
+            System.Diagnostics.Debug.WriteLine("MODEL=" + Build.Model);
+            System.Diagnostics.Debug.WriteLine("MANUFACTURER=" + Build.Manufacturer);
+            System.Diagnostics.Debug.WriteLine("SDK=" + Build.VERSION.Sdk);
 
             LinearLayout fl = new LinearLayout(this);
             ViewGroup.LayoutParams lparams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
@@ -93,20 +95,20 @@ namespace TutoXamarin.Android
         protected override void OnResume()
         {
             base.OnResume();
-            if (Int32.Parse(global::Android.OS.Build.VERSION.Sdk) >= 23)
+            if (Int32.Parse(Build.VERSION.Sdk) >= 23)
             {
                 List<string> Permissions = new List<string>();
-                if (this.CheckSelfPermission(Manifest.Permission.Camera) != Permission.Granted)
+                if (CheckSelfPermission(Manifest.Permission.Camera) != Permission.Granted)
                 {
                     Permissions.Add(Manifest.Permission.Camera);
                 }
-                if (this.CheckSelfPermission(Manifest.Permission.RecordAudio) != Permission.Granted)
+                if (CheckSelfPermission(Manifest.Permission.RecordAudio) != Permission.Granted)
                 {
                     Permissions.Add(Manifest.Permission.RecordAudio);
                 }
                 if (Permissions.Count > 0)
                 {
-                    this.RequestPermissions(Permissions.ToArray(), PERMISSIONS_REQUEST);
+                    RequestPermissions(Permissions.ToArray(), PERMISSIONS_REQUEST);
                 }
             }
         }
