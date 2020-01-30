@@ -47,4 +47,9 @@ That's all! Generate the solution and you can deploy the sample app on any Andro
 
 #### For iOS
 
-TODO
+For the C# wrapper to work, it needs to find the Linphone native libraries. On IOS, here's the procedure to add them to the project:
+
+* Import the Frameworks folder with all the frameworks within your Xamarin.iOS project ;
+* Right click on your Xamarin.iOS project then select add -> add native references and select all the frameworks you imported in the project.
+
+Do not forget to add your required permissions in your project Info.plist (i.e: use of microphone etc...) or your app will crash !
