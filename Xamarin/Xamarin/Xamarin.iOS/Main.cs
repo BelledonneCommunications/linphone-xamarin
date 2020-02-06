@@ -25,7 +25,7 @@ using System.Linq;
 using Foundation;
 using UIKit;
 
-namespace Xamarin.iOS
+namespace TutoXamarin.iOS
 {
 	public class IApplication
 	{

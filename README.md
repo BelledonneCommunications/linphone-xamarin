@@ -11,10 +11,9 @@ You can find a nightly build here: [Snapshots](http://linphone.org/snapshots/xam
 The Xamarin SDK embed the following:
 
 * The C# wrapper (named LinphoneWrapper.cs) ;
-* The Android libraries for armv7, arm64 and x86 ;
+* The Android libraries for armv7, arm64 and x86_64 ;
 * The Linphone java classes as an AAR (liblinphone-sdk.aar) which is required for Android (debug and release flavors) ;
 * The iOS libraries for armv7, arm64 and x86_64 (as frameworks) ;
-* A sample solution using a shared project that contains a Xamarin Forms application along with Android and iOS projects.
 
 ## Building the SDK
 

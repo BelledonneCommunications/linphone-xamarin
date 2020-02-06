@@ -27,9 +27,9 @@
     <MtouchArch>x86_64</MtouchArch>
     <MtouchLink>SdkOnly</MtouchLink>
     <MtouchDebug>true</MtouchDebug>
-    <CodesignProvision>VS: WildCard Development</CodesignProvision>
     <CodesignKey>iPhone Developer: jehan monnier (JE7WX5SP6H)</CodesignKey>
 <AssemblyName>LinphoneXamarin.iOS</AssemblyName>
+<CodesignProvision>VS: WildCard Development</CodesignProvision>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>none</DebugType>
@@ -57,6 +57,7 @@
     <CodesignKey>iPhone Developer: jehan monnier (JE7WX5SP6H)</CodesignKey>
     <MtouchDebug>true</MtouchDebug>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
+    <CodesignProvision>VS: WildCard Development</CodesignProvision>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugType>none</DebugType>
@@ -151,7 +152,7 @@
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
-    <Reference Include="TutoXamarin.iOS" />
+    <Reference Include="Xamarin.iOS" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Xamarin.Forms">
@@ -159,39 +160,107 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <NativeReference Include="Frameworks\bctoolbox.framework">
+    <NativeReference Include="..\..\..\linphone-sdk-xamarin-4\linphone-sdk-ios\linphone-sdk\apple-darwin\Frameworks\linphone.framework">
       <Kind>Framework</Kind>
       <SmartLink>False</SmartLink>
     </NativeReference>
-    <NativeReference Include="Frameworks\belcard.framework">
+    <NativeReference Include="..\..\..\linphone-sdk-xamarin-4\linphone-sdk-ios\linphone-sdk\apple-darwin\Frameworks\mediastreamer2.framework">
       <Kind>Framework</Kind>
       <SmartLink>False</SmartLink>
     </NativeReference>
-    <NativeReference Include="Frameworks\belr.framework">
+    <NativeReference Include="..\..\..\linphone-sdk-xamarin-4\linphone-sdk-ios\linphone-sdk\apple-darwin\Frameworks\ortp.framework">
       <Kind>Framework</Kind>
       <SmartLink>False</SmartLink>
     </NativeReference>
-    <NativeReference Include="Frameworks\linphone.framework">
+    <NativeReference Include="..\..\..\linphone-sdk-xamarin-4\linphone-sdk-ios\linphone-sdk\apple-darwin\Frameworks\bctoolbox-ios.framework">
       <Kind>Framework</Kind>
       <SmartLink>False</SmartLink>
     </NativeReference>
-    <NativeReference Include="Frameworks\mediastreamer2.framework">
+    <NativeReference Include="..\..\..\linphone-sdk-xamarin-4\linphone-sdk-ios\linphone-sdk\apple-darwin\Frameworks\bctoolbox.framework">
       <Kind>Framework</Kind>
       <SmartLink>False</SmartLink>
     </NativeReference>
-    <NativeReference Include="Frameworks\ortp.framework">
+    <NativeReference Include="..\..\..\linphone-sdk-xamarin-4\linphone-sdk-ios\linphone-sdk\apple-darwin\Frameworks\belcard.framework">
       <Kind>Framework</Kind>
       <SmartLink>False</SmartLink>
     </NativeReference>
-    <NativeReference Include="..\..\..\..\..\workspace-macosx\linphone-sdk\WORK-IOS-XCODE\linphone-sdk\apple-darwin\Frameworks\belle-sip.framework">
+    <NativeReference Include="..\..\..\linphone-sdk-xamarin-4\linphone-sdk-ios\linphone-sdk\apple-darwin\Frameworks\belle-sip.framework">
       <Kind>Framework</Kind>
       <SmartLink>False</SmartLink>
     </NativeReference>
-    <NativeReference Include="..\..\..\..\..\workspace-macosx\linphone-sdk\WORK-IOS-XCODE\linphone-sdk\apple-darwin\Frameworks\lime.framework">
+    <NativeReference Include="..\..\..\linphone-sdk-xamarin-4\linphone-sdk-ios\linphone-sdk\apple-darwin\Frameworks\belr.framework">
       <Kind>Framework</Kind>
       <SmartLink>False</SmartLink>
     </NativeReference>
-    <NativeReference Include="..\..\..\..\..\workspace-macosx\linphone-sdk\WORK-IOS-XCODE\linphone-sdk\apple-darwin\Frameworks\belcard.framework">
+    <NativeReference Include="..\..\..\linphone-sdk-xamarin-4\linphone-sdk-ios\linphone-sdk\apple-darwin\Frameworks\lime.framework">
+      <Kind>Framework</Kind>
+      <SmartLink>False</SmartLink>
+    </NativeReference>
+    <NativeReference Include="..\..\..\linphone-sdk-xamarin-4\linphone-sdk-ios\linphone-sdk\apple-darwin\Frameworks\linphonesw.framework">
+      <Kind>Framework</Kind>
+      <SmartLink>False</SmartLink>
+    </NativeReference>
+    <NativeReference Include="..\..\..\linphone-sdk-xamarin-4\linphone-sdk-ios\linphone-sdk\apple-darwin\Frameworks\linphonetester.framework">
+      <Kind>Framework</Kind>
+      <SmartLink>False</SmartLink>
+    </NativeReference>
+    <NativeReference Include="..\..\..\linphone-sdk-xamarin-4\linphone-sdk-ios\linphone-sdk\apple-darwin\Frameworks\mediastreamer2.framework">
+      <Kind>Framework</Kind>
+      <SmartLink>False</SmartLink>
+    </NativeReference>
+    <NativeReference Include="..\..\..\linphone-sdk-xamarin-4\linphone-sdk-ios\linphone-sdk\apple-darwin\Frameworks\msamr.framework">
+      <Kind>Framework</Kind>
+      <SmartLink>False</SmartLink>
+    </NativeReference>
+    <NativeReference Include="..\..\..\linphone-sdk-xamarin-4\linphone-sdk-ios\linphone-sdk\apple-darwin\Frameworks\mscodec2.framework">
+      <Kind>Framework</Kind>
+      <SmartLink>False</SmartLink>
+    </NativeReference>
+    <NativeReference Include="..\..\..\linphone-sdk-xamarin-4\linphone-sdk-ios\linphone-sdk\apple-darwin\Frameworks\msopenh264.framework">
+      <Kind>Framework</Kind>
+      <SmartLink>False</SmartLink>
+    </NativeReference>
+    <NativeReference Include="..\..\..\linphone-sdk-xamarin-4\linphone-sdk-ios\linphone-sdk\apple-darwin\Frameworks\mssilk.framework">
+      <Kind>Framework</Kind>
+      <SmartLink>False</SmartLink>
+    </NativeReference>
+    <NativeReference Include="..\..\..\linphone-sdk-xamarin-4\linphone-sdk-ios\linphone-sdk\apple-darwin\Frameworks\mswebrtc.framework">
+      <Kind>Framework</Kind>
+      <SmartLink>False</SmartLink>
+    </NativeReference>
+    <NativeReference Include="..\..\..\linphone-sdk-xamarin-4\linphone-sdk-ios\linphone-sdk\apple-darwin\Frameworks\msx264.framework">
+      <Kind>Framework</Kind>
+      <SmartLink>False</SmartLink>
+    </NativeReference>
+    <NativeReference Include="..\..\..\linphone-sdk-xamarin-4\linphone-sdk-ios\linphone-sdk\apple-darwin\Frameworks\ortp.framework">
+      <Kind>Framework</Kind>
+      <SmartLink>False</SmartLink>
+    </NativeReference>
+    <NativeReference Include="..\..\..\linphone-sdk-xamarin-4\linphone-sdk-ios\linphone-sdk\apple-darwin\Frameworks\linphone.framework">
+      <Kind>Framework</Kind>
+      <SmartLink>False</SmartLink>
+    </NativeReference>
+    <NativeReference Include="..\..\..\linphone-sdk-xamarin-4\linphone-sdk-ios\linphone-sdk\apple-darwin\Frameworks\belcard.framework">
+      <Kind>Framework</Kind>
+      <SmartLink>False</SmartLink>
+    </NativeReference>
+    <NativeReference Include="..\..\..\linphone-sdk-xamarin-4\linphone-sdk-ios\linphone-sdk\apple-darwin\Frameworks\belle-sip.framework">
+      <Kind>Framework</Kind>
+      <SmartLink>False</SmartLink>
+    </NativeReference>
+    <NativeReference Include="..\..\..\linphone-sdk-xamarin-4\linphone-sdk-ios\linphone-sdk\apple-darwin\Frameworks\belr.framework">
+      <Kind>Framework</Kind>
+      <SmartLink>False</SmartLink>
+    </NativeReference>
+    <NativeReference Include="..\..\..\linphone-sdk-xamarin-4\linphone-sdk-ios\linphone-sdk\apple-darwin\Frameworks\lime.framework">
+      <Kind>Framework</Kind>
+      <SmartLink>False</SmartLink>
+    </NativeReference>
+    <NativeReference Include="..\..\..\linphone-sdk-xamarin-4\linphone-sdk-ios\linphone-sdk\apple-darwin\Frameworks\bctoolbox-ios.framework">
+      <Kind>Framework</Kind>
+      <SmartLink>False</SmartLink>
+    </NativeReference>
+    <NativeReference Include="..\..\..\linphone-sdk-xamarin-4\linphone-sdk-ios\linphone-sdk\apple-darwin\Frameworks\bctoolbox.framework">
       <Kind>Framework</Kind>
       <SmartLink>False</SmartLink>
     </NativeReference>
