@@ -47,9 +47,9 @@
 		<string>Icon-Small@2x.png</string>
 		<string>Icon-Small@3x.png</string>
 	</array>
-	<key>CFBundleName</key>
-	<string>TutoXamarin</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Make audio call</string>
+	<key>CFBundleName</key>
+	<string>75</string>
 </dict>
 </plist>
