@@ -13,8 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Liblinphone", "Xamarin\Libl
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		Xamarin\Xamarin\Xamarin.projitems*{d2483c58-7564-4e3e-a37a-756a74fe0eff}*SharedItemsImports = 13
-		Xamarin\Xamarin\Xamarin.projitems*{ec207f3d-6538-4998-97de-f52471ebd21d}*SharedItemsImports = 4
+		Xamarin\Xamarin\TutoXamarin.projitems*{d2483c58-7564-4e3e-a37a-756a74fe0eff}*SharedItemsImports = 13
+		Xamarin\Xamarin\TutoXamarin.projitems*{ec207f3d-6538-4998-97de-f52471ebd21d}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Ad-Hoc|Any CPU = Ad-Hoc|Any CPU
