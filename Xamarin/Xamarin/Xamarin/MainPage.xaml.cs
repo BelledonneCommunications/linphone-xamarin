@@ -1,11 +1,31 @@
-﻿using Linphone;
+﻿/*
+ * Copyright (c) 2010-2019 Belledonne Communications SARL.
+ *
+ * This file is part of linphone-android
+ * (see https://www.linphone.org).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+using Linphone;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
 using Xamarin.Forms;
 
-namespace Xamarin
+namespace TutoXamarin
 {
 	public partial class MainPage : ContentPage
 	{
@@ -16,7 +36,6 @@ namespace Xamarin
                 return ((App)App.Current).Core;
             }
         }
-        private CoreListener Listener;
 
         private Dictionary<string, TransportType> Transports;
 
@@ -97,12 +116,11 @@ namespace Xamarin
 
             welcome.Text = "Linphone Xamarin version: " + Core.Version;
 
-            Listener = Factory.Instance.CreateCoreListener();
-            Listener.OnRegistrationStateChanged = OnRegistration;
-            Listener.OnCallStateChanged = OnCall;
-            Listener.OnCallStatsUpdated = OnStats;
-            Listener.OnLogCollectionUploadStateChanged = OnLogCollectionUpload;
-            Core.AddListener(Listener);
+            Core.Listener.OnRegistrationStateChanged += OnRegistration;
+            Core.Listener.OnCallStateChanged += OnCall;
+            Core.Listener.OnCallStatsUpdated += OnStats;
+            Core.Listener.OnLogCollectionUploadStateChanged += OnLogCollectionUpload;
+            
             
             Transports = new Dictionary<string, TransportType>
             {
@@ -142,6 +160,40 @@ namespace Xamarin
             Core.DefaultProxyConfig = proxyConfig;
 
             Core.RefreshRegisters();
+        }
+
+        public void OnChatMessageSent(ChatRoom room, EventLog log)
+        {
+            Debug.WriteLine("Chat message sent !");
+        }
+
+        public void OnMessageReceived(ChatRoom room, EventLog log)
+        {
+            Debug.WriteLine("Chat message received !");
+        }
+
+        public void OnMessageStateChanged(ChatMessage msg, ChatMessageState state)
+        {
+            Debug.WriteLine("Chat message state changed: " + state);
+        }
+
+        public void OnMessageClicked(object sender, EventArgs e)
+        {
+            ProxyConfig proxyConfig = Core.DefaultProxyConfig;
+            if (proxyConfig != null)
+            {
+                Address remoteAddr = Core.InterpretUrl(address.Text);
+                if (remoteAddr != null)
+                {
+                    ChatRoom room = Core.GetChatRoom(remoteAddr, proxyConfig.IdentityAddress);
+
+                    ChatMessage message = room.CreateMessage(chatMessage.Text);
+                    message.Listener.OnMsgStateChanged = OnMessageStateChanged;
+
+                    message.Send();
+                }
+            }
+            
         }
 
         private void OnCallClicked(object sender, EventArgs e)

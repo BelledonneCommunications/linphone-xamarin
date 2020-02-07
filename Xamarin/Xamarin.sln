@@ -3,18 +3,18 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2042
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xamarin.Android", "Xamarin\Xamarin.Android\Xamarin.Android.csproj", "{EC207F3D-6538-4998-97DE-F52471EBD21D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TutoXamarin.Android", "Xamarin\Xamarin.Android\TutoXamarin.Android.csproj", "{EC207F3D-6538-4998-97DE-F52471EBD21D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xamarin.iOS", "Xamarin\Xamarin.iOS\Xamarin.iOS.csproj", "{FF3DB725-2085-47E9-BC02-1C002E09FA2B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xamarin.iOS", "Xamarin\Xamarin.iOS\TutoXamarin.iOS.csproj", "{FF3DB725-2085-47E9-BC02-1C002E09FA2B}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Xamarin", "Xamarin\Xamarin\Xamarin.shproj", "{D2483C58-7564-4E3E-A37A-756A74FE0EFF}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "TutoXamarin", "Xamarin\Xamarin\TutoXamarin.shproj", "{D2483C58-7564-4E3E-A37A-756A74FE0EFF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Liblinphone", "Xamarin\Liblinphone\Liblinphone.csproj", "{39A1E0E0-306C-43B4-AEAF-6E5CA42A52FB}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		Xamarin\Xamarin\Xamarin.projitems*{d2483c58-7564-4e3e-a37a-756a74fe0eff}*SharedItemsImports = 13
-		Xamarin\Xamarin\Xamarin.projitems*{ec207f3d-6538-4998-97de-f52471ebd21d}*SharedItemsImports = 4
+		Xamarin\Xamarin\TutoXamarin.projitems*{d2483c58-7564-4e3e-a37a-756a74fe0eff}*SharedItemsImports = 13
+		Xamarin\Xamarin\TutoXamarin.projitems*{ec207f3d-6538-4998-97de-f52471ebd21d}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Ad-Hoc|Any CPU = Ad-Hoc|Any CPU

@@ -1,11 +1,29 @@
-﻿using Android.App;
+﻿/*
+ * Copyright (c) 2010-2019 Belledonne Communications SARL.
+ *
+ * This file is part of linphone-android
+ * (see https://www.linphone.org).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+using Android.App;
 using Android.Content.PM;
 using Android.Runtime;
 using Android.OS;
 using Android.Content.Res;
 using System.IO;
-using Linphone;
-using Org.Linphone.Mediastream.Video;
 using Xamarin.Forms.Platform.Android;
 using Android;
 using Android.Util;
@@ -15,26 +33,22 @@ using Android.Views;
 using Android.Widget;
 using System;
 
-namespace Xamarin.Droid
+namespace TutoXamarin.Android
 {
     [Activity(Label = "Xamarin", Icon = "@mipmap/icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
-    public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
+    public class MainActivity : FormsAppCompatActivity
     {
         int PERMISSIONS_REQUEST = 101;
-        Org.Linphone.Mediastream.Video.Display.GL2JNIView displayCamera;
-        SurfaceView captureCamera;
+        TextureView displayCamera;
+        TextureView captureCamera;
 
         protected override void OnCreate(Bundle bundle)
         {
             Java.Lang.JavaSystem.LoadLibrary("c++_shared");
             Java.Lang.JavaSystem.LoadLibrary("bctoolbox");
             Java.Lang.JavaSystem.LoadLibrary("ortp");
-            Java.Lang.JavaSystem.LoadLibrary("mediastreamer_base");
-            Java.Lang.JavaSystem.LoadLibrary("mediastreamer_voip");
+            Java.Lang.JavaSystem.LoadLibrary("mediastreamer");
             Java.Lang.JavaSystem.LoadLibrary("linphone");
-
-            // This is mandatory for Android
-            LinphoneAndroid.setAndroidContext(JNIEnv.Handle, this.Handle);
 
             TabLayoutResource = Resource.Layout.Tabbar;
             ToolbarResource = Resource.Layout.Toolbar;
@@ -62,33 +76,35 @@ namespace Xamarin.Droid
                 }
             }
 
-            global::Xamarin.Forms.Forms.Init(this, bundle);
+            Forms.Init(this, bundle);
             App.ConfigFilePath = rc_path;
             App.FactoryFilePath = factory_path;
-            App app = new App(); // Do not add an arg to App constructor
-            app.Manager.AndroidContext = this;
+
+            App app = new App(this.Handle);
+
+            System.Diagnostics.Debug.WriteLine("DEVICE=" + Build.Device);
+            System.Diagnostics.Debug.WriteLine("MODEL=" + Build.Model);
+            System.Diagnostics.Debug.WriteLine("MANUFACTURER=" + Build.Manufacturer);
+            System.Diagnostics.Debug.WriteLine("SDK=" + Build.VERSION.Sdk);
 
             LinearLayout fl = new LinearLayout(this);
             ViewGroup.LayoutParams lparams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
             fl.LayoutParameters = lparams;
 
-            displayCamera = new Org.Linphone.Mediastream.Video.Display.GL2JNIView(this);
+            displayCamera = new TextureView(this);
             ViewGroup.LayoutParams dparams = new ViewGroup.LayoutParams(640, 480);
             displayCamera.LayoutParameters = dparams;
-            displayCamera.Holder.SetFixedSize(640, 480);
 
-            captureCamera = new SurfaceView(this);
+            captureCamera = new TextureView(this);
             ViewGroup.LayoutParams cparams = new ViewGroup.LayoutParams(320, 240);
             captureCamera.LayoutParameters = cparams;
-            captureCamera.Holder.SetFixedSize(240, 320);
 
             fl.AddView(displayCamera);
             fl.AddView(captureCamera);
-
-            AndroidVideoWindowImpl androidView = new AndroidVideoWindowImpl(displayCamera, captureCamera, null);
-            app.Core.NativeVideoWindowId = androidView.Handle;
-            app.Core.NativePreviewWindowId = captureCamera.Handle;
             app.getLayoutView().Children.Add(fl);
+
+            app.Core.NativeVideoWindowId = displayCamera.Handle;
+            app.Core.NativePreviewWindowId = captureCamera.Handle;
 
             app.Core.VideoDisplayEnabled = true;
             app.Core.VideoCaptureEnabled = true;
@@ -99,20 +115,20 @@ namespace Xamarin.Droid
         protected override void OnResume()
         {
             base.OnResume();
-            if (Int32.Parse(global::Android.OS.Build.VERSION.Sdk) >= 23)
+            if (Int32.Parse(Build.VERSION.Sdk) >= 23)
             {
                 List<string> Permissions = new List<string>();
-                if (this.CheckSelfPermission(Manifest.Permission.Camera) != Permission.Granted)
+                if (CheckSelfPermission(Manifest.Permission.Camera) != Permission.Granted)
                 {
                     Permissions.Add(Manifest.Permission.Camera);
                 }
-                if (this.CheckSelfPermission(Manifest.Permission.RecordAudio) != Permission.Granted)
+                if (CheckSelfPermission(Manifest.Permission.RecordAudio) != Permission.Granted)
                 {
                     Permissions.Add(Manifest.Permission.RecordAudio);
                 }
                 if (Permissions.Count > 0)
                 {
-                    this.RequestPermissions(Permissions.ToArray(), PERMISSIONS_REQUEST);
+                    RequestPermissions(Permissions.ToArray(), PERMISSIONS_REQUEST);
                 }
             }
         }

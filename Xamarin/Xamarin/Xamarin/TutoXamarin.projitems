@@ -6,7 +6,7 @@
     <SharedGUID>{D2483C58-7564-4E3E-A37A-756A74FE0EFF}</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
-    <Import_RootNamespace>Xamarin</Import_RootNamespace>
+    <Import_RootNamespace>TutoXamarin</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="$(MSBuildThisFileDirectory)App.xaml" />

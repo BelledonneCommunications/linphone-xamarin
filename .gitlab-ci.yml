@@ -1,0 +1,130 @@
+#################################################
+# Base configuration
+#################################################
+
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+  MAKEFILE_JOBS: 5
+  CCACHE_SIZE: 4G
+  BUILD_TYPE: RELEASE
+  DEFAULT_CMAKE_OPTIONS: -DENABLE_ARCH_SUFFIX=OFF -DENABLE_CSHARP_WRAPPER=ON
+
+#################################################
+# MacOsX
+#################################################
+
+job-ios-framework:
+
+  stage: build
+  tags: [ "macosx" ]
+
+  variables:
+    CMAKE_GENERATOR: Unix Makefiles
+    ADDITIONAL_BUILD_OPTIONS: -j$MAKEFILE_JOBS
+
+  script:
+    - ccache -s
+    - cd linphone-sdk
+    - mkdir -p build-ios
+    - cd build-ios
+    - cmake .. -G "$CMAKE_GENERATOR" -DLINPHONESDK_PLATFORM=IOS -DCMAKE_BUILD_TYPE=$BUILD_TYPE $DEFAULT_CMAKE_OPTIONS
+    - cmake --build . --target sdk -- $ADDITIONAL_BUILD_OPTIONS
+    - ccache -s
+
+  artifacts:
+    paths:
+      - linphone-sdk/build-ios/linphone-sdk/apple-darwin/Frameworks
+    when: always
+    expire_in: 1 day
+
+#################################################
+# Android
+#################################################
+
+job-android-sdk:
+
+  cache:
+    key: $CI_JOB_NAME
+    paths:
+      - ccache/
+
+  stage: build
+  tags: [ "docker-android" ]
+  image: gitlab.linphone.org:4567/bc/public/linphone-sdk/bc-dev-android:r16b
+
+  variables:
+    CMAKE_GENERATOR: Unix Makefiles
+    ADDITIONAL_BUILD_OPTIONS: -j$MAKEFILE_JOBS
+
+  before_script:
+    - cd linphone-sdk
+    - mkdir -p ccache
+    - echo "max_size = $CCACHE_SIZE" > ccache/ccache.conf
+    - export CCACHE_BASEDIR=${PWD}
+    - export CCACHE_DIR=${PWD}/ccache
+    - ccache -s
+
+  script:
+    - sdkmanager
+    - mkdir -p build-android
+    - cd build-android
+    - cmake .. -G "$CMAKE_GENERATOR" -DLINPHONESDK_PLATFORM=Android -DCMAKE_BUILD_TYPE=$BUILD_TYPE $DEFAULT_CMAKE_OPTIONS
+    - cmake --build . --target sdk -- $ADDITIONAL_BUILD_OPTIONS
+
+  after_script:
+    - export CCACHE_DIR=${PWD}/ccache
+    - ccache -s
+
+  artifacts:
+    paths:
+      - linphone-sdk/build-android/linphone-sdk/bin/outputs/aar/*.aar
+      - linphone-sdk/build-android/linphone-sdk/android-arm64/share/linphonecs/
+    when: always
+    expire_in: 1 day
+
+#################################################
+# Package
+#################################################
+
+job-package:
+
+  stage: package
+  tags: [ "linux-deploy" ]
+
+  dependencies:
+    - job-android-sdk
+    - job-ios-framework
+
+  script:
+    - cp linphone-sdk/build-android/linphone-sdk/bin/outputs/aar/linphone-sdk-android-*.aar Xamarin/Xamarin/Liblinphone/liblinphone-sdk.aar
+    - cp linphone-sdk/build-android/linphone-sdk/android-arm64/share/linphonecs/*.cs Xamarin/Xamarin/Xamarin/
+    - cp -r linphone-sdk/build-ios/linphone-sdk/apple-darwin/Frameworks Xamarin/Xamarin/Xamarin.iOS/
+    - cd linphone-sdk
+    - GIT_DESCRIBE=$(git describe)
+    - cd ..
+    - zip -r liblinphone-xamarin-sdk-$GIT_DESCRIBE.zip Xamarin README.md
+
+  artifacts:
+    paths:
+      - liblinphone-xamarin-sdk-*.zip
+    when: always
+    expire_in: 1 week
+
+#################################################
+# Deploy
+#################################################
+
+job-deploy:
+  stage: deploy
+  tags: [ "deploy" ]
+
+  dependencies:
+    - job-package
+
+  script:
+    - scp liblinphone-xamarin-sdk-*.zip $DEPLOY_SERVER:$XAMARIN_UPLOAD_DIRECTORY/
+
+stages:
+ - build
+ - package
+ - deploy

@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:local="clr-namespace:Xamarin"
-             x:Class="Xamarin.MainPage">
+             xmlns:local="clr-namespace:TutoXamarin"
+             x:Class="TutoXamarin.MainPage">
 
     <StackLayout x:Name="stack_layout" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" Orientation="Vertical" Spacing="15">
         <Label x:Name="welcome" Text="Welcome to Linphone Xamarin!" HorizontalOptions="Center" />
@@ -21,6 +21,9 @@
         <Button x:Name="video_call" Text="Start Video Call" Clicked="OnVideoCallClicked" HorizontalOptions="Center" />
         <Label x:Name="call_status" HorizontalOptions="Center" />
         <Label x:Name="call_stats" HorizontalOptions="Center" />
+        
+        <Entry x:Name="chatMessage" Placeholder="Chat message" />
+        <Button x:Name="sendMessage" Text="Send message" Clicked="OnMessageClicked" HorizontalOptions="Center" />
 
         <StackLayout Orientation="Horizontal" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
             <Button x:Name="video" Text="Start Video" Clicked="OnVideoClicked" HorizontalOptions="Center" IsEnabled="False" />
