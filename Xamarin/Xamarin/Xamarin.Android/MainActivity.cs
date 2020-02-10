@@ -44,12 +44,6 @@ namespace TutoXamarin.Android
 
         protected override void OnCreate(Bundle bundle)
         {
-            Java.Lang.JavaSystem.LoadLibrary("c++_shared");
-            Java.Lang.JavaSystem.LoadLibrary("bctoolbox");
-            Java.Lang.JavaSystem.LoadLibrary("ortp");
-            Java.Lang.JavaSystem.LoadLibrary("mediastreamer");
-            Java.Lang.JavaSystem.LoadLibrary("linphone");
-
             TabLayoutResource = Resource.Layout.Tabbar;
             ToolbarResource = Resource.Layout.Toolbar;
 
