@@ -50,7 +50,7 @@ job-android-sdk:
 
   stage: build
   tags: [ "docker-android" ]
-  image: gitlab.linphone.org:4567/bc/public/linphone-sdk/bc-dev-android:r16b
+  image: gitlab.linphone.org:4567/bc/public/linphone-sdk/bc-dev-android:r17c
 
   variables:
     CMAKE_GENERATOR: Unix Makefiles
