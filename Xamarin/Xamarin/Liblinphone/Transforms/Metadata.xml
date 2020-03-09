@@ -53,4 +53,12 @@
   <attr path="/api/package[@name='org.linphone.core']/
         interface[@name='ChatRoomListener']/method[@name='onIsComposingReceived']"
       name="argsType">ChatRoomIsComposingReceivedEventArgs</attr>
+
+  <attr path="/api/package[@name='org.linphone.core']/
+        interface[@name='ChatRoomListener']/method[@name='onEphemeralMessageDeleted']"
+      name="argsType">ChatRooEphemeralMessageDeletedEventArgs</attr>
+
+  <attr path="/api/package[@name='org.linphone.core']/
+        interface[@name='ChatRoomListener']/method[@name='onEphemeralMessageTimerStarted']"
+      name="argsType">ChatRooEphemeralMessageTimerStartedEventArgs</attr>
 </metadata>
