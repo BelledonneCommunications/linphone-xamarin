@@ -21,6 +21,8 @@ To build the sdk, clone the linphone SDK [git repository](https://gitlab.linphon
 
 ## Getting started
 
+> This guide has been tested with Visual Studio Community 2019 (version 16.11.5) and SDK version 5.0.48 on an Android 8.1 device.
+
 ### Using our sample solution in the SDK
 
 The sample we provide is a solution using four projects: one for Android, one for iOS, one for the native libraries and a shared one.
@@ -38,11 +40,29 @@ Finally, the Liblinphone project contains the native libraries built by linphone
 
 #### For Android
 
-In the linphone sdk xamarin zip file, copy from linphone-sdk-android directory either the debug or release AAR into Xamarin\Xamarin\Liblinphone\liblinphone-sdk.aar (the name must remain the same)
+In the linphone sdk xamarin zip file, copy from linphone-sdk-android directory either the debug or release AAR into
 
-Also copy the file linphone-sdk-ios\linphone-sdk\apple-darwin\share\linphonecs\LinphoneWrapper.cs into Xamarin\Xamarin\Xamarin\LinphoneWrapper.cs (the name must remain the same)
+```
+Xamarin\Xamarin\Liblinphone\liblinphone-sdk.aar
+```
 
-That's all! Generate the solution and you can deploy the sample app on any Android device.
+Make sure the new name exactly matches the above. That is: If you decide to take the debug lib `linphone-sdk-android-debug.aar` you have to rename it to `liblinphone-sdk.aar` (Notice the added "lib" prefix).
+
+Also copy the file
+
+```
+linphone-sdk-ios\linphone-sdk\apple-darwin\share\linphonecs\LinphoneWrapper.cs
+```
+
+into
+
+```
+Xamarin\Xamarin\Xamarin\LinphoneWrapper.cs
+```
+
+(the name must remain the same)
+
+That's all! You can open the solution (or close and reopen if you already have it opened), generate the solution, and deploy the sample app on any Android device.
 
 #### For iOS
 

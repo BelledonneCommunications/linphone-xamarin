@@ -208,7 +208,7 @@ namespace TutoXamarin
                 Call call = Core.CurrentCall;
                 if (call.State == CallState.IncomingReceived)
                 {
-                    Core.AcceptCall(call);
+                    call.Accept();
                 }
                 else
                 {
@@ -233,7 +233,7 @@ namespace TutoXamarin
                 {
                     CallParams CallParams = Core.CreateCallParams(call);
                     CallParams.VideoEnabled = true;
-                    Core.AcceptCallWithParams(call, CallParams);
+                    call.AcceptWithParams(CallParams);
                 }
                 else
                 {
@@ -253,7 +253,7 @@ namespace TutoXamarin
                     CallParams param = Core.CreateCallParams(call);
                     param.VideoEnabled = !call.CurrentParams.VideoEnabled;
                     param.VideoDirection = MediaDirection.SendRecv;
-                    Core.UpdateCall(call, param);
+                    call.Update(param);
                 }
             }
         }
@@ -294,7 +294,7 @@ namespace TutoXamarin
                         }
                         Core.VideoDevice = newDevice;
 
-                        Core.UpdateCall(call, call.Params);
+                        call.Update(call.Params);
                     }
                     catch (ArithmeticException)
                     {
